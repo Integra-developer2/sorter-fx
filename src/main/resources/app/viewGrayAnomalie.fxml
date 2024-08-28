@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="appBox" alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.ctrlGrayAnomalie">
+   <children>
+      <VBox fx:id="header" alignment="CENTER">
+         <children>
+            <Label id="title" fx:id="title" alignment="TOP_CENTER" contentDisplay="CENTER" prefHeight="39.0" prefWidth="609.0" text="" textFill="#005075" VBox.vgrow="ALWAYS">
+               <font>
+                  <Font name="System Bold" size="27.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Label>
+            <Label text="VERIFICA SE I BARCODE SONO UGUALI" VBox.vgrow="ALWAYS">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <StackPane>
+               <children>
+                  <ImageView fx:id="progressImg" fitHeight="33.0" fitWidth="117.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@img/progress-00.gif" />
+                     </image>
+                  </ImageView>
+                  <Label fx:id="progressLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="35.0" prefWidth="89.0" text="0/0" StackPane.alignment="CENTER">
+                     <font>
+                        <Font size="24.0" />
+                     </font>
+                  </Label>
+               </children>
+            </StackPane>
+         </children>
+      </VBox>
+      <VBox id="body" fx:id="zoomBoxParent" alignment="CENTER" style="-fx-padding: 20;">
+         <children>
+            <HBox alignment="CENTER">
+               <children>
+                  <HBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <StackPane fx:id="parentFront" alignment="TOP_CENTER" style="-fx-background-color: #DCDCDC;" HBox.hgrow="ALWAYS">
+                           <children>
+                              <ImageView fx:id="front" pickOnBounds="true" preserveRatio="true" />
+                              <HBox maxHeight="10.0" style="-fx-padding: 10;">
+                                 <children>
+                                    <ImageView fx:id="frontLeft" fitHeight="37.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@img/rotate-left.png" />
+                                       </image>
+                                       <HBox.margin>
+                                          <Insets right="5.0" />
+                                       </HBox.margin>
+                                    </ImageView>
+                                    <ImageView fx:id="frontRight" fitHeight="37.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@img/rotate-right.png" />
+                                       </image>
+                                    </ImageView>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </StackPane>
+                     </children>
+                  </HBox>
+                  <HBox fx:id="divider" prefWidth="100.0">
+                     <children>
+                        <ImageView fx:id="dividerImg" fitHeight="1.0" fitWidth="1.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </HBox>
+                  <HBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <StackPane fx:id="parentBack" alignment="TOP_CENTER" style="-fx-background-color: #DCDCDC;" HBox.hgrow="ALWAYS">
+                           <children>
+                              <ImageView fx:id="back" pickOnBounds="true" preserveRatio="true" />
+                              <HBox maxHeight="10.0" style="-fx-padding: 10;">
+                                 <children>
+                                    <ImageView fx:id="backLeft" fitHeight="37.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@img/rotate-left.png" />
+                                       </image>
+                                       <HBox.margin>
+                                          <Insets right="5.0" />
+                                       </HBox.margin>
+                                    </ImageView>
+                                    <ImageView fx:id="backRight" fitHeight="37.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@img/rotate-right.png" />
+                                       </image>
+                                    </ImageView>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </StackPane>
+                     </children>
+                  </HBox>
+                  <VBox alignment="CENTER_RIGHT" nodeOrientation="LEFT_TO_RIGHT" prefHeight="314.0" prefWidth="66.0" HBox.hgrow="NEVER">
+                     <children>
+                        <Button fx:id="btnEqual" mnemonicParsing="false" prefHeight="88.0" prefWidth="74.0" VBox.vgrow="NEVER">
+                           <graphic>
+                              <ImageView fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@img/same.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <VBox.margin>
+                              <Insets top="50.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button fx:id="btnNotEqual" mnemonicParsing="false" VBox.vgrow="NEVER">
+                           <graphic>
+                              <ImageView fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@img/notSame.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <VBox.margin>
+                              <Insets top="50.0" />
+                           </VBox.margin>
+                        </Button>
+                     </children>
+                     <HBox.margin>
+                        <Insets left="50.0" />
+                     </HBox.margin>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <HBox fx:id="footer" alignment="CENTER_RIGHT" prefHeight="55.0" prefWidth="610.0" style="-fx-padding: 20;" VBox.vgrow="NEVER">
+         <children>
+            <Button id="btn" fx:id="btnBackwards" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" text="INDIETRO">
+               <font>
+                  <Font name="System Bold" size="21.0" />
+               </font>
+               <HBox.margin>
+                  <Insets right="30.0" />
+               </HBox.margin>
+            </Button>
+            <Button id="btn" fx:id="btnFoward" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" text="AVANTI">
+               <font>
+                  <Font name="System Bold" size="21.0" />
+               </font>
+            </Button>
+         </children>
+      </HBox>
+   </children>
+</VBox>

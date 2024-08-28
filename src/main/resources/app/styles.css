@@ -1,0 +1,58 @@
+#printPane {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #005075;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+}
+#printPane:hover {
+    -fx-background-color: #cde5f0;
+    -fx-border-color: #005075;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-cursor: hand;
+}
+#title,#body{
+    -fx-background-color: rgb(238, 238, 238);
+}
+#row{
+    -fx-background-color: white;
+    -fx-border-color: rgb(175, 175, 175);
+    -fx-border-width: 0.5px;
+    -fx-border-radius: 5px;
+    -fx-start-margin: 2px;
+    -fx-text-fill: #005075;
+}
+#row:hover{
+    -fx-background-color: #005075;
+    -fx-border-width: 0px;
+    -fx-start-margin: 2px;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+#row:hover .label {
+    -fx-text-fill: white;
+}
+#row .label {
+    -fx-text-fill:#005075;
+}
+#stockNumber {
+    -fx-border-width: 0;
+    -fx-prompt-text-fill: grey;
+}
+#stockNumber .text-field .prompt-text {
+    -fx-fill: #005075;
+    -fx-font-size: 16px;
+    -fx-opacity: 1.0;
+}
+#btn{
+    -fx-background-color:#005075;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+#btn:hover{
+    -fx-opacity: 0.4;
+}
+#btn .label {
+    -fx-text-fill: white;
+}
+

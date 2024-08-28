@@ -1,0 +1,10 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.jdt.ls.java.home": "C:\\Java\\jdk22",
+    "maven.home": "C:\\Maven\\apache-maven-3.9.8",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.project.referencedLibraries": [
+        "C:/Java/javafx-sdk-22.0.2/lib/*.jar",
+    ],
+    "java.debug.settings.onBuildFailureProceed": true
+}
