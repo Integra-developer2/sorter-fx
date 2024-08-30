@@ -107,7 +107,7 @@ public class ctrlStockAnomalie2 implements Initializable {
             pallet1.setCellValueFactory(cellData -> cellData.getValue().pallet1());
             box2.setCellValueFactory(cellData -> cellData.getValue().box2());
             pallet2.setCellValueFactory(cellData -> cellData.getValue().pallet2());
-    
+
             tableView.setItems(objAnomalies.stock2);
             tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
             centerAlignColumn(id);
@@ -141,7 +141,7 @@ public class ctrlStockAnomalie2 implements Initializable {
 
         if(start[0]){
             for (modelEtichette2 obj : objAnomalies.stock2) {
-                moveStock2(obj.group(), obj.fileList(), "target");
+                moveStock2(obj.group(), obj.fileList(), "log");
             }
             objAnomalies.clear();
             writeEtichette();
@@ -256,13 +256,13 @@ public class ctrlStockAnomalie2 implements Initializable {
                     shootButtonContainer.setAlignment(Pos.CENTER);
                     shootButtonContainer.getChildren().add(shootButton);
                     shootButton.setStyle("-fx-background-color: transparent;");
-                    
+
                     Image deleteIcon = new Image(getClass().getResourceAsStream("/app/img/shoot.png"));
                     ImageView imageView = new ImageView(deleteIcon);
                     imageView.setFitWidth(20);
                     imageView.setFitHeight(20);
                     shootButton.setGraphic(imageView);
-                    
+
                     shootButton.setOnAction(event -> {
                         modelEtichette2 currentItem = getTableView().getItems().get(getIndex());
                         shootList.clear();
@@ -287,41 +287,43 @@ public class ctrlStockAnomalie2 implements Initializable {
             };
         });
 
-        shoot2.setCellFactory(param -> new TableCell<modelEtichette2, Void>() {
-            private final HBox shootButtonContainer = new HBox();
-            private final javafx.scene.control.Button shootButton = new javafx.scene.control.Button();
-            {
-                shootButtonContainer.setAlignment(Pos.CENTER);
-                shootButtonContainer.getChildren().add(shootButton);
-                shootButton.setStyle("-fx-background-color: transparent;");
+        shoot2.setCellFactory(param ->  {
+            return new TableCell<modelEtichette2, Void>() {
+                private final HBox shootButtonContainer = new HBox();
+                private final javafx.scene.control.Button shootButton = new javafx.scene.control.Button();
+                {
+                    shootButtonContainer.setAlignment(Pos.CENTER);
+                    shootButtonContainer.getChildren().add(shootButton);
+                    shootButton.setStyle("-fx-background-color: transparent;");
 
-                Image deleteIcon = new Image(getClass().getResourceAsStream("/app/img/shoot.png"));
-                ImageView imageView = new ImageView(deleteIcon);
-                imageView.setFitWidth(20);
-                imageView.setFitHeight(20);
-                shootButton.setGraphic(imageView);
+                    Image deleteIcon = new Image(getClass().getResourceAsStream("/app/img/shoot.png"));
+                    ImageView imageView = new ImageView(deleteIcon);
+                    imageView.setFitWidth(20);
+                    imageView.setFitHeight(20);
+                    shootButton.setGraphic(imageView);
 
-                shootButton.setOnAction(event -> {
-                    modelEtichette2 currentItem = getTableView().getItems().get(getIndex());
-                    shootList.clear();
-                    for (String barcode : currentItem.barcodeList()) {
-                        shootList.add(new modelEtichetteSoot(barcode));
-                        findList.add(barcode);
-                    }
-                    shootingRow=currentItem.row2();
-                    shootingId=currentItem.intId();
-                    load("viewStockAnomalie2Shoot");
-                });
-            }
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(shootButtonContainer);
+                    shootButton.setOnAction(event -> {
+                        modelEtichette2 currentItem = getTableView().getItems().get(getIndex());
+                        shootList.clear();
+                        for (String barcode : currentItem.barcodeList()) {
+                            shootList.add(new modelEtichetteSoot(barcode));
+                            findList.add(barcode);
+                        }
+                        shootingRow=currentItem.row2();
+                        shootingId=currentItem.intId();
+                        load("viewStockAnomalie2Shoot");
+                    });
                 }
-            }
+                @Override
+                protected void updateItem(Void item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        setGraphic(shootButtonContainer);
+                    }
+                }
+            };
         });
     }
 

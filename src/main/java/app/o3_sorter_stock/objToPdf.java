@@ -1,11 +1,11 @@
 package app.o3_sorter_stock;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 public class objToPdf {
-    public static ConcurrentHashMap<String, String> list = new ConcurrentHashMap<>();
+    public static HashMap<String, String> list = new HashMap<>();
     public static void add(String from, String to){
-        if(!list.contains(from)){
+        if(!list.containsKey(from)){
             list.put(from, to);
         }
     }

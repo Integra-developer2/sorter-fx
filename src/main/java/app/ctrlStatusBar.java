@@ -298,7 +298,7 @@ public class ctrlStatusBar implements Initializable {
                     };
                 }
             };
-            
+
             setupServices();
             startService();
         } catch (Exception e) {

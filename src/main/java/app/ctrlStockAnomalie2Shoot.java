@@ -1,6 +1,5 @@
 package app;
 
-import java.io.File;
 import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -44,25 +43,13 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
         btnBackwards.setOnAction(event->btnBackwards());
         findBarcodes.setCellValueFactory(cellData -> cellData.getValue().barcode());
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        searchBarcodes.setOnKeyPressed(event -> {
-            switch (event.getCode()) {
-                case ENTER -> {
-                    String fullText = searchBarcodes.getText();
-                    String[] lines = fullText.split("\n");
-                    String lastLine = lines[lines.length - 1];
-                    searchBarcodes(lastLine);
-                }
-                default -> {
-                }
-            }
-        });
         searchBarcodes.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.contains("\n")) {
                 String[] lines = newValue.split("\n");
                 String lastLine = lines[lines.length - 1];
                 searchBarcodes(lastLine);
             }
-        });        
+        });
         centerAlignColumn(findBarcodes);
     }
 
@@ -166,9 +153,12 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
     }
 
     private void finish(){
-        btnBackwards();
-        if(!new File(objGlobals.anomalyFolderStock2).exists()){
+        if(objAnomalies.stock2.isEmpty()){
+            objGlobals.skipAnomalies=true;
             load("viewStatusBar");
+        }
+        else{
+            btnBackwards();
         }
     }
 

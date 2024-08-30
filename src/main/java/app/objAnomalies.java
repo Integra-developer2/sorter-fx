@@ -104,7 +104,7 @@ public class objAnomalies extends functions{
 
     public static boolean hasStockAnomaly(){
         try {
-            objToPdf.clear();
+            //objToPdf.clear();
             objAnomalies.clear();
             objEtichetta.clear();
             objDoneStockNumber.clear();
@@ -343,7 +343,7 @@ public class objAnomalies extends functions{
 
         for (Integer row1 : notExpected.keySet()){
             objNotExpected obj = notExpected.get(row1);
-            addStock2(id++,obj);
+            addStock2(++id,obj);
         }
     }
 
