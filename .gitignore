@@ -3,3 +3,8 @@
 target/
 assets/
 com/
+javafx/
+META-INF/
+org/
+profiles/
+test/

@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import app.o2_sorter_gray.objConcurrentBlackController;
+import static app.o3_sorter_stock.functions.strPad;
 import app.o3_sorter_stock.objBlackFiles;
 import app.o3_sorter_stock.objDonePdf;
 import app.o3_sorter_stock.objDoneStock;
@@ -462,7 +463,7 @@ public class functions {
                                 if(stock.isEmpty()){
                                     if(isFirst){
                                         isFirst=false;
-                                        stock=objGlobals.stockPrefix + objGlobals.stockNumber;
+                                        stock=strPad(String.valueOf(objGlobals.stockPrefix + objGlobals.stockNumber),4,"0");
                                     }
                                     else{
                                         stock = objGlobals.stockPrefix + objDoneStock.getNext();

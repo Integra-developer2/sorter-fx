@@ -1,12 +1,9 @@
 package app.o3_sorter_stock;
 
-import java.io.File;
+import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import com.opencsv.CSVWriter;
 
 import static app.functions.logError;
 import static app.functions.printError;
@@ -47,28 +44,20 @@ public class EntryPoint extends functions{
     }
 
     public static void makeSorterExport(){
+        String header = "N.Pacco-Anno;Sequenza nel Pacco;Barcode";
         for(String folder : objSorterExport.list.keySet()){
-            File csvFileFile = new File(objGlobals.sorterExport+folder+".csv");
-            String csvFile = csvFileFile.toString();
-            String[] header = {"N.Pacco-Anno", "Sequenza nel Pacco", "Barcode"};
-            try (
-                CSVWriter writer = new CSVWriter(new FileWriter(csvFile), ';',
-                CSVWriter.NO_QUOTE_CHARACTER,
-                CSVWriter.DEFAULT_ESCAPE_CHARACTER,
-                CSVWriter.DEFAULT_LINE_END)
-            ) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(objGlobals.sorterExport+folder+".csv"))) {
                 HashMap<String, ArrayList<String[]>> keys = objSorterExport.list.get(folder);
                 for (String key : keys.keySet()) {
-                    String[] firstRow = new String[]{objGlobals.sorterExportTitolo+":", key};
-                    writer.writeNext(firstRow);
-                    writer.writeNext(header);
+                    writer.append("Soggetto: "+key).append(System.lineSeparator());
+                    writer.append(header).append(System.lineSeparator());
                     for (String[] row : keys.get(key)) {
-                        writer.writeNext(row);
+                        writer.append(String.join(";",row)).append(System.lineSeparator());
                     }
-                    writer.writeNext(new String[]{});
                 }
-            } catch (IOException e) {
-                printError("makeSorterExport",e,true);
+                writer.append(System.lineSeparator());
+            } catch (Exception e) {
+                printError(e, true);
             }
         }
     }

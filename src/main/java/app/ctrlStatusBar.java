@@ -457,9 +457,13 @@ public class ctrlStatusBar implements Initializable {
                     Platform.runLater(()->{completeMoveFiles();completeGray();});
                     grayAnomaliesService.start();
                 }
-                else{
+                else if(!objGlobals.skipAnomalies){
                     Platform.runLater(()->{completeMoveFiles();completeGray();completeGrayAnomalies();});
                     stockAnomaliesService.start();
+                }
+                else{
+                    Platform.runLater(()->{completeMoveFiles();completeGray();completeGrayAnomalies();completeStockAnomalies();completeStockAnomalies2();});
+                    stockService.start();
                 }
             } else {
                 Platform.runLater(()->{

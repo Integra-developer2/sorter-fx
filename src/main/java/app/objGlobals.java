@@ -29,7 +29,6 @@ public class objGlobals {
     public static int backAngle=270;
     public static String scanditProgram="it.smaart.sorter.stock";
     public static String scanditKey="test.key";
-    public static String sorterExportTitolo="Soggetto";
     public static String sorterExportValoreDaSorter="C";
     public static String[] raggruppamentoJobSorter={"C"};
     public static String nomeCartellaPdf="{SC}/{F6}-sorter-{D1::uppercase::noNumber}-{F5}-{ANNO}-{NUMERO_PACCO}.pdf";
