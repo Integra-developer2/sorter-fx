@@ -463,7 +463,7 @@ public class functions {
                                 if(stock.isEmpty()){
                                     if(isFirst){
                                         isFirst=false;
-                                        stock=strPad(String.valueOf(objGlobals.stockPrefix + objGlobals.stockNumber),4,"0");
+                                        stock=objGlobals.stockPrefix + strPad(String.valueOf( objGlobals.stockNumber),4,"0");
                                     }
                                     else{
                                         stock = objGlobals.stockPrefix + objDoneStock.getNext();

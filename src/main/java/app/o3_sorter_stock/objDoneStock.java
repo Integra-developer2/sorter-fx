@@ -3,6 +3,8 @@ package app.o3_sorter_stock;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.locks.ReentrantLock;
 
+import app.objGlobals;
+
 public class objDoneStock extends functions{
     public static String lastNumber;
     private static final ConcurrentLinkedDeque<String> list = new ConcurrentLinkedDeque<>();
@@ -24,6 +26,12 @@ public class objDoneStock extends functions{
         } finally {
             lock.unlock();
         }
+    }
+
+    public static void clear(){
+        list.clear();
+        lastNumber=String.valueOf(objGlobals.stockNumber);
+        add(String.valueOf(objGlobals.stockNumber));
     }
 
 }

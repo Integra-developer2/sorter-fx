@@ -6,17 +6,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static app.functions.logError;
+import static app.functions.makeStockNumber;
 import static app.functions.printError;
+import app.objAnomalies;
 import app.objGlobals;
 
 public class EntryPoint extends functions{
 
     public static void start() {
         try {
-            write("primo: "+objGlobals.stockPrefix + strPad(String.valueOf(objGlobals.stockNumber),4,"0"), objGlobals.stockTxt);
-            makePdfMulti(new StepController());
-            makeSorterExport();
-            write("ultimo: "+objGlobals.stockPrefix + objDoneStock.lastNumber, objGlobals.stockTxt);
+            objToPdf.clear();
+            objDoneStock.clear();
+            if(objAnomalies.hasStockAnomaly()){
+                printError( new Exception("hasStockAnomaly() should be empty"),true);
+            }
+            else{
+                write("primo: "+objGlobals.stockPrefix + strPad(String.valueOf(objGlobals.stockNumber),4,"0"), objGlobals.stockTxt);
+                makeStockNumber();
+                makePdfMulti(new StepController());
+                makeSorterExport();
+                write("ultimo: "+objGlobals.stockPrefix + objDoneStock.lastNumber, objGlobals.stockTxt);
+            }
         } catch (Exception e) {
             printError("error",e,true);
         }
