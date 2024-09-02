@@ -86,18 +86,8 @@ public class ctrlStockAnomalie2 implements Initializable {
             }
 
         }
-        objAnomalies.unExpectedGroups.clear();
-        if(objAnomalies.stock2.isEmpty()){
-            writeEtichette();
-            if(ls(objGlobals.anomalyFolderStock2, ".tiff").isEmpty()){
-                deleteFolder(objGlobals.anomalyFolderStock2);
-                objAnomalies.clear();
-            }
-            else{
-                printError(new Exception(" ANOMALA ctrlStockAnomalie2: 94"),true);
-            }
-        }
-        else if(start[0]){
+        if(start[0]){
+            objAnomalies.unExpectedGroups.clear();
             tableView.setEditable(true);
             addShootButtonToTable();
             btnFoward.setOnAction(event -> btnFoward());

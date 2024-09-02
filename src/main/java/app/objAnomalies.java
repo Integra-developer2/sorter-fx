@@ -104,7 +104,6 @@ public class objAnomalies extends functions{
 
     public static boolean hasStockAnomaly(){
         try {
-            //objToPdf.clear();
             objAnomalies.clear();
             objEtichetta.clear();
             objDoneStockNumber.clear();
