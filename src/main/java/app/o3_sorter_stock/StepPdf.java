@@ -17,6 +17,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
+import static app.functions.isHorizontal;
 import static app.functions.logError;
 import app.objGlobals;
 
@@ -117,19 +118,7 @@ public class StepPdf extends functions {
             rotateWithJai(path, Math.toRadians(degrees));
         }
     }
-    public static Boolean isHorizontal(String path) {
-        try {
-            File fpath = new File(path);
-            try {
-                SimpleImageInfo imageInfo = new SimpleImageInfo(fpath);
-                return imageInfo.getWidth() > imageInfo.getHeight();
-            } catch (IOException var3) {
-                return null;
-            }
-        } catch (Exception var4) {
-            return null;
-        }
-    }
+
     public static void rotateWithJai(String path, double radians) {
         try {
             File inputFile = new File(path);

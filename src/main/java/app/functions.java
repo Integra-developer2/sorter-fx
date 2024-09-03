@@ -5,7 +5,6 @@ import java.io.BufferedReader;
 import static app.o3_sorter_stock.functions.delete;
 import static app.o3_sorter_stock.functions.fileExists;
 import static app.o3_sorter_stock.functions.getBarcodeFromBlackFile;
-import static app.o3_sorter_stock.functions.getGroup;
 import static app.o3_sorter_stock.functions.getIndexFromBlackFile;
 import static app.o3_sorter_stock.functions.letterToIndex;
 import static app.o3_sorter_stock.functions.moveFiles;
@@ -34,6 +33,8 @@ import java.util.regex.Pattern;
 
 import app.o2_sorter_gray.objConcurrentBlackController;
 import static app.o3_sorter_stock.functions.strPad;
+
+import app.o3_sorter_stock.SimpleImageInfo;
 import app.o3_sorter_stock.objBlackFiles;
 import app.o3_sorter_stock.objDonePdf;
 import app.o3_sorter_stock.objDoneStock;
@@ -140,16 +141,10 @@ public class functions {
 
     public static void logError(String text, Exception e){
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(objGlobals.errorLog,true))) {
-            System.out.println("----------------------------------------------------------------------------------------------------------------------------------");
-            System.out.println(text+";"+e.toString());
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            String stackTrace = sw.toString();
-            System.out.println(text+";"+stackTrace);
-            System.out.println("----------------------------------------------------------------------------------------------------------------------------------");
-
-            writer.append(text+";"+e.toString());
+            writer.append(text+";"+e.toString()).append(System.lineSeparator());
         } catch (Exception ee) {
             alert("ERROR LOG",ee.toString());
         }
@@ -485,6 +480,20 @@ public class functions {
                     index++;
                 }
             }
+        }
+    }
+
+    public static Boolean isHorizontal(String path) {
+        try {
+            File fpath = new File(path);
+            try {
+                SimpleImageInfo imageInfo = new SimpleImageInfo(fpath);
+                return imageInfo.getWidth() > imageInfo.getHeight();
+            } catch (IOException var3) {
+                return null;
+            }
+        } catch (Exception var4) {
+            return null;
         }
     }
 

@@ -6,11 +6,9 @@ import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 
 import static app.functions.load;
-import static app.functions.ls;
 import static app.functions.moveStock2;
 import static app.functions.alert;
 import static app.functions.confirm;
-import static app.functions.deleteFolder;
 import static app.functions.printError;
 import static app.functions.writeEtichette;
 

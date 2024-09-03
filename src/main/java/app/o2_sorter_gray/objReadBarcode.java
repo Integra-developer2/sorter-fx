@@ -80,13 +80,14 @@ public class objReadBarcode extends functions{
         }
         return current;
     }
-    
+
     public ArrayList<String> readBarCodes(String path, String bcType){
         ArrayList<String> ret = new ArrayList<>();
         char unity = path.charAt(0);
         String wslPath = path.replace(unity+":", "/mnt/"+Character.toLowerCase(unity)).replace("\\","/");
         String command = "wsl /srv/scandit_multiple/"+objGlobals.scanditProgram+" /srv/scandit_multiple/"+objGlobals.scanditKey+" /srv/scandit_multiple/codes_"+bcType+".settings \""+wslPath+"\"";
         try {
+            @SuppressWarnings("deprecation")
             Process process = Runtime.getRuntime().exec(command);
             int exitCode = process.waitFor();
             if (exitCode != 0) {
@@ -97,7 +98,7 @@ public class objReadBarcode extends functions{
                     String line;
                     while ((line = reader.readLine()) != null) {
                         ret=readLine(line,ret);
-                    }           
+                    }
                 } catch (Exception ee) { logError("path:"+path+"readBarCodes",ee);}
             }
         } catch (IOException | InterruptedException e) {
