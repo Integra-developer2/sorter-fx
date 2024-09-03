@@ -378,6 +378,16 @@ public class functions{
             } catch (IOException e) {
                 throw e;
             }
+
+            mkdir(objGlobals.allBlackFiles.toString());
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(objGlobals.allBlackFiles.toString()))) {
+                for (String file : objBlackFiles.paths) {
+                    writer.append(file).append(System.lineSeparator());
+                }
+            } catch (Exception e) {
+                throw e;
+            }
+
         }
     }
 }

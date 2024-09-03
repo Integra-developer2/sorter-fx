@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -592,4 +593,30 @@ public class functions {
         moveFile(from+"-RETRO.tiff", to+"-RETRO.tiff");
     }
 
+    public static void writeAllBlackFiles(){
+        if(!objGlobals.allBlackFiles.exists()){
+            ConcurrentLinkedQueue<String> files = new ConcurrentLinkedQueue<>();
+            try {
+                Files.walkFileTree(Paths.get(objGlobals.targetTiff), new SimpleFileVisitor<Path>()  {
+                    @Override
+                    public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+                        files.add(path.toString());
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+            } catch (IOException e) {
+                printError(e, true);
+            }
+
+            mkdir(objGlobals.allBlackFiles.toString());
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(objGlobals.allBlackFiles.toString()))) {
+                for (String file : files) {
+                    writer.append(file).append(System.lineSeparator());
+                }
+            } catch (Exception e) {
+                printError(e, true);
+            }
+        }
+
+    }
 }

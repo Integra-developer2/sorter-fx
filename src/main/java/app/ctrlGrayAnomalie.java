@@ -61,6 +61,8 @@ public class ctrlGrayAnomalie implements Initializable{
     @FXML
     private Label progressLabel;
     @FXML
+    private Label fileName;
+    @FXML
     private Button btnBackwards;
     @FXML
     private Button btnFoward;
@@ -207,7 +209,7 @@ public class ctrlGrayAnomalie implements Initializable{
         }
         else{
             imageView.fitHeightProperty().bind(Bindings.createDoubleBinding(
-                () -> (appBox.getHeight()*0.9) - header.getHeight() - footer.getHeight(),
+                () -> (appBox.getHeight()*0.8) - header.getHeight() - footer.getHeight(),
                 appBox.heightProperty(),
                 header.heightProperty(),
                 footer.heightProperty()
@@ -237,6 +239,7 @@ public class ctrlGrayAnomalie implements Initializable{
     }
 
     private void rotateImageView(ImageView imageView, double angle) {
+        resetImageView(imageView);
         imageView.getTransforms().clear();
         double pivotX = imageView.getBoundsInParent().getWidth() / 2;
         double pivotY = imageView.getBoundsInParent().getHeight() / 2;
@@ -305,10 +308,14 @@ public class ctrlGrayAnomalie implements Initializable{
         try {
             File fileFront = files.get(count).fileFront;
             File fileBack = files.get(count).fileBack;
+            String file = fileFront.toString().replace("-FRONTE.tiff", "").replace(objGlobals.anomalyFolderGray, "");
+            resetImageView(front);
+            resetImageView(back);
             bindImageViewToParent(front,isHorizontal(fileFront.toString()),parentFront);
             bindImageViewToParent(back,isHorizontal(fileBack.toString()),parentBack);
             front.setImage(loadTiffAsImage(fileFront));
             back.setImage(loadTiffAsImage(fileBack));
+            fileName.setText(file);
         } catch (Exception e) {
             printError(e,false);
         }
@@ -335,6 +342,14 @@ public class ctrlGrayAnomalie implements Initializable{
                 progressImg.setImage(new Image(App.class.getResource("img/progress-10.gif").toExternalForm()));
             }
         });
+    }
+
+    private void resetImageView(ImageView imageView) {
+        imageView.setScaleX(1.0);
+        imageView.setScaleY(1.0);
+        imageView.setTranslateX(0);
+        imageView.setTranslateY(0);
+        imageView.getTransforms().clear();
     }
 
     private void btnFoward(){
