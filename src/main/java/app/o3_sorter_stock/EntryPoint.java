@@ -59,11 +59,12 @@ public class EntryPoint extends functions{
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(objGlobals.sorterExport+folder+".csv"))) {
                 HashMap<String, ArrayList<String[]>> keys = objSorterExport.list.get(folder);
                 for (String key : keys.keySet()) {
-                    writer.append("Soggetto: "+key).append(System.lineSeparator());
+                    writer.append("soggetto;"+key).append(System.lineSeparator());
                     writer.append(header).append(System.lineSeparator());
                     for (String[] row : keys.get(key)) {
                         writer.append(String.join(";",row)).append(System.lineSeparator());
                     }
+                    writer.append(System.lineSeparator());
                 }
                 writer.append(System.lineSeparator());
             } catch (Exception e) {
