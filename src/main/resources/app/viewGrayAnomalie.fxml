@@ -32,12 +32,12 @@
             </Label>
             <StackPane>
                <children>
-                  <ImageView fx:id="progressImg" fitHeight="33.0" fitWidth="117.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="progressImg" fitHeight="33.0" fitWidth="239.0" pickOnBounds="true">
                      <image>
                         <Image url="@img/progress-00.gif" />
                      </image>
                   </ImageView>
-                  <Label fx:id="progressLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="35.0" prefWidth="89.0" text="0/0" StackPane.alignment="CENTER">
+                  <Label fx:id="progressLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="35.0" prefWidth="240.0" text="0/0" StackPane.alignment="CENTER">
                      <font>
                         <Font size="24.0" />
                      </font>
@@ -140,6 +140,14 @@
                   </VBox>
                </children>
             </HBox>
+            <Label fx:id="fileName" text="FILE" VBox.vgrow="ALWAYS">
+               <VBox.margin>
+                  <Insets top="50.0" />
+               </VBox.margin>
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
          </children>
       </VBox>
       <HBox fx:id="footer" alignment="CENTER_RIGHT" prefHeight="55.0" prefWidth="610.0" style="-fx-padding: 20;" VBox.vgrow="NEVER">

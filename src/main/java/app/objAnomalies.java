@@ -35,7 +35,6 @@ import app.o3_sorter_stock.objDoneStockNumber;
 import app.o3_sorter_stock.objEtichetta;
 import app.o3_sorter_stock.objJobSorterGrouped;
 import app.o3_sorter_stock.objSorterExport;
-import app.o3_sorter_stock.objToPdf;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
