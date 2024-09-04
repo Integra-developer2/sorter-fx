@@ -16,6 +16,8 @@ import static app.functions.moveStock2;
 import static app.functions.printError;
 import static app.functions.writeEtichette;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -27,17 +29,22 @@ import javafx.scene.control.TextArea;
 
 public class ctrlStockAnomalie2Shoot implements Initializable{
     @FXML
-    private TableView<modelEtichetteSoot> tableView;
+    private TableView<modelEtichetteShoot> tableView;
     @FXML
-    private TableColumn<modelEtichetteSoot, String> findBarcodes;
+    private TableColumn<modelEtichetteShoot, String> findBarcodes;
+    @FXML
+    private TableView<modelEtichetteShootNotFound> tableView1;
+    @FXML
+    private TableColumn<modelEtichetteShootNotFound, String> notFound;
     @FXML
     private TextArea searchBarcodes;
     @FXML
     private Button btnFoward;
     @FXML
     private Button btnBackwards;
+    private final ObservableList<modelEtichetteShootNotFound> notFoundList = FXCollections.observableArrayList();
 
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({ "deprecation", "static-access" })
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         tableView.setItems(shootList);
@@ -50,14 +57,36 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
                 String[] lines = newValue.split("\n");
                 String lastLine = lines[lines.length - 1];
                 searchBarcodes(lastLine);
+                javafx.application.Platform.runLater(() -> searchBarcodes.clear());
             }
         });
         centerAlignColumn(findBarcodes);
+        tableView1.setItems(notFoundList);
+        notFound.setCellValueFactory(data -> data.getValue().barcode());
+        tableView1.setColumnResizePolicy(tableView1.CONSTRAINED_RESIZE_POLICY);
     }
 
-    private void centerAlignColumn(TableColumn<modelEtichetteSoot, String> column) {
+    private void centerAlignColumn(TableColumn<modelEtichetteShoot, String> column) {
         column.setCellFactory(tc -> {
-            TableCell<modelEtichetteSoot, String> cell = new TableCell<modelEtichetteSoot, String>() {
+            TableCell<modelEtichetteShoot, String> cell = new TableCell<modelEtichetteShoot, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item);
+                        setAlignment(Pos.CENTER);
+                    }
+                }
+            };
+            return cell;
+        });
+    }
+
+    private void centerAlignColumnNotFound(TableColumn<modelEtichetteShootNotFound, String> column) {
+        column.setCellFactory(tc -> {
+            TableCell<modelEtichetteShootNotFound, String> cell = new TableCell<modelEtichetteShootNotFound, String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
@@ -102,6 +131,10 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
                 objAnomalies.stock2.remove(obj);
                 finish();
             }
+        }
+        else{
+            notFoundList.add(new modelEtichetteShootNotFound(cleanBarcode));
+            centerAlignColumnNotFound(notFound);
         }
     }
 
@@ -168,4 +201,5 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
     private void btnBackwards(){
         load("viewStockAnomalie2",1000,600);
     }
+
 }

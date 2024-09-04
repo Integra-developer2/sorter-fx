@@ -56,7 +56,7 @@ public class ctrlStockAnomalie2 implements Initializable {
     private HBox printPane;
     @FXML
     private Button btnFoward;
-    public static ObservableList<modelEtichetteSoot> shootList = FXCollections.observableArrayList(); 
+    public static ObservableList<modelEtichetteShoot> shootList = FXCollections.observableArrayList();
     public static ArrayList<String> findList = new ArrayList<>();
     public static Integer shootingRow;
     public static Integer shootingId;
@@ -255,7 +255,7 @@ public class ctrlStockAnomalie2 implements Initializable {
                         modelEtichette2 currentItem = getTableView().getItems().get(getIndex());
                         shootList.clear();
                         for (String barcode : currentItem.barcodeList()) {
-                            shootList.add(new modelEtichetteSoot(barcode));
+                            shootList.add(new modelEtichetteShoot(barcode));
                             findList.add(barcode);
                         }
                         shootingRow=currentItem.row1();
@@ -294,7 +294,7 @@ public class ctrlStockAnomalie2 implements Initializable {
                         modelEtichette2 currentItem = getTableView().getItems().get(getIndex());
                         shootList.clear();
                         for (String barcode : currentItem.barcodeList()) {
-                            shootList.add(new modelEtichetteSoot(barcode));
+                            shootList.add(new modelEtichetteShoot(barcode));
                             findList.add(barcode);
                         }
                         shootingRow=currentItem.row2();
