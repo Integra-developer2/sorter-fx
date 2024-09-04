@@ -25,27 +25,43 @@
          </HBox>
       </VBox>
       <VBox alignment="CENTER" prefHeight="400.0" prefWidth="246.0" VBox.vgrow="ALWAYS">
-         <HBox prefHeight="405.0" prefWidth="562.0">
+         <HBox prefHeight="405.0" prefWidth="562.0" VBox.vgrow="ALWAYS">
             <children>
-               <TableView fx:id="tableView" editable="true" prefHeight="398.0" prefWidth="282.0">
+               <TableView fx:id="tableView" editable="true" prefHeight="398.0" prefWidth="337.0" HBox.hgrow="ALWAYS">
                   <columns>
                      <TableColumn fx:id="findBarcodes" editable="false" minWidth="175.0" prefWidth="175.0" text="TROVA BARCODES" />
                   </columns>
                </TableView>
-               <VBox alignment="CENTER" prefHeight="100.0" prefWidth="285.0">
+               <VBox prefHeight="398.0" prefWidth="338.0" HBox.hgrow="ALWAYS">
                   <children>
-                     <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="24.0" prefWidth="306.0" text="CERCA BARCODES" VBox.vgrow="ALWAYS">
-                        <font>
-                           <Font name="System Bold" size="13.0" />
-                        </font>
-                        <padding>
-                           <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
-                        </padding>
-                     </Label>
-                     <TextArea fx:id="searchBarcodes" prefHeight="409.0" prefWidth="286.0" />
+                     <VBox alignment="CENTER" prefHeight="76.0" prefWidth="234.0" VBox.vgrow="ALWAYS">
+                        <children>
+                           <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="24.0" prefWidth="306.0" text="CERCA BARCODE" VBox.vgrow="ALWAYS">
+                              <font>
+                                 <Font name="System Bold" size="13.0" />
+                              </font>
+                              <padding>
+                                 <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
+                              </padding>
+                           </Label>
+                           <TextArea fx:id="searchBarcodes" prefHeight="52.0" prefWidth="219.0" VBox.vgrow="ALWAYS" />
+                        </children>
+                     </VBox>
+                     <VBox prefHeight="322.0" prefWidth="234.0" VBox.vgrow="ALWAYS">
+                        <children>
+                           <TableView fx:id="tableView1" editable="false" prefHeight="322.0" prefWidth="234.0" VBox.vgrow="ALWAYS">
+                              <columns>
+                                 <TableColumn fx:id="notFound" editable="false" minWidth="175.0" prefWidth="175.0" text="NON TROVATI" />
+                              </columns>
+                              <VBox.margin>
+                                 <Insets top="20.0" />
+                              </VBox.margin>
+                           </TableView>
+                        </children>
+                     </VBox>
                   </children>
                   <HBox.margin>
-                     <Insets left="30.0" />
+                     <Insets left="10.0" />
                   </HBox.margin>
                </VBox>
             </children>
@@ -53,9 +69,9 @@
       </VBox>
       <VBox alignment="CENTER_RIGHT" VBox.vgrow="ALWAYS">
          <children>
-            <HBox prefHeight="62.0" prefWidth="412.0">
+            <HBox alignment="CENTER" prefHeight="62.0" prefWidth="412.0" VBox.vgrow="ALWAYS">
                <children>
-                  <Button fx:id="btnBackwards" alignment="CENTER" prefHeight="59.0" prefWidth="263.0" style="-fx-background-color: #005075;" text="INDIETRO" textFill="WHITE">
+                  <Button fx:id="btnBackwards" alignment="CENTER" prefHeight="59.0" prefWidth="263.0" style="-fx-background-color: #005075;" text="INDIETRO" textFill="WHITE" HBox.hgrow="NEVER">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
@@ -66,7 +82,7 @@
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Button>
-                  <Button fx:id="btnFoward" alignment="CENTER" prefHeight="59.0" prefWidth="263.0" style="-fx-background-color: #005075;" text="AVANTI" textFill="WHITE">
+                  <Button fx:id="btnFoward" alignment="CENTER" prefHeight="59.0" prefWidth="263.0" style="-fx-background-color: #005075;" text="AVANTI" textFill="WHITE" HBox.hgrow="NEVER">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
