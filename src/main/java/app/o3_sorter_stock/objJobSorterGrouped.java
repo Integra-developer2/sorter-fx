@@ -41,8 +41,12 @@ public class objJobSorterGrouped {
     }
 
     public static void alternative(String a, String b){
-        alternative.put(a, b);
-        parent.put(b,a);
+        if(!a.isEmpty()){
+            alternative.put(a, b);
+        }
+        if(!b.isEmpty()){
+            parent.put(b,a);
+        }
     }
 
     public static String getAlternative(String barcode){
@@ -53,6 +57,14 @@ public class objJobSorterGrouped {
             ret = parent.get(barcode);
         }
         return ret;
+    }
+
+    public static String getParent(String barcode){
+        String ret = "";
+        if(alternative.containsKey(barcode)){
+            ret = alternative.get(barcode);
+        }
+        return ((ret.isEmpty())?barcode:ret);
     }
 
     public static void clear(){

@@ -464,6 +464,10 @@ public class functions {
                                 String filenameReplaced = tagReplace(barcode, fullFilename, stock);
                                 File fileTo = new File(objGlobals.pdfFolder,filenameReplaced);
                                 String to = fileTo.toString();
+                                if(baseName.contains("\\consegnato\\")){
+                                    String parentBarcode = objJobSorterGrouped.getParent(barcode);
+                                    to=to.replace(barcode, parentBarcode);
+                                }
                                 objToPdf.add(baseName, to);
                                 objDoneStockNumber.add(barcode);
                             }
