@@ -68,6 +68,37 @@
             </HBox>
             <HBox id="row1" alignment="CENTER" minHeight="50.0" prefHeight="50.0" VBox.vgrow="ALWAYS">
                <children>
+                  <Label alignment="CENTER" prefHeight="50.0" prefWidth="300.0" text="CONTROLLO DEI GRIGI" HBox.hgrow="ALWAYS">
+                     <font>
+                        <Font size="25.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblGray" alignment="CENTER" contentDisplay="CENTER" prefHeight="50.0" prefWidth="160.0" text="in attesa" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                     <font>
+                        <Font name="System Bold Italic" size="20.0" />
+                     </font>
+                  </Label>
+                  <StackPane prefHeight="50.0" prefWidth="34.0" HBox.hgrow="NEVER">
+                     <children>
+                        <ImageView fx:id="imgGray" fitHeight="40.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@img/edit.gif" />
+                           </image>
+                        </ImageView>
+                        <Label fx:id="plGray" text="0.00%" visible="false">
+                           <font>
+                              <Font name="System Bold" size="20.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </StackPane>
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
+            <HBox id="row1" alignment="CENTER" minHeight="50.0" prefHeight="50.0" VBox.vgrow="ALWAYS">
+               <children>
                   <Label alignment="CENTER" prefHeight="53.0" prefWidth="319.0" text="ANOMALIE GRIGI" HBox.hgrow="ALWAYS">
                      <font>
                         <Font size="25.0" />
@@ -161,37 +192,6 @@
                            </image>
                         </ImageView>
                         <Label fx:id="plStock" text="0.00%" visible="false">
-                           <font>
-                              <Font name="System Bold" size="20.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </StackPane>
-               </children>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </HBox>
-            <HBox id="row1" alignment="CENTER" minHeight="50.0" prefHeight="50.0" VBox.vgrow="ALWAYS">
-               <children>
-                  <Label alignment="CENTER" prefHeight="50.0" prefWidth="300.0" text="CONTROLLO DEI GRIGI" HBox.hgrow="ALWAYS">
-                     <font>
-                        <Font size="25.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="lblGray" alignment="CENTER" contentDisplay="CENTER" prefHeight="50.0" prefWidth="160.0" text="in attesa" textAlignment="CENTER" HBox.hgrow="ALWAYS">
-                     <font>
-                        <Font name="System Bold Italic" size="20.0" />
-                     </font>
-                  </Label>
-                  <StackPane prefHeight="50.0" prefWidth="34.0" HBox.hgrow="NEVER">
-                     <children>
-                        <ImageView fx:id="imgGray" fitHeight="40.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@img/edit.gif" />
-                           </image>
-                        </ImageView>
-                        <Label fx:id="plGray" text="0.00%" visible="false">
                            <font>
                               <Font name="System Bold" size="20.0" />
                            </font>
