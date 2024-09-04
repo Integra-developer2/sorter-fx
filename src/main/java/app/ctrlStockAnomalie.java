@@ -205,7 +205,7 @@ public class ctrlStockAnomalie implements Initializable {
         pane.setPadding(new Insets(5));
         return pane;
     }
-    
+
     private void centerAlignColumn(TableColumn<modelEtichette, String> column) {
         column.setCellFactory(tc -> {
             TableCell<modelEtichette, String> cell = new TableCell<modelEtichette, String>() {
@@ -245,7 +245,7 @@ public class ctrlStockAnomalie implements Initializable {
                     tableView.getItems().remove(currentItem);
                 });
             }
-    
+
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
