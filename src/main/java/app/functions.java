@@ -33,15 +33,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import app.o2_sorter_gray.objConcurrentBlackController;
-import static app.o3_sorter_stock.functions.strPad;
-
 import app.o3_sorter_stock.SimpleImageInfo;
 import app.o3_sorter_stock.objBlackFiles;
 import app.o3_sorter_stock.objDonePdf;
-import app.o3_sorter_stock.objDoneStock;
 import app.o3_sorter_stock.objDoneStockNumber;
 import app.o3_sorter_stock.objEtichetta;
 import app.o3_sorter_stock.objJobSorter;
+import app.o3_sorter_stock.objJobSorterGrouped;
 import app.o3_sorter_stock.objSorterExport;
 import app.o3_sorter_stock.objToPdf;
 import javafx.application.Platform;
@@ -437,7 +435,6 @@ public class functions {
     }
 
     public static void makeStockNumber(){
-        boolean isFirst = true;
         File fileOrigin = new File(objGlobals.targetTiff);
         for (String group : objEtichetta.list.keySet()) {
             for (int indexFrom : objEtichetta.list.get(group).keySet()) {
@@ -457,15 +454,9 @@ public class functions {
                             String baseName = fullFilename.replace("-FRONTE.tiff", "").replace("-RETRO.tiff", "");
                             if(fileExists(baseName+"-FRONTE.tiff")&&fileExists(baseName+"-RETRO.tiff")){
                                 if(stock.isEmpty()){
-                                    if(isFirst){
-                                        isFirst=false;
-                                        stock=objGlobals.stockPrefix + strPad(String.valueOf( objGlobals.stockNumber),4,"0");
-                                    }
-                                    else{
-                                        stock = objGlobals.stockPrefix + objDoneStock.getNext();
-                                    }
+                                    stock=objJobSorterGrouped.stock(group);
                                 }
-                                String[] sorterExportRow = new String[]{stock, String.valueOf(countStock), barcode+"-"+getIndexFromBlackFile(fullFilename)};
+                                String[] sorterExportRow = new String[]{stock, String.valueOf(countStock), barcode+"-"+getIndexFromBlackFile(fullFilename),objEtichetta.boxNote.get(group).get(indexFrom)};
                                 String sorterExportLabel = objJobSorter.rows.get(barcode)[letterToIndex(objGlobals.sorterExportValoreDaSorter)];
                                 File file = new File(fullFilename);
                                 String extraFolders = file.getParent().replace(fileOrigin.getAbsolutePath(), "");

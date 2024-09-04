@@ -93,7 +93,7 @@ public class functions{
         String dir;
         dir=objGlobals.errorMap.get(code).path;
         mkdir(dir);
-        moveFile(from,dir+"\\\\"+filename);        
+        moveFile(from,dir+"\\\\"+filename);
     }
 
     public static void readJobSorterCSV() throws Exception{
@@ -117,16 +117,17 @@ public class functions{
                                 objJobSorter.add(row[barcodeIndex], row);
                                 String groupBy = getGroup(row[barcodeIndex]);
                                 objJobSorterGrouped.add(groupBy, row[barcodeIndex], row);
-                                if(row.length>7){
-                                    objJobSorterGrouped.alternative(row[barcodeIndex], row[7]);
-                                }
+                                objJobSorterGrouped.alternative(row[barcodeIndex], row[7]);
+                                objJobSorterGrouped.stock.put(row[8],row[9]);
+                                objJobSorterGrouped.isFirst.put(row[8],true);
+                                objJobSorterGrouped.groupCustomer.put(groupBy,row[8]);
                             }
                         }
                     }
-                } catch (Exception e) { throw e;}   
+                } catch (Exception e) { throw e;}
                 return FileVisitResult.CONTINUE;
             }
-        });        
+        });
     }
 
     public static void moveFilesWithDir(String code, String from){

@@ -6,21 +6,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static app.functions.alert;
 import static app.functions.load;
 import static app.functions.printError;
 import static app.functions.writeOnce;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -40,8 +36,6 @@ public class ctrlInputs implements Initializable {
     @FXML
     private HBox tiff;
     @FXML
-    private TextField stockNumber;
-    @FXML
     private Button btnFoward;
     @FXML
     private Button btnBackwards;
@@ -53,8 +47,6 @@ public class ctrlInputs implements Initializable {
     private ImageView gifGray;
     @FXML
     private ImageView gifTiff;
-    @FXML
-    private ImageView gifStock;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -64,9 +56,6 @@ public class ctrlInputs implements Initializable {
         tiff.setOnMouseClicked(event->tiff());
         btnBackwards.setOnAction(event->btnBackwards());
         btnFoward.setOnAction(event->btnFoward());
-        stockNumber.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            validateStockNumber(newValue);
-        });
     }
     @FXML
     public void etichette(){
@@ -80,6 +69,7 @@ public class ctrlInputs implements Initializable {
             gifEtichette.setImage(new Image(App.class.getResource("img/done.gif").toExternalForm()));
         }
     }
+
     @FXML
     public void jobSorter(){
         FileChooser fileChooser = new FileChooser();
@@ -94,6 +84,7 @@ public class ctrlInputs implements Initializable {
             gifJobSorter.setImage(new Image(App.class.getResource("img/done.gif").toExternalForm()));
         }
     }
+
     @FXML
     public void gray(){
         DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -106,6 +97,7 @@ public class ctrlInputs implements Initializable {
             gifGray.setImage(new Image(App.class.getResource("img/done.gif").toExternalForm()));
         }
     }
+
     @FXML
     public void tiff(){
         DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -117,21 +109,7 @@ public class ctrlInputs implements Initializable {
             gifTiff.setImage(new Image(App.class.getResource("img/done.gif").toExternalForm()));
         }
     }
-    @FXML
-    private void validateStockNumber(String stock) {
-        if (!stock.isEmpty()) {
-            Pattern prefixPattern = Pattern.compile("[A-Za-z]+");
-            Matcher prefix = prefixPattern.matcher(stock);
-            Pattern numberPattern = Pattern.compile("\\d+");
-            Matcher number = numberPattern.matcher(stock);
-            if (prefix.find() && number.find()) {
-                gifStock.setImage(new Image(App.class.getResource("img/done.gif").toExternalForm()));
-            }
-            else{
-                gifStock.setImage(new Image(App.class.getResource("img/edit.gif").toExternalForm()));
-            }
-        }
-    }    
+
     @FXML
     public void btnBackwards() {
         try {
@@ -144,27 +122,10 @@ public class ctrlInputs implements Initializable {
             stage.show();
         } catch (IOException e) {printError(e,false);}
     }
+
     @FXML
     public void btnFoward() {
         ArrayList<String> errors=new ArrayList<>();
-        String stockText = stockNumber.getText();
-        if(stockText.isEmpty()){
-            errors.add("INSERIRE NUMERO PACCO");
-            gifStock.setImage(new Image(App.class.getResource("img/error.gif").toExternalForm()));
-        }
-        else{
-            Pattern prefixPattern = Pattern.compile("[A-Za-z]+");
-            Matcher prefix = prefixPattern.matcher(stockText);
-            Pattern numberPattern = Pattern.compile("\\d+");
-            Matcher number = numberPattern.matcher(stockText);
-            if(!prefix.find()||!number.find()){
-                errors.add("NUMERO PACCO DEVI COMINCIARE CON LETTERE E FINIRE CON NUMERI");
-                gifStock.setImage(new Image(App.class.getResource("img/error.gif").toExternalForm()));
-            }else{
-                objGlobals.stockPrefix=prefix.group();
-                objGlobals.stockNumber=Integer.parseInt(number.group());
-            }
-        }
         if(objGlobals.sourceEtichette.isEmpty()){
             errors.add("INSERIRE IL FILE ETICHETTE");
             gifEtichette.setImage(new Image(App.class.getResource("img/error.gif").toExternalForm()));
@@ -188,8 +149,6 @@ public class ctrlInputs implements Initializable {
             writeOnce(objGlobals.sourceJobSorterFile, objGlobals.sourceJobSorter);
             writeOnce(objGlobals.sourceGrayFile, objGlobals.sourceGray);
             writeOnce(objGlobals.sourceTiffFile, objGlobals.sourceTiff);
-            writeOnce(objGlobals.stockPrefixFile, objGlobals.stockPrefix);
-            writeOnce(objGlobals.stockNumberFile, String.valueOf(objGlobals.stockNumber));
             objGlobals.variables();
             load("viewStatusBar");
         }

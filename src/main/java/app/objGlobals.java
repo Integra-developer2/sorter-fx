@@ -13,14 +13,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static app.functions.printError;
-import app.o3_sorter_stock.objDoneStock;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class objGlobals {
-    public static String version = "SORTER-FX 1.0.0";
+    public static String version = "SORTER-FX 2.0.0";
     public static final int PRINT_AT=100;
     public static int totalThreadsMoveFiles=300;
     public static int totalThreadsGray=100;
@@ -39,9 +38,7 @@ public class objGlobals {
     public static ArrayList<String> sourceJobSorter;
     public static String sourceGray;
     public static String sourceTiff;
-    public static String stockPrefix;
     public static String masterCode;
-    public static int stockNumber=0;
     public static String targetGray;
     public static String targetTiff;
     public static String logFolder;
@@ -90,8 +87,7 @@ public class objGlobals {
     public static File sourceJobSorterFile;
     public static File sourceGrayFile;
     public static File sourceTiffFile;
-    public static File stockPrefixFile;
-    public static File stockNumberFile;
+    public static String stockUpdate;
 
     public static void variables(){
         try{
@@ -103,14 +99,10 @@ public class objGlobals {
             sourceJobSorterFile=sourceJobSorterFile();
             sourceGrayFile=sourceGrayFile();
             sourceTiffFile=sourceTiffFile();
-            stockPrefixFile=stockPrefixFile();
-            stockNumberFile=stockNumberFile();
             sourceEtichette=readFromFile(sourceEtichetteFile);
             sourceJobSorter=sourceJobSorter();
             sourceGray=readFromFile(sourceGrayFile);
             sourceTiff=readFromFile(sourceTiffFile);
-            stockPrefix=readOnce(stockPrefixFile);
-            stockNumber=stockNumber();
             anomalyLog=anomalyLog();
             errorLog=errorLog();
             jogSorterFolder=jogSorterFolder();
@@ -133,8 +125,7 @@ public class objGlobals {
             targetEtichette=targetEtichette();
             allBlackFiles=allBlackFiles();
             sorterExport=sorterExport();
-
-            objDoneStock.add(String.valueOf(stockNumber));
+            stockUpdate=stockUpdate();
         } catch (Exception e) { printError(e,true);}
     }
 
@@ -142,12 +133,15 @@ public class objGlobals {
     public static File sourceJobSorterFile(){return new File(logFolder,"sourceJobSorter");}
     public static File sourceGrayFile(){return new File(logFolder,"sourceGray");}
     public static File sourceTiffFile(){return new File(logFolder,"sourceTiff");}
-    public static File stockPrefixFile(){return new File(logFolder,"stockPrefix");}
-    public static File stockNumberFile(){return new File(logFolder,"stockNumber");}
 
     public static boolean hasInputs(){
         variables();
-        return !sourceEtichette.isEmpty()&&!sourceJobSorter.isEmpty()&&!sourceGray.isEmpty()&&!sourceTiff.isEmpty()&&!stockPrefix.isEmpty()&&stockNumber>0;
+        return !sourceEtichette.isEmpty()&&!sourceJobSorter.isEmpty()&&!sourceGray.isEmpty()&&!sourceTiff.isEmpty();
+    }
+
+    public static String stockUpdate(){
+        File file = new File(outputFolder, "aggiornaPacchi.csv");
+        return file.toString();
     }
 
     public static String logFolder() throws Exception{
@@ -180,15 +174,6 @@ public class objGlobals {
             } catch (Exception e) {
                 printError(e,true);
             }
-        }
-        return ret;
-    }
-
-    public static Integer stockNumber(){
-        String file = readOnce(stockNumberFile);
-        Integer ret = 0;
-        if(!file.isEmpty()){
-            ret = Integer.valueOf(file);
         }
         return ret;
     }

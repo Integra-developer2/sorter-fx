@@ -163,7 +163,7 @@ public class objAnomalies extends functions{
                             indexTo = indexFrom;
                             indexFrom = tmp;
                         }
-                        objEtichetta.add(groupFrom,indexFrom,indexTo);
+                        objEtichetta.add(groupFrom,indexFrom,indexTo,obj.reference);
                         obj.extra(groupFrom,indexFrom,indexTo);
                         objGlobals.fileEtichette.put(row,obj);
                     }
