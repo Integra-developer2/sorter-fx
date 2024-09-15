@@ -27,6 +27,7 @@ public class objGlobals {
     public static int totalThreadsStock=300;
     public static int frontAngle=90;
     public static int backAngle=270;
+    public static String startingFrom="";
     public static String scanditProgram="it.smaart.sorter.stock";
     public static String scanditKey="test.key";
     public static String sorterExportValoreDaSorter="C";

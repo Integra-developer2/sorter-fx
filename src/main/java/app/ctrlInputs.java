@@ -13,6 +13,7 @@ import static app.functions.alert;
 import static app.functions.load;
 import static app.functions.printError;
 import static app.functions.writeOnce;
+import app.o3_sorter_stock.objDoneStock;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -67,6 +68,12 @@ public class ctrlInputs implements Initializable {
         stockNumber.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
             validateStockNumber(newValue);
         });
+        if(!objGlobals.startingFrom.equals("move_files")){
+            etichette.setVisible(false);
+            jobSorter.setVisible(false);
+            gray.setVisible(false);
+            tiff.setVisible(false);
+        }
     }
     @FXML
     public void etichette(){
@@ -165,32 +172,45 @@ public class ctrlInputs implements Initializable {
                 objGlobals.stockNumber=Integer.parseInt(number.group());
             }
         }
-        if(objGlobals.sourceEtichette.isEmpty()){
-            errors.add("INSERIRE IL FILE ETICHETTE");
-            gifEtichette.setImage(new Image(App.class.getResource("img/error.gif").toExternalForm()));
-        }
-        if(objGlobals.sourceJobSorter.isEmpty()){
-            errors.add("INSERIRE ALMENO UN FILE JOBSORTER");
-            gifJobSorter.setImage(new Image(App.class.getResource("img/error.gif").toExternalForm()));
-        }
-        if(objGlobals.sourceGray.isEmpty()){
-            errors.add("INSERIRE IL PERCORSO PER I FILE GRIGI");
-            gifGray.setImage(new Image(App.class.getResource("img/error.gif").toExternalForm()));
-        }
-        if(objGlobals.sourceTiff.isEmpty()){
-            errors.add("INSERIRE IL PERCORSO PER I FILE TIFF");
-            gifTiff.setImage(new Image(App.class.getResource("img/error.gif").toExternalForm()));
+        if(objGlobals.startingFrom.equals("move_files")){
+            if(objGlobals.sourceEtichette.isEmpty()){
+                errors.add("INSERIRE IL FILE ETICHETTE");
+                gifEtichette.setImage(new Image(App.class.getResource("img/error.gif").toExternalForm()));
+            }
+            if(objGlobals.sourceJobSorter.isEmpty()){
+                errors.add("INSERIRE ALMENO UN FILE JOBSORTER");
+                gifJobSorter.setImage(new Image(App.class.getResource("img/error.gif").toExternalForm()));
+            }
+            if(objGlobals.sourceGray.isEmpty()){
+                errors.add("INSERIRE IL PERCORSO PER I FILE GRIGI");
+                gifGray.setImage(new Image(App.class.getResource("img/error.gif").toExternalForm()));
+            }
+            if(objGlobals.sourceTiff.isEmpty()){
+                errors.add("INSERIRE IL PERCORSO PER I FILE TIFF");
+                gifTiff.setImage(new Image(App.class.getResource("img/error.gif").toExternalForm()));
+            }
         }
         if(!errors.isEmpty()){
             alert("INFORMAZIONI MANCANTI",errors);
         }else{
-            writeOnce(objGlobals.sourceEtichetteFile, objGlobals.sourceEtichette);
-            writeOnce(objGlobals.sourceJobSorterFile, objGlobals.sourceJobSorter);
-            writeOnce(objGlobals.sourceGrayFile, objGlobals.sourceGray);
-            writeOnce(objGlobals.sourceTiffFile, objGlobals.sourceTiff);
-            writeOnce(objGlobals.stockPrefixFile, objGlobals.stockPrefix);
-            writeOnce(objGlobals.stockNumberFile, String.valueOf(objGlobals.stockNumber));
-            objGlobals.variables();
+            if(objGlobals.startingFrom.equals("move_files")){
+                writeOnce(objGlobals.sourceEtichetteFile, objGlobals.sourceEtichette);
+                writeOnce(objGlobals.sourceJobSorterFile, objGlobals.sourceJobSorter);
+                writeOnce(objGlobals.sourceGrayFile, objGlobals.sourceGray);
+                writeOnce(objGlobals.sourceTiffFile, objGlobals.sourceTiff);
+                writeOnce(objGlobals.stockPrefixFile, objGlobals.stockPrefix);
+                writeOnce(objGlobals.stockNumberFile, String.valueOf(objGlobals.stockNumber));
+                objGlobals.variables();
+            }
+            else{
+                writeOnce(objGlobals.stockPrefixFile, objGlobals.stockPrefix);
+                writeOnce(objGlobals.stockNumberFile, String.valueOf(objGlobals.stockNumber));
+                objGlobals.stockPrefixFile=objGlobals.stockPrefixFile();
+                objGlobals.stockNumberFile=objGlobals.stockNumberFile();      
+                objGlobals.stockNumber=objGlobals.stockNumber();
+                objDoneStock.add(String.valueOf(objGlobals.stockNumber));
+            }
+            
             load("viewStatusBar");
         }
     }

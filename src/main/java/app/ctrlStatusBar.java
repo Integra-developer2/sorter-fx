@@ -1,8 +1,6 @@
 package app;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
@@ -11,13 +9,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
+import static app.functions.step;
 import static app.functions.alert;
+import static app.functions.stepFile;
 import static app.functions.confirm;
 import static app.functions.deleteFolder;
 import static app.functions.getProgressGray;
@@ -25,7 +24,6 @@ import static app.functions.getProgressStock;
 import static app.functions.load;
 import static app.functions.loadFullscreen;
 import static app.functions.ls;
-import static app.functions.mkdir;
 import static app.functions.printError;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
@@ -37,7 +35,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-public class ctrlStatusBar implements Initializable {
+public class ctrlStatusBar implements Initializable { 
     @FXML
     private Label title;
     @FXML
@@ -425,20 +423,6 @@ public class ctrlStatusBar implements Initializable {
 
     private void bindServiceStack(Service<Void> service, Label label, ImageView imageView){
         service.setOnFailed(event -> handleError(label, imageView, event));
-    }
-
-    private void step(File file){
-        mkdir(file.toString());
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file.toString()))) {
-            LocalDateTime now = LocalDateTime.now();
-            writer.write(now.toString());
-        } catch (Exception e) {
-            printError(e,true);
-        }
-    }
-
-    private File stepFile(String step){
-        return new File(objGlobals.logStep,step);
     }
 
     private void startService(){
