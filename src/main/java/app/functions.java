@@ -24,6 +24,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,6 +70,20 @@ public class functions {
             alert.getDialogPane().setContent(label);
             alert.showAndWait();
         });
+    }
+
+    public static File stepFile(String step){
+        return new File(objGlobals.logStep,step);
+    }
+
+    public static void step(File file){
+        mkdir(file.toString());
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file.toString()))) {
+            LocalDateTime now = LocalDateTime.now();
+            writer.write(now.toString());
+        } catch (Exception e) {
+            printError(e,true);
+        }
     }
 
     public static void alert(String title, ArrayList<String> texts){
@@ -600,7 +615,10 @@ public class functions {
                 Files.walkFileTree(Paths.get(objGlobals.targetTiff), new SimpleFileVisitor<Path>()  {
                     @Override
                     public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
-                        files.add(path.toString());
+                        String file =path.toString();
+                        if(file.endsWith(".tiff")){
+                            files.add(file);
+                        }
                         return FileVisitResult.CONTINUE;
                     }
                 });

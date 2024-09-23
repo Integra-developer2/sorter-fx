@@ -46,7 +46,7 @@ public class ctrlWorkingFolder implements Initializable {
                 load("viewStatusBar");
             }
             else{
-                load("viewInputs",450,500);
+                load("viewStepChoice");
             }
         }
     }
