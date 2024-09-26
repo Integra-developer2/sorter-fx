@@ -35,7 +35,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-public class ctrlStatusBar implements Initializable { 
+public class ctrlStatusBar implements Initializable {
     @FXML
     private Label title;
     @FXML
@@ -105,15 +105,15 @@ public class ctrlStatusBar implements Initializable {
                                         imgMoveFiles.setImage(new Image(App.class.getResource("img/download.gif").toExternalForm()));
                                     });
                                     boolean start[] = {true};
-                                    CountDownLatch latch = new CountDownLatch(1); 
+                                    CountDownLatch latch = new CountDownLatch(1);
                                     if(outOfSpace()){
                                         Platform.runLater(() -> {
                                             try {
                                                 start[0] = confirm(objAnomalies.noSpace, "SPAZIO INSUFFICIENTE!, CONTINUA LO STESSO ?");
-                                            } 
+                                            }
                                             finally {
                                                 latch.countDown();
-                                            }    
+                                            }
                                         });
                                         latch.await();
                                     }
@@ -131,17 +131,17 @@ public class ctrlStatusBar implements Initializable {
                                                 Platform.runLater(() -> {completeMoveFiles();});
                                                 grayService.start();
                                             }
-                                        }                                    
+                                        }
                                     }
                                     else{
                                         Platform.exit();
                                     }
-                                } 
+                                }
                                 catch (Exception e) {
                                     printError(e,true);throw e;
                                 }
                             }
-                            
+
                             return null;
                         }
                     };
@@ -330,13 +330,13 @@ public class ctrlStatusBar implements Initializable {
                     return true;
                 }
             }
-        } 
+        }
         catch (Exception e) {
             throw e;
         }
         return false;
     }
-    
+
     public static long folderSize(String directoryPath) throws Exception {
         Path path = Paths.get(directoryPath);
         final long[] size = {0};
@@ -347,7 +347,7 @@ public class ctrlStatusBar implements Initializable {
                     size[0] += attrs.size();
                     return FileVisitResult.CONTINUE;
                 }
-            });            
+            });
         } catch (IOException e) {
             printError(e,true);throw e;
         }
@@ -419,7 +419,7 @@ public class ctrlStatusBar implements Initializable {
                 }
             }
         }, 0, 60000);
-    }    
+    }
 
     private void bindServiceStack(Service<Void> service, Label label, ImageView imageView){
         service.setOnFailed(event -> handleError(label, imageView, event));

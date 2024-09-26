@@ -146,9 +146,17 @@ public class objGlobals {
     public static File stockPrefixFile(){return new File(logFolder,"stockPrefix");}
     public static File stockNumberFile(){return new File(logFolder,"stockNumber");}
 
+    public static boolean hasEtichette(){
+        return (!sourceEtichette.isEmpty()||targetEtichetteLog.exists());
+    }
+
+    public static boolean hasJobSorter(){
+        return (!sourceJobSorter.isEmpty() || new File(objGlobals.jogSorterFolder).exists());
+    }
+
     public static boolean hasInputs(){
         variables();
-        return !sourceEtichette.isEmpty()&&!sourceJobSorter.isEmpty()&&!sourceGray.isEmpty()&&!sourceTiff.isEmpty()&&!stockPrefix.isEmpty()&&stockNumber>0;
+        return hasEtichette()&&hasJobSorter()&&!stockPrefix.isEmpty()&&stockNumber>0;
     }
 
     public static String logFolder() throws Exception{
@@ -348,21 +356,21 @@ public class objGlobals {
     }
 
     public static String targetEtichette() {
-        if(!sourceEtichette.isEmpty()){
-            if(targetEtichetteLog.exists()){
-                try (BufferedReader reader = new BufferedReader(new FileReader(targetEtichetteLog))) {
-                    String line;
-                    while ((line=reader.readLine())!=null) {
-                        File file = new File(line);
-                        if(file.exists()){
-                            sourceEtichette=file.getAbsolutePath();
-                            return file.toString();
-                        }
+        if(targetEtichetteLog.exists()){
+            try (BufferedReader reader = new BufferedReader(new FileReader(targetEtichetteLog))) {
+                String line;
+                while ((line=reader.readLine())!=null) {
+                    File file = new File(line);
+                    if(file.exists()){
+                        sourceEtichette=file.getAbsolutePath();
+                        return file.toString();
                     }
-                } catch (Exception e) {
-                    printError(e,true);
                 }
+            } catch (Exception e) {
+                printError(e,true);
             }
+        }
+        if(!sourceEtichette.isEmpty()){
             File folderFrom = new File(sourceEtichette);
             return  sourceEtichette.replace(folderFrom.getParent(), etichetteFolder);
         }

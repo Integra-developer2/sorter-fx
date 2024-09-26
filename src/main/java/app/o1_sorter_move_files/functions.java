@@ -28,7 +28,7 @@ public class functions {
                 String to = from.replace(strSourceTiff, strTargetTiff);
                 File fileTo = new File(to);
                 if(!fileTo.exists()&&from.endsWith(".tiff")){
-                    ret.put(from, to);                  
+                    ret.put(from, to);
                 }
                 return FileVisitResult.CONTINUE;
             }
@@ -45,7 +45,7 @@ public class functions {
                 String to = from.replace(strSourceGray, strTargetGray);
                 File fileTo = new File(to);
                 if(!fileTo.exists()&&from.endsWith(".bmp")){
-                    ret.put(from, to);                 
+                    ret.put(from, to);
                 }
                 return FileVisitResult.CONTINUE;
             }
@@ -60,13 +60,13 @@ public class functions {
                 ret.put(from, to);
             }
         }
-        
+
         File fileFrom = new File(objGlobals.sourceEtichette);
         File folderTo = new File(objGlobals.etichetteFolder);
         String to = objGlobals.sourceEtichette.replace(fileFrom.getParent(), folderTo.getPath());
         File fileTo = new File(to);
         if(!fileTo.exists()){
-            ret.put(objGlobals.sourceEtichette, to);          
+            ret.put(objGlobals.sourceEtichette, to);
         }
 
         return ret;

@@ -203,14 +203,17 @@ public class ctrlInputs implements Initializable {
                 objGlobals.variables();
             }
             else{
+                writeOnce(objGlobals.sourceEtichetteFile, objGlobals.sourceEtichette);
+                
+                writeOnce(objGlobals.sourceJobSorterFile, objGlobals.sourceJobSorter);
                 writeOnce(objGlobals.stockPrefixFile, objGlobals.stockPrefix);
                 writeOnce(objGlobals.stockNumberFile, String.valueOf(objGlobals.stockNumber));
                 objGlobals.stockPrefixFile=objGlobals.stockPrefixFile();
-                objGlobals.stockNumberFile=objGlobals.stockNumberFile();      
+                objGlobals.stockNumberFile=objGlobals.stockNumberFile();
                 objGlobals.stockNumber=objGlobals.stockNumber();
                 objDoneStock.add(String.valueOf(objGlobals.stockNumber));
             }
-            
+
             load("viewStatusBar");
         }
     }
