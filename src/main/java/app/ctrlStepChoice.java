@@ -25,7 +25,7 @@ public class ctrlStepChoice implements Initializable{
     private HBox stepOne;
     @FXML
     private HBox stepTwo;
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         stepOne.setOnMouseClicked(event -> { objGlobals.startingFrom="move_files";});
@@ -48,10 +48,10 @@ public class ctrlStepChoice implements Initializable{
                     });
                     File stepMoveFiles=stepFile("moveFilesEnd");
                     step(stepMoveFiles);
-                    load("viewInputs",450,500);                
+                    load("viewInputs",450,500);
                 } catch (IOException e) {
                     printError(e, true);
-                }                
+                }
             }
         });
     }

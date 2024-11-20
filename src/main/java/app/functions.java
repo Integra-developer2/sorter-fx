@@ -629,7 +629,9 @@ public class functions {
             mkdir(objGlobals.allBlackFiles.toString());
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(objGlobals.allBlackFiles.toString()))) {
                 for (String file : files) {
-                    writer.append(file).append(System.lineSeparator());
+                    if(file.endsWith(".tiff")){
+                        writer.append(file).append(System.lineSeparator());
+                    }
                 }
             } catch (Exception e) {
                 printError(e, true);

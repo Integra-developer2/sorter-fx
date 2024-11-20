@@ -28,7 +28,7 @@ public class functions{
         File file = new File(a,b);
         return file.getPath();
     }
-    
+
     public static String getFileName(String filePath){
         File file = new File(filePath);
         return file.getName();
@@ -72,7 +72,7 @@ public class functions{
         } catch (IOException e) {
             logError("copyFile from "+from+" to "+to, e);
         }
-    }   
+    }
 
     public static String getFrontPath(String path){
         return path.replace("Backside", "");
@@ -93,7 +93,7 @@ public class functions{
         String dir;
         dir=objGlobals.errorMap.get(code).path;
         mkdir(dir);
-        moveFile(from,dir+"\\\\"+filename);        
+        moveFile(from,dir+"\\\\"+filename);
     }
 
     public static void readJobSorterCSV() throws Exception{
@@ -123,10 +123,10 @@ public class functions{
                             }
                         }
                     }
-                } catch (Exception e) { throw e;}   
+                } catch (Exception e) { throw e;}
                 return FileVisitResult.CONTINUE;
             }
-        });        
+        });
     }
 
     public static void moveFilesWithDir(String code, String from){
@@ -163,13 +163,13 @@ public class functions{
                     foundFiles.add(file.getCanonicalPath());
                 }
             }
-            return foundFiles;            
+            return foundFiles;
         } catch (IOException e) {
             logError("getFiles.back path: "+path, e);
         }
         return null;
 
-    }    
+    }
 
     public static String strPad(String inputString, int length, String append) {
         if (inputString.length() >= length) {
@@ -308,7 +308,7 @@ public class functions{
             ret = index(barcode, filename);
         } catch (Exception e) {}
         return ret;
-    } 
+    }
 
     public static int index(String barcode, String filename) throws Exception{
         int ret = 0;
@@ -319,7 +319,7 @@ public class functions{
             throw e;
         }
         return ret;
-    }  
+    }
 
     public static void printProgress(double percent, String text){
         if(percent>1.0){
