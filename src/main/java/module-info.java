@@ -9,8 +9,7 @@ module app {
     requires com.opencsv;
     requires javafx.swing;
     requires com.twelvemonkeys.imageio.tiff;
-    
-requires javafx.graphics;
+    requires javafx.graphics;
     opens app to javafx.fxml;
     exports app;
 }

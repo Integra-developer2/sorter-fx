@@ -20,7 +20,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class objGlobals {
-    public static String version = "SORTER-FX 1.0.0";
+    public static String version = "SORTER-FX 1.0.1";
     public static final int PRINT_AT=100;
     public static int totalThreadsMoveFiles=300;
     public static int totalThreadsGray=100;
