@@ -138,7 +138,7 @@ public class ctrlInputs implements Initializable {
                 gifStock.setImage(new Image(App.class.getResource("img/edit.gif").toExternalForm()));
             }
         }
-    }    
+    }
     @FXML
     public void btnBackwards() {
         try {
@@ -204,7 +204,6 @@ public class ctrlInputs implements Initializable {
             }
             else{
                 writeOnce(objGlobals.sourceEtichetteFile, objGlobals.sourceEtichette);
-                
                 writeOnce(objGlobals.sourceJobSorterFile, objGlobals.sourceJobSorter);
                 writeOnce(objGlobals.stockPrefixFile, objGlobals.stockPrefix);
                 writeOnce(objGlobals.stockNumberFile, String.valueOf(objGlobals.stockNumber));

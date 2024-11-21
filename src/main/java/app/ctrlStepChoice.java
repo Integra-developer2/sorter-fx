@@ -25,10 +25,12 @@ public class ctrlStepChoice implements Initializable{
     private HBox stepOne;
     @FXML
     private HBox stepTwo;
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        stepOne.setOnMouseClicked(event -> { objGlobals.startingFrom="move_files";});
+        stepOne.setOnMouseClicked(event -> {
+            objGlobals.startingFrom="move_files";
+            load("viewInputs",450,500);
+        });
         stepTwo.setOnMouseClicked(event -> {
             objGlobals.startingFrom="gray";
             if(!fileExists(objGlobals.etichetteFolder)||!fileExists(objGlobals.jogSorterFolder)||!fileExists(objGlobals.targetGray)||!fileExists(objGlobals.targetTiff)){

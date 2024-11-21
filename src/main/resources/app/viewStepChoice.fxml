@@ -24,9 +24,9 @@
             <Insets />
          </VBox.margin>
          <children>
-            <HBox id="row" fx:id="stepOne" alignment="TOP_CENTER" minHeight="70.0" minWidth="470.0" prefHeight="70.0" prefWidth="470.0" VBox.vgrow="ALWAYS">
+            <HBox id="stepOne" fx:id="stepOne" alignment="TOP_CENTER" minHeight="70.0" minWidth="470.0" prefHeight="70.0" prefWidth="470.0">
                <children>
-                  <ImageView fitHeight="38.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
+                  <ImageView fx:id="stepOneImg" fitHeight="38.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
                      <image>
                         <Image url="@img/stepOne.png" />
                      </image>
@@ -47,9 +47,9 @@
                   <Insets />
                </opaqueInsets>
             </HBox>
-            <HBox id="row" fx:id="stepTwo" alignment="TOP_CENTER" minHeight="70.0" minWidth="470.0" prefHeight="70.0" prefWidth="470.0">
+            <HBox id="stepTwo" fx:id="stepTwo" alignment="TOP_CENTER" minHeight="70.0" minWidth="470.0" prefHeight="70.0" prefWidth="470.0">
                <children>
-                  <ImageView fitHeight="38.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
+                  <ImageView fx:id="stepTwoImg" fitHeight="38.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
                      <image>
                         <Image url="@img/stepTwo.png" />
                      </image>
