@@ -15,6 +15,12 @@
 				"kind": "build",
 				"isDefault": true
 			}
+		},
+		{
+			"label": "Set Java 22 Environment",
+			"type": "shell",
+			"command": "set JAVA_HOME=C:\\Java\\jdk22 && set PATH=%JAVA_HOME%\\bin;%PATH%",
+			"problemMatcher": []
 		}
 	]
 }

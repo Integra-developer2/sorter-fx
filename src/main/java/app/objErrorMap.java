@@ -13,11 +13,13 @@ public class objErrorMap extends functions{
         map.put("BBNE", new objError(objGlobals.anomalyFolderGray,true));//Black barcode not equal
         map.put("CGNF", new objError(objGlobals.anomalyFolderGray, false));//Couple file not found
         map.put("ISMT", new objError(objGlobals.anomalyFolderGray, false));//Is Multi
-        map.put("GFNF", new objError(objGlobals.anomalyFolderGray, true));//Gray file not found     
+        map.put("GFNF", new objError(objGlobals.anomalyFolderGray, true));//Gray file not found
         map.put("FSEC", new objError(objGlobals.anomalyFolderGray, true));//File is error or corrupted
-        map.put("ISDB", new objError(objGlobals.anomalyFolderStock2, false));//Many files, same barcode
-        map.put("PDFE", new objError(objGlobals.anomalyFolderStock2, false));//Error generating pdf
-        map.put("NONP", new objError(objGlobals.anomalyFolderStock2, true));//Not expected by file etichette
+        map.put("ISDB", new objError(objGlobals.anomalyLog, true));//Many files, same barcode
+        map.put("PDFE", new objError(objGlobals.anomalyLog, true));//Error generating pdf
+        map.put("NONP", new objError(objGlobals.notExpectedFolder, true));//Not expected by file etichette
+        map.put("CBNF", new objError(objGlobals.anomalyLog, true));//Coupe black not found
+        map.put("TMPS", new objError(objGlobals.anomalyFolderStock2, true));//Temporary stock error
         success.add("FOUND");
         success.add("FOUND_ACTCG");
     }

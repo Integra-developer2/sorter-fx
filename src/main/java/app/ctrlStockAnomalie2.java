@@ -5,13 +5,12 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
 
-import static app.functions.load;
-import static app.functions.moveStock2;
 import static app.functions.alert;
 import static app.functions.confirm;
+import static app.functions.load;
+import static app.functions.moveStock2;
 import static app.functions.printError;
 import static app.functions.writeEtichette;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,10 +18,10 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.print.PrinterJob;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Border;
@@ -63,52 +62,22 @@ public class ctrlStockAnomalie2 implements Initializable {
     @SuppressWarnings("deprecation")
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        boolean start[] = {true};
-        if(!objAnomalies.unExpectedGroups.isEmpty()){
-            CountDownLatch latch = new CountDownLatch(1);
-            try {
-                try {
-                    String message="CONFERMI CHE QUESTI COMUNI NON DEVONO ESSERE PREVISTI ?";
-                    start[0] = confirm("ATENZIONE",message,objAnomalies.unExpectedGroups);
-                }
-                finally {
-                    latch.countDown();
-                }
-                latch.await();
-            } catch (InterruptedException e) {
-                printError(e,false);
-            }
-
-            for (String group : objAnomalies.unExpectedGroups.keySet()) {
-                moveStock2(group, objAnomalies.unExpectedGroups.get(group), "log");
-            }
-
-        }
-        if(start[0]){
-            objAnomalies.unExpectedGroups.clear();
-            tableView.setEditable(true);
-            addShootButtonToTable();
-            btnFoward.setOnAction(event -> btnFoward());
-            printPane.setOnMouseClicked(event -> printPane());
-            id.setCellValueFactory(cellData -> cellData.getValue().id());
-            box1.setCellValueFactory(cellData -> cellData.getValue().box1());
-            pallet1.setCellValueFactory(cellData -> cellData.getValue().pallet1());
-            box2.setCellValueFactory(cellData -> cellData.getValue().box2());
-            pallet2.setCellValueFactory(cellData -> cellData.getValue().pallet2());
-
-            tableView.setItems(objAnomalies.stock2);
-            tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-            centerAlignColumn(id);
-            centerAlignColumn(box1);
-            centerAlignColumn(pallet1);
-            centerAlignColumn(box2);
-            centerAlignColumn(pallet2);
-        }
-        else{
-            objGlobals.stop=true;
-            alert("NON POSSO CONTINUARE","SISTEMA IL FILE ETICHETTE AGGIUNGENDO I COMUNI MANCANTI E RIAPRI IL PROGRAMA");
-        }
-
+        tableView.setEditable(true);
+        addShootButtonToTable();
+        btnFoward.setOnAction(_-> btnFoward());
+        printPane.setOnMouseClicked(_-> printPane());
+        id.setCellValueFactory(cellData -> cellData.getValue().id());
+        box1.setCellValueFactory(cellData -> cellData.getValue().box1());
+        pallet1.setCellValueFactory(cellData -> cellData.getValue().pallet1());
+        box2.setCellValueFactory(cellData -> cellData.getValue().box2());
+        pallet2.setCellValueFactory(cellData -> cellData.getValue().pallet2());
+        tableView.setItems(objAnomalies.stock2);
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        centerAlignColumn(id);
+        centerAlignColumn(box1);
+        centerAlignColumn(pallet1);
+        centerAlignColumn(box2);
+        centerAlignColumn(pallet2);
     }
 
     @FXML
@@ -129,7 +98,7 @@ public class ctrlStockAnomalie2 implements Initializable {
 
         if(start[0]){
             for (modelEtichette2 obj : objAnomalies.stock2) {
-                moveStock2(obj.group(), obj.fileList(), "log");
+                moveStock2(obj.group(), obj.fileList(), objGlobals.anomalyFolderStock2, objGlobals.anomalyFolderStock2Log);
             }
             objAnomalies.clear();
             writeEtichette();
@@ -218,7 +187,7 @@ public class ctrlStockAnomalie2 implements Initializable {
     }
 
     private void centerAlignColumn(TableColumn<modelEtichette2, String> column) {
-        column.setCellFactory(tc -> {
+        column.setCellFactory(_-> {
             TableCell<modelEtichette2, String> cell = new TableCell<modelEtichette2, String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
@@ -236,7 +205,7 @@ public class ctrlStockAnomalie2 implements Initializable {
     }
 
     private void addShootButtonToTable() {
-        shoot1.setCellFactory(param -> {
+        shoot1.setCellFactory(_-> {
             return new TableCell<modelEtichette2, Void>() {
                 private final HBox shootButtonContainer = new HBox();
                 private final javafx.scene.control.Button shootButton = new javafx.scene.control.Button();
@@ -251,7 +220,7 @@ public class ctrlStockAnomalie2 implements Initializable {
                     imageView.setFitHeight(20);
                     shootButton.setGraphic(imageView);
 
-                    shootButton.setOnAction(event -> {
+                    shootButton.setOnAction(_-> {
                         modelEtichette2 currentItem = getTableView().getItems().get(getIndex());
                         shootList.clear();
                         for (String barcode : currentItem.barcodeList()) {
@@ -275,7 +244,7 @@ public class ctrlStockAnomalie2 implements Initializable {
             };
         });
 
-        shoot2.setCellFactory(param ->  {
+        shoot2.setCellFactory(_->  {
             return new TableCell<modelEtichette2, Void>() {
                 private final HBox shootButtonContainer = new HBox();
                 private final javafx.scene.control.Button shootButton = new javafx.scene.control.Button();
@@ -290,7 +259,7 @@ public class ctrlStockAnomalie2 implements Initializable {
                     imageView.setFitHeight(20);
                     shootButton.setGraphic(imageView);
 
-                    shootButton.setOnAction(event -> {
+                    shootButton.setOnAction(_-> {
                         modelEtichette2 currentItem = getTableView().getItems().get(getIndex());
                         shootList.clear();
                         for (String barcode : currentItem.barcodeList()) {

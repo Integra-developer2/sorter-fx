@@ -1,7 +1,9 @@
 package app;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,14 +17,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
-import static app.functions.deleteFolder;
+import static app.o3_sorter_stock.functions.moveFilesWithDir;
+import static app.functions.writeEtichette;
 import static app.functions.makeStockNumber;
 import static app.functions.moveErrors;
 import static app.functions.moveStock2;
 import static app.functions.printError;
 import static app.functions.readEtichette;
+import static app.functions.readStockFile;
 import app.o1_sorter_move_files.functions;
 import static app.o3_sorter_stock.functions.getBarcodeFromBlackFile;
+import static app.o3_sorter_stock.functions.getEntity;
 import static app.o3_sorter_stock.functions.getGroup;
 import static app.o3_sorter_stock.functions.getIndexFromBlackFile;
 import static app.o3_sorter_stock.functions.indexMax;
@@ -31,7 +36,6 @@ import static app.o3_sorter_stock.functions.readBlackDir;
 import static app.o3_sorter_stock.functions.readJobSorterCSV;
 
 import app.o3_sorter_stock.objBlackFiles;
-import app.o3_sorter_stock.objDoneStockNumber;
 import app.o3_sorter_stock.objEtichetta;
 import app.o3_sorter_stock.objJobSorterGrouped;
 import app.o3_sorter_stock.objSorterExport;
@@ -44,8 +48,10 @@ public class objAnomalies extends functions{
     public static ConcurrentLinkedQueue<String> gray = new ConcurrentLinkedQueue<>();
     public static ObservableList<modelEtichette> stock = FXCollections.observableArrayList();
     public static ObservableList<modelEtichette2> stock2 = FXCollections.observableArrayList();
+    public static ObservableList<modelStockFile> stockFile = FXCollections.observableArrayList();
+    public static HashMap<Integer, objNotExpected> notExpected = new HashMap<>();
+    public static boolean hasStockFileAnomaly=false;
     public static ArrayList<String> stock2List = new ArrayList<>();
-    public static HashMap<String,ArrayList<String>> unExpectedGroups = new HashMap<>();
 
     public static void addMoveFiles(String anomalyFile){
         if(!moveFiles.contains(anomalyFile)){
@@ -94,7 +100,6 @@ public class objAnomalies extends functions{
         stock.clear();
         stock2.clear();
         stock2List.clear();
-        unExpectedGroups.clear();
     }
 
     public static void addStock2(Integer id,objNotExpected obj){
@@ -105,7 +110,6 @@ public class objAnomalies extends functions{
         try {
             objAnomalies.clear();
             objEtichetta.clear();
-            objDoneStockNumber.clear();
             objSorterExport.clear();
             objBlackFiles.clear();
             readJobSorterCSV();
@@ -138,23 +142,28 @@ public class objAnomalies extends functions{
                     }
                     String groupFrom = getGroup(obj.firstBarcode);
                     String groupTo = getGroup(obj.lastBarcode);
+                    String entityFrom = getEntity(obj.firstBarcode);
+                    String entityTo = getEntity(obj.lastBarcode);
                     String error="";
                     if(indexFrom==0){
                         error+="barcode iniziale non trovato nei file tiff \n";
                     }
-                    else if(groupFrom.isEmpty()){
+                    else if(groupFrom.isEmpty()||entityFrom.isEmpty()){
                         error+="barcode iniziale non trovato nel job-sorter \n";
                     }
 
                     if(indexTo==0){
                         error+="barcode finale non trovato nei file tiff \n";
                     }
-                    else if(groupTo.isEmpty()){
+                    else if(groupTo.isEmpty()||entityTo.isEmpty()){
                         error+="barcode finale non trovato nel job-sorter \n";
                     }
 
                     if(!groupFrom.isEmpty()&&!groupTo.isEmpty()&&!groupFrom.equals(groupTo)){
                         error+="raggruppamento diverso \n";
+                    }
+                    else if(!entityFrom.isEmpty()&&!entityTo.isEmpty()&&!entityFrom.equals(entityTo)){
+                        error+="Agenzia diversa \n";
                     }
 
                     if(error.isEmpty()){
@@ -163,8 +172,8 @@ public class objAnomalies extends functions{
                             indexTo = indexFrom;
                             indexFrom = tmp;
                         }
-                        objEtichetta.add(groupFrom,indexFrom,indexTo);
-                        obj.extra(groupFrom,indexFrom,indexTo);
+                        objEtichetta.add(groupFrom,entityFrom,obj.reference,indexFrom,indexTo);
+                        obj.extra(groupFrom,entityFrom,indexFrom,indexTo);
                         objGlobals.fileEtichette.put(row,obj);
                     }
                     else{
@@ -178,48 +187,19 @@ public class objAnomalies extends functions{
         return !objAnomalies.stock.isEmpty();
     }
 
-    public static boolean hasStockAnomaly2(){
+    public static void findStockAnomaly2(){
         try {
             makeStockNumber();
             moveErrors();
-            if(hasStock2List()){
-                stockAnomaly2();
-            }
+            hasStock2List();
         } catch (Exception e) {
             printError(e, true);
         }
-        return !stock2.isEmpty()||!unExpectedGroups.isEmpty();
     }
 
-    private static boolean hasStock2List(){
-        File folderFile = new File(objGlobals.anomalyFolderStock2);
-        if(folderFile.exists()){
-            try {
-                Files.walkFileTree(Paths.get(folderFile.toString()), new SimpleFileVisitor<Path>()  {
-                    @Override
-                    public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
-                        String strPath=path.toString();
-                        String filename = strPath.replace("-FRONTE.tiff", "").replace("-RETRO.tiff", "");
-                        if(strPath.endsWith(".tiff")&&!objAnomalies.stock2List.contains(filename)){
-                            objAnomalies.stock2List.add(filename);
-                        }
-                        return FileVisitResult.CONTINUE;
-                    }
-                });
-            } catch (IOException e) {
-                printError(e, true);
-            }
-            if(objAnomalies.stock2List.isEmpty()){
-                deleteFolder(folderFile.toString());
-            }
-        }
-        return !objAnomalies.stock2List.isEmpty();
-    }
-
-    private static void stockAnomaly2(){
+    private static void hasStock2List(){
         HashMap<String,Integer>originalProgEnd = new HashMap<>();
         HashMap<String, ArrayList<objFileEtichette>> etichetteByGroup = new HashMap<>();
-        HashMap<Integer, objNotExpected> notExpected = new HashMap<>();
         Integer id = 0;
 
         HashMap<String,Integer>stock2ListWithIndex = new HashMap<>();
@@ -230,30 +210,20 @@ public class objAnomalies extends functions{
         LinkedHashMap<String, Integer> sortedStock2ListWithIndex = stock2ListWithIndex.entrySet()
             .stream()
             .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-            .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue,(e1, e2) -> e1,LinkedHashMap::new));
+            .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue,(e1, _) -> e1,LinkedHashMap::new));
 
         for (String file : sortedStock2ListWithIndex.keySet()) {
             Integer index = sortedStock2ListWithIndex.get(file);
             etichetteByGroup.clear();
             for (Integer row : objGlobals.fileEtichette.keySet()) {
                 objFileEtichette obj = objGlobals.fileEtichette.get(row);
-                etichetteByGroup.computeIfAbsent(obj.group, k -> new ArrayList<>()).add(obj);
+                etichetteByGroup.computeIfAbsent(obj.group, _-> new ArrayList<>()).add(obj);
             }
             String barcode = getBarcodeFromBlackFile(file);
             String group = getGroup(barcode);
             String alternative = objJobSorterGrouped.getAlternative(barcode);
             if(!etichetteByGroup.containsKey(group)){
-                ArrayList<String> currentFiles;
-                if(unExpectedGroups.containsKey(group)){
-                    currentFiles=unExpectedGroups.get(group);
-                }
-                else{
-                    currentFiles = new ArrayList<>();
-                }
-                if(!currentFiles.contains(file)){
-                    currentFiles.add(file);
-                    unExpectedGroups.put(group,currentFiles);
-                }
+                moveStock2(group, file, "notExpectedGroup");
             }
             else{
                 ArrayList<objFileEtichette> possibles = etichetteByGroup.get(group);
@@ -270,7 +240,6 @@ public class objAnomalies extends functions{
                         currentRow.progEnd = index;
                     }
                     objGlobals.fileEtichette.put(possibles.get(0).row,currentRow);
-                    moveStock2(group, file, "target");
                 }
                 else{
                     boolean gotPossible=false;
@@ -321,14 +290,12 @@ public class objAnomalies extends functions{
                             if(!originalProgEnd.containsKey(group)){
                                 originalProgEnd.put(group, lastProg);
                             }
-                            moveStock2(group, file, "target");
                         }
                         else if(index<=firstProg){
                             objFileEtichette currentRow = objGlobals.fileEtichette.get(possibles.get(0).row);
                             currentRow.firstBarcode = barcode;
                             currentRow.progStart = index;
                             objGlobals.fileEtichette.put(possibles.get(lastIndex).row,currentRow);
-                            moveStock2(group, file, "target");
                         }
                         else{
                             printError(new Exception("SITUAZIONE NON PREVISTA GROUP:"+group+" BARCODE: "+barcode),false);
@@ -338,11 +305,43 @@ public class objAnomalies extends functions{
                 }
             }
         }
-
+        writeEtichette();
         for (Integer row1 : notExpected.keySet()){
             objNotExpected obj = notExpected.get(row1);
-            addStock2(++id,obj);
+            id++;
+            obj.save(id);
+            addStock2(id,obj);
+            for(String file : obj.fileList){
+                moveFilesWithDir("TMPS",file+"-FRONTE.tiff");
+                moveFilesWithDir("TMPS",file+"-RETRO.tiff");
+            }
         }
     }
 
+    public static boolean hasStockFileAnomaly(){
+        readStockFile();
+        return hasStockFileAnomaly;
+    }
+
+    public static void loadObjNotExpected() {
+        stock2.clear();
+        try {
+            Files.walkFileTree(Paths.get(objGlobals.objNotExpectedFolder), new SimpleFileVisitor<Path>()  {
+                @Override
+                public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+                    String id = path.getFileName().toString();
+                    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(path.toString())))) {
+                        addStock2(Integer.valueOf(id),(objNotExpected)ois.readObject());
+                    } catch (IOException | ClassNotFoundException e) {
+                        printError(e, true);
+                        return null;
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            printError(e,true);
+        }
+
+    }
 }

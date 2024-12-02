@@ -1,6 +1,7 @@
 package app;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
@@ -9,8 +10,10 @@ import static app.ctrlStockAnomalie2.findList;
 import static app.ctrlStockAnomalie2.shootList;
 import static app.ctrlStockAnomalie2.shootingId;
 import static app.ctrlStockAnomalie2.shootingRow;
+import static app.functions.ls;
 import static app.functions.alert;
 import static app.functions.confirm;
+import static app.functions.deleteFolder;
 import static app.functions.load;
 import static app.functions.moveStock2;
 import static app.functions.printError;
@@ -48,11 +51,11 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         tableView.setItems(shootList);
-        btnFoward.setOnAction(event->btnFoward());
-        btnBackwards.setOnAction(event->btnBackwards());
+        btnFoward.setOnAction(_->btnFoward());
+        btnBackwards.setOnAction(_->btnBackwards());
         findBarcodes.setCellValueFactory(cellData -> cellData.getValue().barcode());
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        searchBarcodes.textProperty().addListener((observable, oldValue, newValue) -> {
+        searchBarcodes.textProperty().addListener((_, _, newValue) -> {
             if (newValue.contains("\n")) {
                 String[] lines = newValue.split("\n");
                 String lastLine = lines[lines.length - 1];
@@ -67,7 +70,7 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
     }
 
     private void centerAlignColumn(TableColumn<modelEtichetteShoot, String> column) {
-        column.setCellFactory(tc -> {
+        column.setCellFactory(_-> {
             TableCell<modelEtichetteShoot, String> cell = new TableCell<modelEtichetteShoot, String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
@@ -85,7 +88,7 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
     }
 
     private void centerAlignColumnNotFound(TableColumn<modelEtichetteShootNotFound, String> column) {
-        column.setCellFactory(tc -> {
+        column.setCellFactory(_-> {
             TableCell<modelEtichetteShootNotFound, String> cell = new TableCell<modelEtichetteShootNotFound, String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
@@ -127,7 +130,7 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
                     fileEtichette.progStart = obj.indexStart();
                 }
                 objGlobals.fileEtichette.put(shootingRow,fileEtichette);
-                moveStock2(obj.group(), obj.fileList(), "target");
+                moveStock2(obj.group(),obj.fileList(),objGlobals.anomalyFolderStock2,objGlobals.targetTiff);
                 objAnomalies.stock2.remove(obj);
                 finish();
             }
@@ -179,7 +182,7 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
                     fileEtichette.progEnd = obj.indexEnd();
                 }
                 objGlobals.fileEtichette.put(fixRow,fileEtichette);
-                moveStock2(obj.group(), obj.fileList(), "target");
+                moveStock2(obj.group(),obj.fileList(),objGlobals.anomalyFolderStock2,objGlobals.targetTiff);
                 objAnomalies.stock2.remove(obj);
                 finish();
             }
@@ -188,6 +191,10 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
     }
 
     private void finish(){
+        ArrayList<String>ls = ls(objGlobals.anomalyFolderStock2,".tiff");
+        if(ls.isEmpty()){
+            deleteFolder(objGlobals.anomalyFolderStock2);
+        }
         if(objAnomalies.stock2.isEmpty()){
             writeEtichette();
             objGlobals.skipAnomalies=true;

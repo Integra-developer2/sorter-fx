@@ -27,13 +27,13 @@ public class ctrlStepChoice implements Initializable{
     private HBox stepTwo;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        stepOne.setOnMouseClicked(event -> {
+        stepOne.setOnMouseClicked(_-> {
             objGlobals.startingFrom="move_files";
             load("viewInputs",450,500);
         });
-        stepTwo.setOnMouseClicked(event -> {
+        stepTwo.setOnMouseClicked(_-> {
             objGlobals.startingFrom="gray";
-            if(!fileExists(objGlobals.etichetteFolder)||!fileExists(objGlobals.jogSorterFolder)||!fileExists(objGlobals.targetGray)||!fileExists(objGlobals.targetTiff)){
+            if(!fileExists(objGlobals.etichetteFolder)||!fileExists(objGlobals.jogSorterFolder)||!fileExists(objGlobals.stockFolder)||!fileExists(objGlobals.targetGray)||!fileExists(objGlobals.targetTiff)){
                 alert("ERRORE","SE VUOI SALTARE IL PRIMO STEP DEVI IMPOSTARE I FILE CONFORME CARTELLA __MODELLO__");
             }
             else{
@@ -48,9 +48,19 @@ public class ctrlStepChoice implements Initializable{
                             return FileVisitResult.CONTINUE;
                         }
                     });
+                    Files.walkFileTree(Paths.get(objGlobals.stockFolder), new SimpleFileVisitor<Path>()  {
+                        @Override
+                        public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+                            if(path.toString().endsWith(".csv")){
+                                objGlobals.sourceStock = path.toString();
+                                objGlobals.targetStock = path.toString();
+                            }
+                            return FileVisitResult.CONTINUE;
+                        }
+                    });
                     File stepMoveFiles=stepFile("moveFilesEnd");
                     step(stepMoveFiles);
-                    load("viewInputs",450,500);
+                    load("viewStatusBar",450,500);
                 } catch (IOException e) {
                     printError(e, true);
                 }

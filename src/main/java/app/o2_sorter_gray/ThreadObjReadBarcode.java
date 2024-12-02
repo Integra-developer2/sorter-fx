@@ -51,7 +51,7 @@ public class ThreadObjReadBarcode extends functions {
       } catch (Exception e) {
          logError(path,e);
       }
-      
+
    }
 
    public static HashMap<String, ArrayList<String>> barcodeFiles(ArrayList<String> barcodesA,ArrayList<String> barcodesB) throws Exception{

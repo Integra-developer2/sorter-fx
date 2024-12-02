@@ -90,10 +90,12 @@ public class functions{
 
     public static void moveFiles(String code, String from){
         String filename = getFileName(from);
-        String dir;
-        dir=objGlobals.errorMap.get(code).path;
-        mkdir(dir);
-        moveFile(from,dir+"\\\\"+filename);
+        if(new File(from).exists()){
+            String dir;
+            dir=objGlobals.errorMap.get(code).path;
+            mkdir(dir);
+            moveFile(from,new File(dir,filename).toString());
+        }
     }
 
     public static void readJobSorterCSV() throws Exception{
@@ -139,6 +141,11 @@ public class functions{
             mkdir(to);
             moveFile(from,to);
         }
+    }
+
+    public static void moveFilesBackWithDir(String from, String to){
+        mkdir(to);
+        moveFile(from,to);
     }
 
     public static void printStepControl(String file, String line){
@@ -290,6 +297,11 @@ public class functions{
             } catch (Exception e) {}
         }
         return ret;
+    }
+
+    public static String getEntity(String barcode) {
+        String[] row = objJobSorter.rows.get(barcode);
+        return row[letterToIndex(objGlobals.entityColumnJobSorter)];
     }
 
     public static int indexMin(String barcode){

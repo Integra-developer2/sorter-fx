@@ -1,14 +1,14 @@
 package app;
 
-import java.io.BufferedReader;
-
 import static app.o3_sorter_stock.functions.delete;
 import static app.o3_sorter_stock.functions.fileExists;
 import static app.o3_sorter_stock.functions.getBarcodeFromBlackFile;
 import static app.o3_sorter_stock.functions.getIndexFromBlackFile;
 import static app.o3_sorter_stock.functions.letterToIndex;
 import static app.o3_sorter_stock.functions.moveFiles;
+import static app.o3_sorter_stock.functions.moveFilesBackWithDir;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
@@ -26,20 +26,16 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import app.o2_sorter_gray.objConcurrentBlackController;
-import static app.o3_sorter_stock.functions.strPad;
-
 import app.o3_sorter_stock.SimpleImageInfo;
 import app.o3_sorter_stock.objBlackFiles;
 import app.o3_sorter_stock.objDonePdf;
-import app.o3_sorter_stock.objDoneStock;
 import app.o3_sorter_stock.objDoneStockNumber;
 import app.o3_sorter_stock.objEtichetta;
 import app.o3_sorter_stock.objJobSorter;
@@ -94,7 +90,7 @@ public class functions {
         alert(title,text.toString());
     }
 
-    public static boolean confirm(String title, String message, HashMap<String, ArrayList<String>> items) {
+    public static boolean confirm(String title, String message, ArrayList<String> items) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setWidth(800);
         alert.setHeight(800);
@@ -111,7 +107,7 @@ public class functions {
 
         String labelStyle = "-fx-background-color: #f0f0f0; -fx-padding: 5px; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-font-size: 13px; -fx-text-fill: #333333;";
 
-        for (String item : items.keySet()) {
+        for (String item : items) {
             Label label = new Label("• " + item);
             label.setStyle(labelStyle);
             vbox.getChildren().add(label);
@@ -421,12 +417,20 @@ public class functions {
                 File fileBack = new File(filename+"-RETRO.tiff");
                 if(!fileFront.exists() || !fileBack.exists()){
                     if(fileFront.exists()){
-                        objConcurrentBlackController.add("CGNF","",filename+"-FRONTE.tiff");
-                        delete(filename+"-FRONTE.tiff");
+                        if(objGlobals.errorMap.get("CBNF").moveFile){
+                            moveFiles("CBNF", filename+"-FRONTE.tiff");
+                        }
+                        else{
+                            delete(file);
+                        }
                     }
                     if(fileBack.exists()){
-                        objConcurrentBlackController.add("CGNF","",filename+"-RETRO.tiff");
-                        delete(filename+"-RETRO.tiff");
+                        if(objGlobals.errorMap.get("CBNF").moveFile){
+                            moveFiles("CBNF", filename+"-RETRO.tiff");
+                        }
+                        else{
+                            delete(file);
+                        }
                     }
                 }
                 else if(!objToPdf.list.containsKey(filename)){
@@ -451,18 +455,44 @@ public class functions {
         }
     }
 
+    public static void writeStockFile(String to){
+        String filename = (to.equals("log") ? objGlobals.newTargetStock() : objGlobals.paccoFinale());
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            writer.write("ID;AGENZIA;CLIENTE;PREFISSO;NUMERO");
+            writer.newLine();
+            for (String entity_id : objGlobals.stockByEntity.keySet()) {
+                objStockFile _row = objGlobals.stockByEntity.get(entity_id);
+                writer.append(_row.ID+";"+_row.AGENZIA+";"+_row.CLIENTE+";"+_row.PREFISSO+";"+(to.equals("log") ? _row.NUMERO : _row.stockNumber));
+                writer.newLine();
+            }
+            for( modelStockFile anomalie: objAnomalies.stockFile){
+                objGlobals.stockByEntity.put(anomalie.A().get(),new objStockFile(anomalie.A().get(), anomalie.B().get(), anomalie.C().get(), anomalie.D().get(), anomalie.E().get()));
+                writer.append(anomalie.A().get()+";"+anomalie.B().get()+";"+anomalie.C().get()+";"+anomalie.D().get()+";"+anomalie.E().get());
+                writer.newLine();
+            }
+            objGlobals.newtargetStock(filename);
+        } catch (IOException e) {
+            printError(e, true);
+        }
+    }
+
     public static void makeStockNumber(){
-        boolean isFirst = true;
         File fileOrigin = new File(objGlobals.targetTiff);
+        objGlobals.stockByEntity.clear();
+        objDoneStockNumber.clear();
+        readStockFile();
         for (String group : objEtichetta.list.keySet()) {
+            String entity = objEtichetta.entityList.get(group);
+            String boxNote=objEtichetta.boxNote.get(group);
+            objStockFile stockObj = objGlobals.stockByEntity.get(entity);
+            stockObj.stockNumber ++;
+            String stock = stockObj.PREFISSO.concat(stockObj.stockNumber.toString());
             for (int indexFrom : objEtichetta.list.get(group).keySet()) {
-                String stock = "";
                 int indexTo = objEtichetta.list.get(group).get(indexFrom);
                 int index = indexFrom;
-                int countStock = 0;
+                int countStock = stockObj.countStock;
                 while (index <= indexTo) {
                     if(objBlackFiles.groupIndex.containsKey(group)&&objBlackFiles.groupIndex.get(group).containsKey(index)){
-                        countStock++;
                         String fullFilename = objBlackFiles.groupIndex.get(group).get(index);
                         String barcode = getBarcodeFromBlackFile(fullFilename);
                         if(objDoneStockNumber.list.contains(barcode)){
@@ -471,16 +501,7 @@ public class functions {
                         else{
                             String baseName = fullFilename.replace("-FRONTE.tiff", "").replace("-RETRO.tiff", "");
                             if(fileExists(baseName+"-FRONTE.tiff")&&fileExists(baseName+"-RETRO.tiff")){
-                                if(stock.isEmpty()){
-                                    if(isFirst){
-                                        isFirst=false;
-                                        stock=objGlobals.stockPrefix + strPad(String.valueOf( objGlobals.stockNumber),4,"0");
-                                    }
-                                    else{
-                                        stock = objGlobals.stockPrefix + objDoneStock.getNext();
-                                    }
-                                }
-                                String[] sorterExportRow = new String[]{stock, String.valueOf(countStock), barcode+"-"+getIndexFromBlackFile(fullFilename)};
+                                String[] sorterExportRow = new String[]{stock, String.valueOf(countStock++), barcode+"-"+getIndexFromBlackFile(fullFilename),boxNote};
                                 String sorterExportLabel = objJobSorter.rows.get(barcode)[letterToIndex(objGlobals.sorterExportValoreDaSorter)];
                                 File file = new File(fullFilename);
                                 String extraFolders = file.getParent().replace(fileOrigin.getAbsolutePath(), "");
@@ -490,6 +511,7 @@ public class functions {
                                 String to = fileTo.toString();
                                 objToPdf.add(baseName, to);
                                 objDoneStockNumber.add(barcode);
+                                stockObj.countStock=countStock;
                             }
                         }
                     }
@@ -497,6 +519,7 @@ public class functions {
                 }
             }
         }
+
     }
 
     public static Boolean isHorizontal(String path) {
@@ -598,14 +621,45 @@ public class functions {
         }
     }
 
+    public static void moveStock2(String group, ArrayList<String> fileList, String from, String to){
+        for (String file : fileList) {
+            String fileFrom=file.replace(objGlobals.targetTiff,from);
+            String fileTo=file.replace(objGlobals.targetTiff,to);
+            moveFilesBackWithDir(fileFrom+"-FRONTE.tiff", fileTo+"-FRONTE.tiff");
+            moveFilesBackWithDir(fileFrom+"-RETRO.tiff", fileTo+"-RETRO.tiff");
+        }
+    }
+
+    public static void moveFolder(String from, String to){
+        if(new File(from).exists()){
+            Path sourceFolder = Paths.get(from);
+            Path targetFolder = new File(to,sourceFolder.getFileName().toString()).toPath();
+            try {
+                Files.move(sourceFolder, targetFolder, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                printError("Failed to move folder: " + e.getMessage(),e,false);
+            }
+        }
+    }
+
     public static void moveStock2(String group, String from, String where){
         String to=from;
         switch (where) {
-            case "target" -> to = to.replace(new File(objGlobals.notExpectedFolder, group).toString(),objGlobals.targetTiff);
+            case "notExpectedGroup" -> to = to.replace(objGlobals.targetTiff,new File(objGlobals.notExpectedFolder, group).toString());
+            case "anomaly" -> to = to.replace(objGlobals.targetTiff,new File(objGlobals.anomalyFolderStock2, group).toString());
+            case "target" -> to = to.replace(new File(objGlobals.anomalyFolderStock2, group).toString(),objGlobals.targetTiff);
             case "log" -> to = to.replace(objGlobals.targetTiff,new File(objGlobals.notExpectedFolder, group).toString());
         }
         moveFile(from+"-FRONTE.tiff", to+"-FRONTE.tiff");
         moveFile(from+"-RETRO.tiff", to+"-RETRO.tiff");
+    }
+
+    public static boolean hasNotExpectedFolder(){
+        return new File(objGlobals.notExpectedFolder).exists();
+    }
+
+    public static boolean hasAnomalyFolderStock2(){
+        return new File(objGlobals.anomalyFolderStock2).exists();
     }
 
     public static void writeAllBlackFiles(){
@@ -639,4 +693,33 @@ public class functions {
         }
 
     }
+
+    public static void readStockFile(){
+        objGlobals.stockByEntity.clear();
+        objAnomalies.stockFile.clear();
+        objAnomalies.hasStockFileAnomaly=false;
+        try (BufferedReader reader = new BufferedReader(new FileReader(objGlobals.targetStock))) {
+            String line;Integer count=0;
+            while ((line=reader.readLine())!=null) {
+                if(count>0){
+                    ArrayList<String> _row = new ArrayList<>();
+                    _row.addAll(Arrays.asList(line.split(";")));
+                    String A = !_row.isEmpty() ? _row.get(0) : "";
+                    String B = _row.size() > 1 ? _row.get(1) : "";
+                    String C = _row.size() > 2 ? _row.get(2) : "";
+                    String D = _row.size() > 3 ? _row.get(3) : "";
+                    String E = _row.size() > 4 ? _row.get(4) : "";
+                    if( D.isEmpty() || E.isEmpty()){
+                        objAnomalies.stockFile.add(new modelStockFile(count, A, B, C, D, E));
+                        objAnomalies.hasStockFileAnomaly=true;
+                    }
+                    else{
+                        objGlobals.stockByEntity.put(A,new objStockFile(A, B, C, D, E));
+                    }
+                }
+                count++;
+            }
+        } catch (Exception e) { printError(e, true);}
+    }
+
 }

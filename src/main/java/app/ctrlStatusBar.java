@@ -9,11 +9,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
+import static app.functions.moveFolder;
+import static app.functions.hasNotExpectedFolder;
+import static app.functions.hasAnomalyFolderStock2;
 import static app.functions.step;
 import static app.functions.alert;
 import static app.functions.stepFile;
@@ -22,7 +26,6 @@ import static app.functions.deleteFolder;
 import static app.functions.getProgressGray;
 import static app.functions.getProgressStock;
 import static app.functions.load;
-import static app.functions.loadFullscreen;
 import static app.functions.ls;
 import static app.functions.printError;
 import javafx.application.Platform;
@@ -42,6 +45,10 @@ public class ctrlStatusBar implements Initializable {
     private Label lblMoveFiles;
     @FXML
     private ImageView imgMoveFiles;
+    @FXML
+    private Label lblStockFile;
+    @FXML
+    private ImageView imgStockFile;
     @FXML
     private Label lblGray;
     @FXML
@@ -70,12 +77,14 @@ public class ctrlStatusBar implements Initializable {
     private double lastProgressGray = 0;
     private double lastProgressStock = 0;
     private File stepMoveFiles;
+    private File stepStockFile;
     private File stepGray;
     private File stepAnomaliesGray;
     private File stepStockAnomalies;
     private File stepStockAnomalies2;
     private File stepStock;
     private Service<Void> moveFilesService;
+    private Service<Void> stockFileService;
     private Service<Void> grayService;
     private Service<Void> grayAnomaliesService;
     private Service<Void> stockAnomaliesService;
@@ -87,6 +96,7 @@ public class ctrlStatusBar implements Initializable {
         title.setText(objGlobals.version);
         try {
             stepMoveFiles=stepFile("moveFilesEnd");
+            stepStockFile=stepFile("stockFileEnd");
             stepGray=stepFile("grayEnd");
             stepAnomaliesGray=stepFile("stepAnomaliesGrayEnd");
             stepStock=stepFile("stockEnd");
@@ -129,12 +139,48 @@ public class ctrlStatusBar implements Initializable {
                                         }else{
                                             if(!objGlobals.stop){
                                                 Platform.runLater(() -> {completeMoveFiles();});
-                                                grayService.start();
+                                                stockFileService.start();
                                             }
                                         }
                                     }
                                     else{
                                         Platform.exit();
+                                    }
+                                }
+                                catch (Exception e) {
+                                    printError(e,true);throw e;
+                                }
+                            }
+
+                            return null;
+                        }
+                    };
+                }
+            };
+
+            stockFileService = new Service<>() {
+                @Override
+                protected Task<Void> createTask() {
+                    return new Task<>() {
+                        @Override
+                        protected Void call() throws Exception {
+                            if(!objGlobals.stop){
+                                Platform.runLater(() -> {
+                                    lblStockFile.setText("iniziato");
+                                });
+                                try {
+                                    if(objAnomalies.hasStockFileAnomaly()){
+                                        Platform.runLater(() -> {
+                                            lblStockFile.setText("Anomalies");
+                                            imgStockFile.setImage(new Image(App.class.getResource("img/warning.gif").toExternalForm()));
+                                            alert("ANOMALIA","SISTEMA LE ANOMALIE PRIMA DI CONTINUARE");
+                                            load("viewStockFile",1200,500);
+                                        });
+                                    }else{
+                                        if(!objGlobals.stop){
+                                            Platform.runLater(() -> {completeStockFile();});
+                                            grayService.start();
+                                        }
                                     }
                                 }
                                 catch (Exception e) {
@@ -191,10 +237,10 @@ public class ctrlStatusBar implements Initializable {
                                 if(objAnomalies.hasGrayAnomaly()){
                                     Platform.runLater(()->{
                                         alert("ANOMALIA","SISTEMA LE ANOMALIE PRIMA DI CONTINUARE");
-                                        loadFullscreen("viewGrayAnomalie");
+                                        load("viewGrayAnomalie",900,900);
                                     });
                                 }
-                                if(!objGlobals.stop){
+                                else if(!objGlobals.stop){
                                     Platform.runLater(()->{completeGrayAnomalies();});
                                 }
                             }
@@ -249,15 +295,55 @@ public class ctrlStatusBar implements Initializable {
                                     lblAnomaliesStock2.setText("iniziato");
                                     imgAnomaliesStock2.setImage(new Image(App.class.getResource("img/warning.gif").toExternalForm()));
                                 });
-                                if(!objGlobals.skipAnomalies&&objAnomalies.hasStockAnomaly2()){
-                                    if(!objGlobals.stop){
-                                        Platform.runLater(()->{
-                                            load("viewStockAnomalie2",1000,600);
+                                if(!hasNotExpectedFolder()&&!hasAnomalyFolderStock2()){ objAnomalies.findStockAnomaly2();}
+                                if(hasNotExpectedFolder()){
+                                    boolean start[] = {true};
+                                    CountDownLatch latch = new CountDownLatch(1);
+                                    try {
+                                        ArrayList<String>unExpectedGroups=new ArrayList<>();
+                                        Platform.runLater(() -> {
+                                            try {
+                                                String message = "CONFERMI CHE QUESTI COMUNI NON DEVONO ESSERE PREVISTI ?";
+                                                try {
+                                                    Files.walkFileTree(Paths.get(objGlobals.notExpectedFolder), new SimpleFileVisitor<Path>()  {
+                                                        @Override
+                                                        public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+                                                            Path fullPath = Paths.get(path.toFile().getParent());
+                                                            Path notExpectedFolderPath = Paths.get(objGlobals.notExpectedFolder);
+                                                            Path relativePath = notExpectedFolderPath.relativize(fullPath);
+                                                            String group = relativePath.getName(0).toString();
+                                                            if(!unExpectedGroups.contains(group)){
+                                                                unExpectedGroups.add(group);
+                                                            }
+                                                            return FileVisitResult.CONTINUE;
+                                                        }
+                                                    });
+                                                } catch (IOException e) {
+                                                    printError(e, false);
+                                                }
+                                                start[0] = confirm("ATENZIONE", message, unExpectedGroups);
+                                            } finally {
+                                                latch.countDown();
+                                            }
                                         });
+                                        latch.await();
+                                    } catch (InterruptedException e) {
+                                        printError(e,false);
+                                    }
+                                    if(start[0]){
+                                        moveFolder(objGlobals.notExpectedFolder, objGlobals.logFolder);
+                                    }
+                                    else{
+                                        objGlobals.stop=true;
+                                        alert("ANOMALIA","SISTEMA LA CARTELLA \"NON PREVISTI NEL FILE ETICHETTE\" E RIAPRI IL PROGRAMMA");
                                     }
                                 }
-                                else{
-                                    if(!objGlobals.stop){
+                                if(!objGlobals.stop){
+                                    if(hasAnomalyFolderStock2()){
+                                        objAnomalies.loadObjNotExpected();
+                                        Platform.runLater(()->{ load("viewStockAnomalie2",1000,600);});
+                                    }
+                                    else{
                                         Platform.runLater(()->{completeStockAnomalies2();});
                                         stockService.start();
                                     }
@@ -306,6 +392,7 @@ public class ctrlStatusBar implements Initializable {
 
     private void setupServices(){
         bindServiceStack(moveFilesService,lblMoveFiles,imgMoveFiles);
+        bindServiceStack(stockFileService,lblStockFile,imgStockFile);
         bindServiceStack(grayService,lblGray,imgGray);
         bindServiceStack(grayAnomaliesService,lblAnomaliesGray,imgAnomaliesGray);
         bindServiceStack(stockAnomaliesService,lblAnomaliesStock,imgAnomaliesStock);
@@ -427,37 +514,31 @@ public class ctrlStatusBar implements Initializable {
 
     private void startService(){
         if(!objGlobals.stop){
-            if(!stepMoveFiles.exists()){
-                moveFilesService.start();
-            }
-            else if(!stepGray.exists()){
-                Platform.runLater(()->{
-                    completeMoveFiles();
-                });
-                grayService.start();
-            }
-            else if(!stepStock.exists()){
-                if(new File(objGlobals.anomalyFolderGray).exists()){
-                    Platform.runLater(()->{completeMoveFiles();completeGray();});
-                    grayAnomaliesService.start();
-                }
-                else if(!objGlobals.skipAnomalies){
-                    Platform.runLater(()->{completeMoveFiles();completeGray();completeGrayAnomalies();});
-                    stockAnomaliesService.start();
-                }
+            if(!stepMoveFiles.exists()){ moveFilesService.start();}
+            else{
+                Platform.runLater(()->{ completeMoveFiles();});
+                if(!stepStockFile.exists()){ stockFileService.start();}
                 else{
-                    Platform.runLater(()->{completeMoveFiles();completeGray();completeGrayAnomalies();completeStockAnomalies();completeStockAnomalies2();});
-                    stockService.start();
+                    Platform.runLater(()->{ completeStockFile();});
+                    if(!stepGray.exists()){ grayService.start();}
+                    else {
+                        Platform.runLater(()->{ completeGray();});
+                        if(!stepStock.exists()){
+                            if(new File(objGlobals.anomalyFolderGray).exists()){ grayAnomaliesService.start();}
+                            else{
+                                Platform.runLater(()->{ completeGrayAnomalies();});
+                                if(!objGlobals.skipAnomalies){ stockAnomaliesService.start();}
+                                else{
+                                    Platform.runLater(()->{ completeStockAnomalies();completeStockAnomalies2();});
+                                    stockService.start();
+                                }
+                            }
+                        }
+                        else {
+                            Platform.runLater(()->{ completeGrayAnomalies();completeStockAnomalies();completeStockAnomalies2();completeStock();});
+                        }
+                    }
                 }
-            } else {
-                Platform.runLater(()->{
-                    completeMoveFiles();
-                    completeGray();
-                    completeGrayAnomalies();
-                    completeStockAnomalies();
-                    completeStockAnomalies2();
-                    completeStock();
-                });
             }
         }
     }
@@ -466,6 +547,12 @@ public class ctrlStatusBar implements Initializable {
         step(stepMoveFiles);
         lblMoveFiles.setText("completato");
         imgMoveFiles.setImage(new Image(App.class.getResource("img/done.gif").toExternalForm()));
+    }
+
+    private void completeStockFile(){
+        step(stepStockFile);
+        lblStockFile.setText("completato");
+        imgStockFile.setImage(new Image(App.class.getResource("img/done.gif").toExternalForm()));
     }
 
     private void completeGray(){
@@ -486,13 +573,6 @@ public class ctrlStatusBar implements Initializable {
         imgAnomaliesGray.setImage(new Image(App.class.getResource("img/done.gif").toExternalForm()));
     }
 
-    private void completeStock(){
-        step(stepStock);
-        lblStock.setText("completato");
-        plStock.setVisible(false);
-        imgStock.setImage(new Image(App.class.getResource("img/done.gif").toExternalForm()));
-    }
-
     private void completeStockAnomalies(){
         step(stepStockAnomalies);
         lblAnomaliesStock.setText("completato");
@@ -504,4 +584,12 @@ public class ctrlStatusBar implements Initializable {
         lblAnomaliesStock2.setText("completato");
         imgAnomaliesStock2.setImage(new Image(App.class.getResource("img/done.gif").toExternalForm()));
     }
+
+    private void completeStock(){
+        step(stepStock);
+        lblStock.setText("completato");
+        plStock.setVisible(false);
+        imgStock.setImage(new Image(App.class.getResource("img/done.gif").toExternalForm()));
+    }
+
 }

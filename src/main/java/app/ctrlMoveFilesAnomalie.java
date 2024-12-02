@@ -40,11 +40,11 @@ public class ctrlMoveFilesAnomalie implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         title.setText(objGlobals.version);
-        btnDownload.setOnAction(event->donwloadTxt());
-        btnFoward.setOnAction(event->foward());
+        btnDownload.setOnAction(_->donwloadTxt());
+        btnFoward.setOnAction(_->foward());
         ObservableList<String> items = FXCollections.observableArrayList (objAnomalies.moveFiles);
         list.setItems(items);
-        list.setCellFactory(lv -> {
+        list.setCellFactory(_-> {
             var cell = new javafx.scene.control.ListCell<String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
@@ -60,21 +60,21 @@ public class ctrlMoveFilesAnomalie implements Initializable{
             });
 
             return cell;
-        });        
+        });
     }
 
     private void showContextMenu(javafx.scene.control.ListCell<String> cell, MouseEvent event) {
         ContextMenu contextMenu = new ContextMenu();
 
         MenuItem copyPath = new MenuItem("Copia Percorso");
-        copyPath.setOnAction(e -> {
+        copyPath.setOnAction(_-> {
             String text = cell.getItem();
             Path path = Paths.get(text);
             copyToClipboard(path.getParent().toString());
         });
 
         MenuItem copyFilename = new MenuItem("Copia Nome File");
-        copyFilename.setOnAction(e -> {
+        copyFilename.setOnAction(_-> {
             String text = cell.getItem();
             Path path = Paths.get(text);
             copyToClipboard(path.getFileName().toString()); 
@@ -122,6 +122,12 @@ public class ctrlMoveFilesAnomalie implements Initializable{
             if(from.endsWith(".csv")){
                 if (from.equals(objGlobals.sourceEtichette)) {
                     File fileTo = new File(objGlobals.targetEtichette);
+                    if(!fileTo.exists()){
+                        moveFiles.add(from);
+                    }
+                }
+                if (from.equals(objGlobals.sourceStock)) {
+                    File fileTo = new File(objGlobals.targetStock);
                     if(!fileTo.exists()){
                         moveFiles.add(from);
                     }

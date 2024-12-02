@@ -16,7 +16,7 @@ import app.objError;
 import app.objGlobals;
 
 public class functions {
-   
+
    public static String folder(String baseFolder, String folder){
       File ret = new File(baseFolder, folder);
       return ret.toString();
@@ -31,12 +31,11 @@ public class functions {
       bd = bd.setScale(places, RoundingMode.HALF_UP);
       return bd.doubleValue();
    }
-   
+
    public static void moveFilesBlackWithDir(String code, ArrayList<String> list){
       for (String from : list) { moveFilesBlackWithDir(code, from);}
    }
 
-   
    public static void delete(String path) {
       File directory = new File(path);
       deleteFile(directory);
@@ -57,7 +56,7 @@ public class functions {
       }
       directory.delete();
    }
-   
+
    public static void moveFilesBlackWithDir(String code, String from){
       objError objError = (objError) objGlobals.errorMap.get(code);
       Path fromPath = Paths.get(from);
@@ -81,7 +80,7 @@ public class functions {
    public static void logResultGray(String code, String from, String result) {
       objConcurrentGrayController.add(from,code,result);
    }
-   
+
    public static String strPad(String inputString, int length, String append) {
       if (inputString.length() >= length) {
          return inputString;
@@ -136,5 +135,5 @@ public class functions {
       String filename = file.getName().replace("RAC-EST", "RAC_EST");
       String[] split = filename.split("-");
       return split[6];
-   } 
+   }
 }
