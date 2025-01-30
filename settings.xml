@@ -3,7 +3,7 @@
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>C:\Users\tsousasilva\Desktop\projects\sorter-fx\1.0.2\target\sorter-fx-1.0.2.jar</jar>
-  <outfile>C:\Users\tsousasilva\Desktop\projects\sorter-fx\1.0.2\sorterFx.exe</outfile>
+  <outfile>C:\Users\tsousasilva\Desktop\projects\sorter-fx\1.0.2\sorterFx-1.0.2.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
