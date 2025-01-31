@@ -337,20 +337,22 @@ public class functions{
     }
 
     private static void addBarcode(ArrayList<String>fileAdded,String file) {
-        String fileName = file.replace("-FRONTE.tiff", "");
-        if(!fileAdded.contains(fileName)){
-            objBlackFiles.addBarcodePath(fileName);
-            fileAdded.add(fileName);
+        if(file.contains(".tiff")){
+            String fileName = file.replace("-FRONTE.tiff", "");
+            if(!fileAdded.contains(fileName)){
+                objBlackFiles.addBarcodePath(fileName);
+                fileAdded.add(fileName);
+            }
+            String barcode = getBarcodeFromBlackFile(file);
+            String alternative = objJobSorterGrouped.getAlternative(barcode);
+            if(!objGlobals.barcodesFromFiles.contains(barcode)){
+                objGlobals.barcodesFromFiles.add(barcode);
+            }
+            if(!alternative.isEmpty()&&!objGlobals.barcodesFromFiles.contains(alternative)){
+                objGlobals.barcodesFromFiles.add(alternative);
+            }
+            objBlackFiles.add(file);
         }
-        String barcode = getBarcodeFromBlackFile(file);
-        String alternative = objJobSorterGrouped.getAlternative(barcode);
-        if(!objGlobals.barcodesFromFiles.contains(barcode)){
-            objGlobals.barcodesFromFiles.add(barcode);
-        }
-        if(!alternative.isEmpty()&&!objGlobals.barcodesFromFiles.contains(alternative)){
-            objGlobals.barcodesFromFiles.add(alternative);
-        }
-        objBlackFiles.add(file);
     }
 
     public static void readBlackDir() throws Exception{
