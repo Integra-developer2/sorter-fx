@@ -20,7 +20,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class objGlobals {
-    public static String version = "SORTER-FX 1.0.1";
+    public static String version = "SORTER-FX 1.0.2";
     public static final int PRINT_AT=100;
     public static int totalThreadsMoveFiles=300;
     public static int totalThreadsGray=100;
@@ -93,6 +93,7 @@ public class objGlobals {
     public static File sourceTiffFile;
     public static File stockPrefixFile;
     public static File stockNumberFile;
+    public static String logObjToPdf;
 
     public static void variables(){
         try{
@@ -134,7 +135,7 @@ public class objGlobals {
             targetEtichette=targetEtichette();
             allBlackFiles=allBlackFiles();
             sorterExport=sorterExport();
-
+            logObjToPdf=logObjToPdf();
             objDoneStock.add(String.valueOf(stockNumber));
         } catch (Exception e) { printError(e,true);}
     }
@@ -276,6 +277,11 @@ public class objGlobals {
         File file = new File(new File(logFolder, "STEP_CONTROL"), "ThreadPdf");
         return file.toString();
     }
+    public static String logObjToPdf() {
+        File file = new File(logFolder, "objToPdf");
+        return file.toString();
+    }
+
 
     public static String targetGray() {
         File file = new File(new File(workingFolder, "FILE_TEMPORANEI"), "GRIGI");

@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static app.functions.logError;
 import static app.functions.makeStockNumber;
 import static app.functions.printError;
 import app.objAnomalies;
@@ -23,7 +22,7 @@ public class EntryPoint extends functions{
             else{
                 write("primo: "+objGlobals.stockPrefix + strPad(String.valueOf(objGlobals.stockNumber),4,"0"), objGlobals.stockTxt);
                 makeStockNumber();
-                makePdfMulti(new StepController());
+                makePdfMulti();
                 makeSorterExport();
                 write("ultimo: "+objGlobals.stockPrefix + objDoneStock.lastNumber, objGlobals.stockTxt);
             }
@@ -32,25 +31,15 @@ public class EntryPoint extends functions{
         }
     }
 
-    public static void makePdfMulti(StepController stepController){
-        int threadIndex = 0;
-        StepPdf objStepPdf = new StepPdf();
-        for (String from : objToPdf.list.keySet()) {
-            String to = objToPdf.list.get(from);
-            if(stepController.listIsFull()){
-                stepController.printProgress("Pdf",objToPdf.list.size());
+    private static void makePdfMulti() {
+        if(!objToPdf.list.isEmpty()){
+            int threadIndex = 0;
+            for (String from : objToPdf.list.keySet()) {
+                String to = objToPdf.list.get(from);
+                Threads.start(new ThreadPdf("bcr_"+threadIndex++, new ThreadObjPdf(), from, to), objToPdf.list.size());
             }
-            var Thread = new ThreadPdf( "pdf" + threadIndex, objStepPdf, from, to);
-            try {
-                Thread.join();
-            } catch ( InterruptedException e) {
-                logError("pdf from: "+from+" to "+to, e);
-            }
-            threadIndex++;
-            Thread.start();
-            stepController.stepAdd(from + " " + to);
+            Threads.waitRunning();
         }
-        ThreadCount.waitPdf();
     }
 
     public static void makeSorterExport(){

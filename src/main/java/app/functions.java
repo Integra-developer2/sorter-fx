@@ -383,6 +383,9 @@ public class functions {
         }
         return ret;
     }
+    public synchronized static void updateProgressStock(double value) {
+        objGlobals.progressStock = value;
+    }
 
     public synchronized static void updateProgressGray(double value) {
         objGlobals.progressGray = value;
@@ -496,6 +499,14 @@ public class functions {
                     index++;
                 }
             }
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(objGlobals.logObjToPdf))) {
+            for (String from : objToPdf.list.keySet()) {
+                String to = objToPdf.list.get(from);
+                writer.append(from+";"+to).append(System.lineSeparator());
+            }
+        } catch (Exception e) {
+            printError(e, false);
         }
     }
 

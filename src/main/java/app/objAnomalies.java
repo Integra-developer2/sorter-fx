@@ -327,7 +327,6 @@ public class objAnomalies extends functions{
                             objFileEtichette currentRow = objGlobals.fileEtichette.get(possibles.get(0).row);
                             currentRow.firstBarcode = barcode;
                             currentRow.progStart = index;
-                            objGlobals.fileEtichette.put(possibles.get(lastIndex).row,currentRow);
                             moveStock2(group, file, "target");
                         }
                         else{

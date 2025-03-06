@@ -336,6 +336,25 @@ public class functions{
         System.out.println(text);
     }
 
+    private static void addBarcode(ArrayList<String>fileAdded,String file) {
+        if(file.contains(".tiff")){
+            String fileName = file.replace("-FRONTE.tiff", "");
+            if(!fileAdded.contains(fileName)){
+                objBlackFiles.addBarcodePath(fileName);
+                fileAdded.add(fileName);
+            }
+            String barcode = getBarcodeFromBlackFile(file);
+            String alternative = objJobSorterGrouped.getAlternative(barcode);
+            if(!objGlobals.barcodesFromFiles.contains(barcode)){
+                objGlobals.barcodesFromFiles.add(barcode);
+            }
+            if(!alternative.isEmpty()&&!objGlobals.barcodesFromFiles.contains(alternative)){
+                objGlobals.barcodesFromFiles.add(alternative);
+            }
+            objBlackFiles.add(file);
+        }
+    }
+
     public static void readBlackDir() throws Exception{
         objBlackFiles.clear();
         ArrayList<String>fileAdded = new ArrayList<>();
@@ -343,20 +362,7 @@ public class functions{
             try (BufferedReader reader = new BufferedReader(new FileReader(objGlobals.allBlackFiles))) {
                 String file;
                 while ((file=reader.readLine())!=null) {
-                    String fileName = file.replace("-FRONTE.tiff", "");
-                    if(!fileAdded.contains(fileName)){
-                        objBlackFiles.addBarcodePath(fileName);
-                        fileAdded.add(fileName);
-                    }
-                    String barcode = getBarcodeFromBlackFile(file);
-                    String alternative = objJobSorterGrouped.getAlternative(barcode);
-                    if(!objGlobals.barcodesFromFiles.contains(barcode)){
-                        objGlobals.barcodesFromFiles.add(barcode);
-                    }
-                    if(!alternative.isEmpty()&&!objGlobals.barcodesFromFiles.contains(alternative)){
-                        objGlobals.barcodesFromFiles.add(alternative);
-                    }
-                    objBlackFiles.add(file);
+                    addBarcode(fileAdded,file);
                 }
             } catch (Exception e) {
                 throw e;
@@ -368,10 +374,7 @@ public class functions{
                     @Override
                     public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
                         String file = path.toString();
-                        if(file.contains("-FRONTE.tiff")){
-                            objBlackFiles.addBarcodePath(file.replace("-FRONTE.tiff", ""));
-                        }
-                        objBlackFiles.add(file);
+                        addBarcode(fileAdded,file);
                         return FileVisitResult.CONTINUE;
                     }
                 });
