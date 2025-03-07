@@ -40,11 +40,11 @@ public class ctrlMoveFilesAnomalie implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         title.setText(objGlobals.version);
-        btnDownload.setOnAction(event->donwloadTxt());
-        btnFoward.setOnAction(event->foward());
+        btnDownload.setOnAction(_->donwloadTxt());
+        btnFoward.setOnAction(_->foward());
         ObservableList<String> items = FXCollections.observableArrayList (objAnomalies.moveFiles);
         list.setItems(items);
-        list.setCellFactory(lv -> {
+        list.setCellFactory(_ -> {
             var cell = new javafx.scene.control.ListCell<String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
@@ -67,14 +67,14 @@ public class ctrlMoveFilesAnomalie implements Initializable{
         ContextMenu contextMenu = new ContextMenu();
 
         MenuItem copyPath = new MenuItem("Copia Percorso");
-        copyPath.setOnAction(e -> {
+        copyPath.setOnAction(_ -> {
             String text = cell.getItem();
             Path path = Paths.get(text);
             copyToClipboard(path.getParent().toString());
         });
 
         MenuItem copyFilename = new MenuItem("Copia Nome File");
-        copyFilename.setOnAction(e -> {
+        copyFilename.setOnAction(_ -> {
             String text = cell.getItem();
             Path path = Paths.get(text);
             copyToClipboard(path.getFileName().toString()); 

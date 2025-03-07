@@ -59,12 +59,12 @@ public class ctrlInputs implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        etichette.setOnMouseClicked(event->etichette());
-        jobSorter.setOnMouseClicked(event->jobSorter());
-        gray.setOnMouseClicked(event->gray());
-        tiff.setOnMouseClicked(event->tiff());
-        btnBackwards.setOnAction(event->btnBackwards());
-        btnFoward.setOnAction(event->btnFoward());
+        etichette.setOnMouseClicked(_->etichette());
+        jobSorter.setOnMouseClicked(_->jobSorter());
+        gray.setOnMouseClicked(_->gray());
+        tiff.setOnMouseClicked(_->tiff());
+        btnBackwards.setOnAction(_->btnBackwards());
+        btnFoward.setOnAction(_->btnFoward());
         stockNumber.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
             validateStockNumber(newValue);
         });

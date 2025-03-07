@@ -22,7 +22,7 @@ public class ctrlWorkingFolder implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         objGlobals.workingFolder="";
-        workingFolder.setOnMouseClicked(event->workingFolder());
+        workingFolder.setOnMouseClicked(_->workingFolder());
     }
     @FXML
     public void workingFolder(){

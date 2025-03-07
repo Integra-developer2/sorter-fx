@@ -87,14 +87,14 @@ public class ctrlGrayAnomalie implements Initializable{
     public void initialize(URL location, ResourceBundle resources) {
         title.setText(objGlobals.version);
         title.prefWidthProperty().bind(Bindings.createDoubleBinding(() -> appBox.getWidth(),appBox.widthProperty()));
-        btnEqual.setOnAction(event -> btnEqual());
-        btnNotEqual.setOnAction(event -> btnNotEqual());
-        btnBackwards.setOnAction(event -> btnBackwards());
-        btnFoward.setOnAction(event -> btnFoward());
-        frontLeft.setOnMouseClicked(event -> frontLeft());
-        frontRight.setOnMouseClicked(event -> frontRight());
-        backLeft.setOnMouseClicked(event -> backLeft());
-        backRight.setOnMouseClicked(event -> backRight());
+        btnEqual.setOnAction(_ -> btnEqual());
+        btnNotEqual.setOnAction(_ -> btnNotEqual());
+        btnBackwards.setOnAction(_ -> btnBackwards());
+        btnFoward.setOnAction(_ -> btnFoward());
+        frontLeft.setOnMouseClicked(_ -> frontLeft());
+        frontRight.setOnMouseClicked(_ -> frontRight());
+        backLeft.setOnMouseClicked(_ -> backLeft());
+        backRight.setOnMouseClicked(_ -> backRight());
         files = new HashMap<>();
         for (String file : objAnomalies.gray) {
             String filename = file.replace("-FRONTE.tiff", "").replace("-RETRO.tiff", "");
