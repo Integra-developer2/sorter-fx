@@ -27,11 +27,11 @@ public class ctrlStepChoice implements Initializable{
     private HBox stepTwo;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        stepOne.setOnMouseClicked(event -> {
+        stepOne.setOnMouseClicked(_ -> {
             objGlobals.startingFrom="move_files";
             load("viewInputs",450,500);
         });
-        stepTwo.setOnMouseClicked(event -> {
+        stepTwo.setOnMouseClicked(_ -> {
             objGlobals.startingFrom="gray";
             if(!fileExists(objGlobals.etichetteFolder)||!fileExists(objGlobals.jogSorterFolder)||!fileExists(objGlobals.targetGray)||!fileExists(objGlobals.targetTiff)){
                 alert("ERRORE","SE VUOI SALTARE IL PRIMO STEP DEVI IMPOSTARE I FILE CONFORME CARTELLA __MODELLO__");

@@ -88,8 +88,8 @@ public class ctrlStockAnomalie2 implements Initializable {
             objAnomalies.unExpectedGroups.clear();
             tableView.setEditable(true);
             addShootButtonToTable();
-            btnFoward.setOnAction(event -> btnFoward());
-            printPane.setOnMouseClicked(event -> printPane());
+            btnFoward.setOnAction(_ -> btnFoward());
+            printPane.setOnMouseClicked(_ -> printPane());
             id.setCellValueFactory(cellData -> cellData.getValue().id());
             box1.setCellValueFactory(cellData -> cellData.getValue().box1());
             pallet1.setCellValueFactory(cellData -> cellData.getValue().pallet1());
@@ -218,7 +218,7 @@ public class ctrlStockAnomalie2 implements Initializable {
     }
 
     private void centerAlignColumn(TableColumn<modelEtichette2, String> column) {
-        column.setCellFactory(tc -> {
+        column.setCellFactory(_ -> {
             TableCell<modelEtichette2, String> cell = new TableCell<modelEtichette2, String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
@@ -236,7 +236,7 @@ public class ctrlStockAnomalie2 implements Initializable {
     }
 
     private void addShootButtonToTable() {
-        shoot1.setCellFactory(param -> {
+        shoot1.setCellFactory(_ -> {
             return new TableCell<modelEtichette2, Void>() {
                 private final HBox shootButtonContainer = new HBox();
                 private final javafx.scene.control.Button shootButton = new javafx.scene.control.Button();
@@ -251,7 +251,7 @@ public class ctrlStockAnomalie2 implements Initializable {
                     imageView.setFitHeight(20);
                     shootButton.setGraphic(imageView);
 
-                    shootButton.setOnAction(event -> {
+                    shootButton.setOnAction(_ -> {
                         modelEtichette2 currentItem = getTableView().getItems().get(getIndex());
                         shootList.clear();
                         for (String barcode : currentItem.barcodeList()) {
@@ -275,7 +275,7 @@ public class ctrlStockAnomalie2 implements Initializable {
             };
         });
 
-        shoot2.setCellFactory(param ->  {
+        shoot2.setCellFactory(_ ->  {
             return new TableCell<modelEtichette2, Void>() {
                 private final HBox shootButtonContainer = new HBox();
                 private final javafx.scene.control.Button shootButton = new javafx.scene.control.Button();
@@ -290,7 +290,7 @@ public class ctrlStockAnomalie2 implements Initializable {
                     imageView.setFitHeight(20);
                     shootButton.setGraphic(imageView);
 
-                    shootButton.setOnAction(event -> {
+                    shootButton.setOnAction(_ -> {
                         modelEtichette2 currentItem = getTableView().getItems().get(getIndex());
                         shootList.clear();
                         for (String barcode : currentItem.barcodeList()) {

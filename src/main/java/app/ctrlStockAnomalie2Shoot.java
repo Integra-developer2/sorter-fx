@@ -48,8 +48,8 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         tableView.setItems(shootList);
-        btnFoward.setOnAction(event->btnFoward());
-        btnBackwards.setOnAction(event->btnBackwards());
+        btnFoward.setOnAction(_->btnFoward());
+        btnBackwards.setOnAction(_->btnBackwards());
         findBarcodes.setCellValueFactory(cellData -> cellData.getValue().barcode());
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         searchBarcodes.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -67,7 +67,7 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
     }
 
     private void centerAlignColumn(TableColumn<modelEtichetteShoot, String> column) {
-        column.setCellFactory(tc -> {
+        column.setCellFactory(_ -> {
             TableCell<modelEtichetteShoot, String> cell = new TableCell<modelEtichetteShoot, String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
@@ -85,7 +85,7 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
     }
 
     private void centerAlignColumnNotFound(TableColumn<modelEtichetteShootNotFound, String> column) {
-        column.setCellFactory(tc -> {
+        column.setCellFactory(_ -> {
             TableCell<modelEtichetteShootNotFound, String> cell = new TableCell<modelEtichetteShootNotFound, String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {

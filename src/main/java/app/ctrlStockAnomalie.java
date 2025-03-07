@@ -61,8 +61,8 @@ public class ctrlStockAnomalie implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         tableView.setEditable(true);
         addDeleteButtonToTable();
-        btnFoward.setOnAction(event -> btnFoward());
-        printPane.setOnMouseClicked(event -> printPane());
+        btnFoward.setOnAction(_ -> btnFoward());
+        printPane.setOnMouseClicked(_ -> printPane());
         r.setCellValueFactory(cellData -> cellData.getValue().row());
         A.setCellValueFactory(cellData -> cellData.getValue().A());
         B.setCellValueFactory(cellData -> cellData.getValue().B());
@@ -207,7 +207,7 @@ public class ctrlStockAnomalie implements Initializable {
     }
 
     private void centerAlignColumn(TableColumn<modelEtichette, String> column) {
-        column.setCellFactory(tc -> {
+        column.setCellFactory(_ -> {
             TableCell<modelEtichette, String> cell = new TableCell<modelEtichette, String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
@@ -225,7 +225,7 @@ public class ctrlStockAnomalie implements Initializable {
     }
 
     private void addDeleteButtonToTable() {
-        deleteColumn.setCellFactory(param -> new TableCell<modelEtichette, Void>() {
+        deleteColumn.setCellFactory(_ -> new TableCell<modelEtichette, Void>() {
             private final HBox deleteButtonContainer = new HBox();
             private final javafx.scene.control.Button deleteButton = new javafx.scene.control.Button();
             {
@@ -239,7 +239,7 @@ public class ctrlStockAnomalie implements Initializable {
                 imageView.setFitHeight(20);
                 deleteButton.setGraphic(imageView);
 
-                deleteButton.setOnAction(event -> {
+                deleteButton.setOnAction(_ -> {
                     modelEtichette currentItem = getTableView().getItems().get(getIndex());
                     deletedRows.add(Integer.valueOf(currentItem.row().get()));
                     tableView.getItems().remove(currentItem);
