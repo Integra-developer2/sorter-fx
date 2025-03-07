@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
@@ -25,6 +24,31 @@
             <Insets />
          </VBox.margin>
          <children>
+            <HBox id="row" fx:id="stock" alignment="CENTER" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="300.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <ImageView fitHeight="48.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@img/excel.png" />
+                     </image>
+                  </ImageView>
+                  <Label prefHeight="46.0" prefWidth="300.0" text="PACCO INIZIALE">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+                  <ImageView fx:id="gifStock" fitHeight="48.0" fitWidth="159.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
+                     <image>
+                        <Image url="@img/edit.gif" />
+                     </image>
+                  </ImageView>
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="20.0" top="20.0" />
+               </padding>
+            </HBox>
             <HBox id="row" fx:id="etichette" alignment="CENTER" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="300.0" VBox.vgrow="ALWAYS">
                <children>
                   <ImageView fitHeight="48.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
@@ -116,44 +140,6 @@
                      </font>
                   </Label>
                   <ImageView fx:id="gifTiff" fitHeight="48.0" fitWidth="159.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
-                     <image>
-                        <Image url="@img/edit.gif" />
-                     </image>
-                  </ImageView>
-               </children>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-               <padding>
-                  <Insets bottom="20.0" top="20.0" />
-               </padding>
-            </HBox>
-            <HBox id="row" fx:id="stock" alignment="CENTER" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="571.0" VBox.vgrow="ALWAYS">
-               <children>
-                  <HBox prefHeight="45.0" prefWidth="339.0" HBox.hgrow="ALWAYS">
-                     <children>
-                        <ImageView fitHeight="33.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
-                           <image>
-                              <Image url="@img/stock.png" />
-                           </image>
-                           <HBox.margin>
-                              <Insets left="8.0" top="5.0" />
-                           </HBox.margin>
-                        </ImageView>
-                        <TextField id="stockNumber" fx:id="stockNumber" alignment="BOTTOM_LEFT" prefHeight="30.0" prefWidth="185.0" promptText="PACCO INIZIALE" HBox.hgrow="ALWAYS">
-                           <opaqueInsets>
-                              <Insets top="10.0" />
-                           </opaqueInsets>
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets bottom="6.0" top="6.0" />
-                           </HBox.margin>
-                        </TextField>
-                     </children>
-                  </HBox>
-                  <ImageView fx:id="gifStock" fitHeight="48.0" fitWidth="159.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
                      <image>
                         <Image url="@img/edit.gif" />
                      </image>

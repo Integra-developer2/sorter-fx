@@ -393,4 +393,9 @@ public class functions{
 
         }
     }
+
+    public static String getEntity(String barcode) {
+        String[] row = objJobSorter.rows.get(barcode);
+        return row[letterToIndex(objGlobals.entityColumnJobSorter)];
+    }
 }

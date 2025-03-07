@@ -43,6 +43,10 @@ public class ctrlStatusBar implements Initializable {
     @FXML
     private ImageView imgMoveFiles;
     @FXML
+    private Label lblStockFile;
+    @FXML
+    private ImageView imgStockFile;
+    @FXML
     private Label lblGray;
     @FXML
     private Label plGray;
@@ -70,12 +74,14 @@ public class ctrlStatusBar implements Initializable {
     private double lastProgressGray = 0;
     private double lastProgressStock = 0;
     private File stepMoveFiles;
+    private File stepStockFile;
     private File stepGray;
     private File stepAnomaliesGray;
     private File stepStockAnomalies;
     private File stepStockAnomalies2;
     private File stepStock;
     private Service<Void> moveFilesService;
+    private Service<Void> stockFileService;
     private Service<Void> grayService;
     private Service<Void> grayAnomaliesService;
     private Service<Void> stockAnomaliesService;
@@ -87,6 +93,7 @@ public class ctrlStatusBar implements Initializable {
         title.setText(objGlobals.version);
         try {
             stepMoveFiles=stepFile("moveFilesEnd");
+            stepStockFile=stepFile("stockFileEnd");
             stepGray=stepFile("grayEnd");
             stepAnomaliesGray=stepFile("stepAnomaliesGrayEnd");
             stepStock=stepFile("stockEnd");
@@ -129,12 +136,48 @@ public class ctrlStatusBar implements Initializable {
                                         }else{
                                             if(!objGlobals.stop){
                                                 Platform.runLater(() -> {completeMoveFiles();});
-                                                grayService.start();
+                                                stockFileService.start();
                                             }
                                         }
                                     }
                                     else{
                                         Platform.exit();
+                                    }
+                                }
+                                catch (Exception e) {
+                                    printError(e,true);throw e;
+                                }
+                            }
+
+                            return null;
+                        }
+                    };
+                }
+            };
+
+            stockFileService = new Service<>() {
+                @Override
+                protected Task<Void> createTask() {
+                    return new Task<>() {
+                        @Override
+                        protected Void call() throws Exception {
+                            if(!objGlobals.stop){
+                                Platform.runLater(() -> {
+                                    lblStockFile.setText("iniziato");
+                                });
+                                try {
+                                    if(objAnomalies.hasStockFileAnomaly()){
+                                        Platform.runLater(() -> {
+                                            lblStockFile.setText("Anomalies");
+                                            imgStockFile.setImage(new Image(App.class.getResource("img/warning.gif").toExternalForm()));
+                                            alert("ANOMALIA","SISTEMA LE ANOMALIE PRIMA DI CONTINUARE");
+                                            load("viewStockFile",1200,500);
+                                        });
+                                    }else{
+                                        if(!objGlobals.stop){
+                                            Platform.runLater(() -> {completeStockFile();});
+                                            grayService.start();
+                                        }
                                     }
                                 }
                                 catch (Exception e) {
@@ -306,6 +349,7 @@ public class ctrlStatusBar implements Initializable {
 
     private void setupServices(){
         bindServiceStack(moveFilesService,lblMoveFiles,imgMoveFiles);
+        bindServiceStack(stockFileService,lblStockFile,imgStockFile);
         bindServiceStack(grayService,lblGray,imgGray);
         bindServiceStack(grayAnomaliesService,lblAnomaliesGray,imgAnomaliesGray);
         bindServiceStack(stockAnomaliesService,lblAnomaliesStock,imgAnomaliesStock);
@@ -430,28 +474,36 @@ public class ctrlStatusBar implements Initializable {
             if(!stepMoveFiles.exists()){
                 moveFilesService.start();
             }
+            else if(!stepStockFile.exists()){
+                Platform.runLater(()->{
+                    completeMoveFiles();
+                });
+                stockFileService.start();
+            }
             else if(!stepGray.exists()){
                 Platform.runLater(()->{
+                    completeStockFile();
                     completeMoveFiles();
                 });
                 grayService.start();
             }
             else if(!stepStock.exists()){
                 if(new File(objGlobals.anomalyFolderGray).exists()){
-                    Platform.runLater(()->{completeMoveFiles();completeGray();});
+                    Platform.runLater(()->{completeStockFile();completeMoveFiles();completeGray();});
                     grayAnomaliesService.start();
                 }
                 else if(!objGlobals.skipAnomalies){
-                    Platform.runLater(()->{completeMoveFiles();completeGray();completeGrayAnomalies();});
+                    Platform.runLater(()->{completeStockFile();completeMoveFiles();completeGray();completeGrayAnomalies();});
                     stockAnomaliesService.start();
                 }
                 else{
-                    Platform.runLater(()->{completeMoveFiles();completeGray();completeGrayAnomalies();completeStockAnomalies();completeStockAnomalies2();});
+                    Platform.runLater(()->{completeStockFile();completeMoveFiles();completeGray();completeGrayAnomalies();completeStockAnomalies();completeStockAnomalies2();});
                     stockService.start();
                 }
             } else {
                 Platform.runLater(()->{
                     completeMoveFiles();
+                    completeStockFile();
                     completeGray();
                     completeGrayAnomalies();
                     completeStockAnomalies();
@@ -466,6 +518,12 @@ public class ctrlStatusBar implements Initializable {
         step(stepMoveFiles);
         lblMoveFiles.setText("completato");
         imgMoveFiles.setImage(new Image(App.class.getResource("img/done.gif").toExternalForm()));
+    }
+
+    private void completeStockFile(){
+        step(stepStockFile);
+        lblStockFile.setText("completato");
+        imgStockFile.setImage(new Image(App.class.getResource("img/done.gif").toExternalForm()));
     }
 
     private void completeGray(){

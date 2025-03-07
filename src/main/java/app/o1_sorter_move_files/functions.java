@@ -69,6 +69,13 @@ public class functions {
             ret.put(objGlobals.sourceEtichette, to);
         }
 
+        File stockFrom = new File(objGlobals.sourceStock);
+        File stockTo = new File(objGlobals.stockFolder);
+        String _to = objGlobals.sourceStock.replace(stockFrom.getParent(), stockTo.getPath());
+        File fileStockTo = new File(_to);
+        if(!fileStockTo.exists()){
+            ret.put(objGlobals.sourceStock, _to);
+        }
         return ret;
     }
 

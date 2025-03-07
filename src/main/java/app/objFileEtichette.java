@@ -7,6 +7,7 @@ public class objFileEtichette {
     public String reference;
     public String obs;
     public String group;
+    public String entity;
     public Integer progStart;
     public Integer progEnd;
     public objFileEtichette(Integer row, String firstBarcode,String lastBarcode,String reference,String obs){
@@ -31,7 +32,12 @@ public class objFileEtichette {
         this.progEnd=progEnd;
     }
 
-    public void extra(String group, Integer progStart, Integer progEnd){
+    public void extra(String group,String entity, Integer progStart, Integer progEnd){
+        this.group = group;
+        this.progStart = progStart;
+        this.progEnd = progEnd;
+    }
+    public void extra(String group,Integer progStart, Integer progEnd){
         this.group = group;
         this.progStart = progStart;
         this.progEnd = progEnd;

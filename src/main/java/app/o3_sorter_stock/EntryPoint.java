@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import static app.functions.makeStockNumber;
 import static app.functions.printError;
+import static app.functions.writeStockFile;
 import app.objAnomalies;
 import app.objGlobals;
 
@@ -20,11 +21,10 @@ public class EntryPoint extends functions{
                 printError( new Exception("hasStockAnomaly() should be empty"),true);
             }
             else{
-                write("primo: "+objGlobals.stockPrefix + strPad(String.valueOf(objGlobals.stockNumber),4,"0"), objGlobals.stockTxt);
                 makeStockNumber();
                 makePdfMulti();
+                writeStockFile("result");
                 makeSorterExport();
-                write("ultimo: "+objGlobals.stockPrefix + objDoneStock.lastNumber, objGlobals.stockTxt);
             }
         } catch (Exception e) {
             printError("error",e,true);
@@ -43,7 +43,7 @@ public class EntryPoint extends functions{
     }
 
     public static void makeSorterExport(){
-        String header = "N.Pacco-Anno;Sequenza nel Pacco;Barcode";
+        String header = "N.Pacco-Anno;Sequenza nel Pacco;Barcode;Riferimento Scatolo";
         for(String folder : objSorterExport.list.keySet()){
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(objGlobals.sorterExport+folder+".csv"))) {
                 HashMap<String, ArrayList<String[]>> keys = objSorterExport.list.get(folder);

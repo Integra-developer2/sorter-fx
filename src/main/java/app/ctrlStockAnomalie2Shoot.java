@@ -52,7 +52,7 @@ public class ctrlStockAnomalie2Shoot implements Initializable{
         btnBackwards.setOnAction(_->btnBackwards());
         findBarcodes.setCellValueFactory(cellData -> cellData.getValue().barcode());
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        searchBarcodes.textProperty().addListener((observable, oldValue, newValue) -> {
+        searchBarcodes.textProperty().addListener((_, _, newValue) -> {
             if (newValue.contains("\n")) {
                 String[] lines = newValue.split("\n");
                 String lastLine = lines[lines.length - 1];

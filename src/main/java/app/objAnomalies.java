@@ -1,7 +1,9 @@
 package app;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,8 +24,10 @@ import static app.functions.moveStock2;
 import static app.functions.printError;
 import static app.functions.logError;
 import static app.functions.readEtichette;
+import static app.functions.readStockFile;
 import app.o1_sorter_move_files.functions;
 import static app.o3_sorter_stock.functions.getBarcodeFromBlackFile;
+import static app.o3_sorter_stock.functions.getEntity;
 import static app.o3_sorter_stock.functions.getGroup;
 import static app.o3_sorter_stock.functions.getIndexFromBlackFile;
 import static app.o3_sorter_stock.functions.indexMax;
@@ -32,7 +36,6 @@ import static app.o3_sorter_stock.functions.readBlackDir;
 import static app.o3_sorter_stock.functions.readJobSorterCSV;
 
 import app.o3_sorter_stock.objBlackFiles;
-import app.o3_sorter_stock.objDoneStockNumber;
 import app.o3_sorter_stock.objEtichetta;
 import app.o3_sorter_stock.objJobSorterGrouped;
 import app.o3_sorter_stock.objSorterExport;
@@ -45,6 +48,9 @@ public class objAnomalies extends functions{
     public static ConcurrentLinkedQueue<String> gray = new ConcurrentLinkedQueue<>();
     public static ObservableList<modelEtichette> stock = FXCollections.observableArrayList();
     public static ObservableList<modelEtichette2> stock2 = FXCollections.observableArrayList();
+    public static ObservableList<modelStockFile> stockFile = FXCollections.observableArrayList();
+    public static HashMap<Integer, objNotExpected> notExpected = new HashMap<>();
+    public static boolean hasStockFileAnomaly=false;
     public static ArrayList<String> stock2List = new ArrayList<>();
     public static HashMap<String,ArrayList<String>> unExpectedGroups = new HashMap<>();
 
@@ -106,7 +112,6 @@ public class objAnomalies extends functions{
         try {
             objAnomalies.clear();
             objEtichetta.clear();
-            objDoneStockNumber.clear();
             objSorterExport.clear();
             objBlackFiles.clear();
             readJobSorterCSV();
@@ -139,23 +144,28 @@ public class objAnomalies extends functions{
                     }
                     String groupFrom = getGroup(obj.firstBarcode);
                     String groupTo = getGroup(obj.lastBarcode);
+                    String entityFrom = getEntity(obj.firstBarcode);
+                    String entityTo = getEntity(obj.lastBarcode);
                     String error="";
                     if(indexFrom==0){
                         error+="barcode iniziale non trovato nei file tiff \n";
                     }
-                    else if(groupFrom.isEmpty()){
+                    else if(groupFrom.isEmpty()||entityFrom.isEmpty()){
                         error+="barcode iniziale non trovato nel job-sorter \n";
                     }
 
                     if(indexTo==0){
                         error+="barcode finale non trovato nei file tiff \n";
                     }
-                    else if(groupTo.isEmpty()){
+                    else if(groupTo.isEmpty()||entityTo.isEmpty()){
                         error+="barcode finale non trovato nel job-sorter \n";
                     }
 
                     if(!groupFrom.isEmpty()&&!groupTo.isEmpty()&&!groupFrom.equals(groupTo)){
                         error+="raggruppamento diverso \n";
+                    }
+                    else if(!entityFrom.isEmpty()&&!entityTo.isEmpty()&&!entityFrom.equals(entityTo)){
+                        error+="Agenzia diversa \n";
                     }
 
                     if(error.isEmpty()){
@@ -164,8 +174,8 @@ public class objAnomalies extends functions{
                             indexTo = indexFrom;
                             indexFrom = tmp;
                         }
-                        objEtichetta.add(groupFrom,indexFrom,indexTo);
-                        obj.extra(groupFrom,indexFrom,indexTo);
+                        objEtichetta.add(groupFrom,entityFrom,obj.reference,indexFrom,indexTo);
+                        obj.extra(groupFrom,entityFrom,indexFrom,indexTo);
                         objGlobals.fileEtichette.put(row,obj);
                     }
                     else{
@@ -220,7 +230,7 @@ public class objAnomalies extends functions{
     private static void stockAnomaly2(){
         HashMap<String,Integer>originalProgEnd = new HashMap<>();
         HashMap<String, ArrayList<objFileEtichette>> etichetteByGroup = new HashMap<>();
-        HashMap<Integer, objNotExpected> notExpected = new HashMap<>();
+        notExpected.clear();
         Integer id = 0;
 
         HashMap<String,Integer>stock2ListWithIndex = new HashMap<>();
@@ -231,14 +241,14 @@ public class objAnomalies extends functions{
         LinkedHashMap<String, Integer> sortedStock2ListWithIndex = stock2ListWithIndex.entrySet()
             .stream()
             .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-            .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue,(e1, e2) -> e1,LinkedHashMap::new));
+            .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue,(e1, _) -> e1,LinkedHashMap::new));
 
         for (String file : sortedStock2ListWithIndex.keySet()) {
             Integer index = sortedStock2ListWithIndex.get(file);
             etichetteByGroup.clear();
             for (Integer row : objGlobals.fileEtichette.keySet()) {
                 objFileEtichette obj = objGlobals.fileEtichette.get(row);
-                etichetteByGroup.computeIfAbsent(obj.group, k -> new ArrayList<>()).add(obj);
+                etichetteByGroup.computeIfAbsent(obj.group, _ -> new ArrayList<>()).add(obj);
             }
             String barcode = getBarcodeFromBlackFile(file);
             String group = getGroup(barcode);
@@ -345,4 +355,30 @@ public class objAnomalies extends functions{
         }
     }
 
+    public static boolean hasStockFileAnomaly(){
+        readStockFile();
+        return hasStockFileAnomaly;
+    }
+
+    public static void loadObjNotExpected() {
+        stock2.clear();
+        try {
+            Files.walkFileTree(Paths.get(objGlobals.objNotExpectedFolder), new SimpleFileVisitor<Path>()  {
+                @Override
+                public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+                    String id = path.getFileName().toString();
+                    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(path.toString())))) {
+                        addStock2(Integer.valueOf(id),(objNotExpected)ois.readObject());
+                    } catch (IOException | ClassNotFoundException e) {
+                        printError(e, true);
+                        return null;
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            printError(e,true);
+        }
+
+    }
 }

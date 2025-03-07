@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static app.functions.readStockFile;
 import static app.functions.writeAllBlackFiles;
 import app.objAnomalies;
 import app.objGlobals;
@@ -17,6 +18,7 @@ public class EntryPoint extends functions{
                 copy(map);
                 check(map);
                 writeAllBlackFiles();
+                readStockFile();
             }
         } catch (Exception e) { throw e;}
     }

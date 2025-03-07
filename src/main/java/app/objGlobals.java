@@ -20,7 +20,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class objGlobals {
-    public static String version = "SORTER-FX 1.0.2";
+    public static String version = "SORTER-FX 2.0.1";
     public static final int PRINT_AT=100;
     public static int totalThreadsMoveFiles=300;
     public static int totalThreadsGray=100;
@@ -34,6 +34,7 @@ public class objGlobals {
     public static String[] raggruppamentoJobSorter={"C"};
     public static String nomeCartellaPdf="{SC}/{F6}-sorter-{D1::uppercase::noNumber}-{F5}-{ANNO}-{NUMERO_PACCO}.pdf";
     public static String colonnaBarcode="B";
+    public static String entityColumnJobSorter="I";
     public static String workingFolder;
     public static String sourceEtichette;
     public static String targetEtichette;
@@ -59,9 +60,9 @@ public class objGlobals {
     public static String logBlack;
     public static String logStep;
     public static HashMap<Integer,objFileEtichette> fileEtichette = new HashMap<>();
+    public static HashMap<String,objStockFile> stockByEntity = new HashMap<>();
     public static ArrayList<String>barcodesFromFiles=new ArrayList<>();
     public static objErrorMap errorMap;
-    public static String stockTxt;
     public static Double progressGray=0.0000;
     public static Double progressStock=0.0000;
     public static boolean debug=false;
@@ -94,6 +95,12 @@ public class objGlobals {
     public static File stockPrefixFile;
     public static File stockNumberFile;
     public static String logObjToPdf;
+    public static File sourceStockFile;
+    public static String sourceStock;
+    public static String objNotExpectedFolder;
+    public static String targetStock;
+    public static File targetStockLog;
+    public static String stockFolder;
 
     public static void variables(){
         try{
@@ -105,14 +112,10 @@ public class objGlobals {
             sourceJobSorterFile=sourceJobSorterFile();
             sourceGrayFile=sourceGrayFile();
             sourceTiffFile=sourceTiffFile();
-            stockPrefixFile=stockPrefixFile();
-            stockNumberFile=stockNumberFile();
             sourceEtichette=readFromFile(sourceEtichetteFile);
             sourceJobSorter=sourceJobSorter();
             sourceGray=readFromFile(sourceGrayFile);
             sourceTiff=readFromFile(sourceTiffFile);
-            stockPrefix=readOnce(stockPrefixFile);
-            stockNumber=stockNumber();
             anomalyLog=anomalyLog();
             errorLog=errorLog();
             jogSorterFolder=jogSorterFolder();
@@ -127,7 +130,6 @@ public class objGlobals {
             logStep=logStep();
             errorMap= new objErrorMap();
             pdfFolder=pdfFolder();
-            stockTxt=stockTxt();
             logStock=logStock();
             logGraytxt=logGraytxt();
             notExpectedFolder=notExpectedFolder();
@@ -136,16 +138,91 @@ public class objGlobals {
             allBlackFiles=allBlackFiles();
             sorterExport=sorterExport();
             logObjToPdf=logObjToPdf();
+            stockFolder=stockFolder();
+            sourceStockFile=sourceStockFile();
+            sourceStock=readFromFile(sourceStockFile);
+            objNotExpectedFolder=objNotExpectedFolder();
+            targetStockLog=targetStockLog();
+            targetStock=targetStock();
             objDoneStock.add(String.valueOf(stockNumber));
         } catch (Exception e) { printError(e,true);}
     }
 
+    public static boolean hasStockFile(){
+        return (!sourceStock.isEmpty() || objGlobals.sourceStockFile.exists());
+    }
+
+    public static String paccoFinale() {
+        File file = new File(outputFolder, "pacco_finale.csv");
+        return file.toString();
+    }
+
+    public static String objNotExpectedFolder() {
+        File file = new File(logFolder, "objNotExpectedFolder");
+        return file.toString();
+    }
+
+    public static void newtargetStock(String newtargetStock){
+        if(targetStockLog.exists()){
+            targetStockLog.delete();
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(targetStockLog))) {
+            writer.append(newtargetStock);
+            targetStock=newtargetStock;
+        } catch (Exception e) {
+            printError(e,true);
+        }
+    }
+
+    public static File targetStockLog() {
+        return new File(logFolder, "targetStockLog");
+    }
+
+    public static String targetStock() {
+        if(targetStockLog.exists()){
+            try (BufferedReader reader = new BufferedReader(new FileReader(targetStockLog))) {
+                String line;
+                while ((line=reader.readLine())!=null) {
+                    File file = new File(line);
+                    if(file.exists()){
+                        targetStock=file.getAbsolutePath();
+                        return file.toString();
+                    }
+                }
+            } catch (Exception e) {
+                printError(e,true);
+            }
+        }
+        if(!sourceStock.isEmpty()){
+            File folderFrom = new File(sourceStock);
+            return  sourceStock.replace(folderFrom.getParent(), stockFolder);
+        }
+        return "";
+    }
+
+    public static String newTargetStock(){
+        File file = new File(targetStock);
+        String fileParent = file.getParent();
+        String filename = file.getName();
+        String extension = filename.substring(filename.lastIndexOf('.') + 1);
+        String baseName = filename.replace("."+extension, "");
+        File newFileName = new File(fileParent, baseName+"_fixed.csv");
+        while (newFileName.exists()) {
+            newFileName = new File(fileParent, newFileName.getName().replace("."+extension, "")+"_fixed.csv");
+        }
+        return newFileName.getAbsolutePath();
+    }
+
+    public static String stockFolder() {
+        File file =new File(new File(workingFolder, "FILE_TEMPORANEI"),"PACCO-INIZIALE");
+        return file.toString();
+    }
+
+    public static File sourceStockFile(){return new File(logFolder,"sourceStock");}
     public static File sourceEtichetteFile(){return new File(logFolder,"sourceEtichette");}
     public static File sourceJobSorterFile(){return new File(logFolder,"sourceJobSorter");}
     public static File sourceGrayFile(){return new File(logFolder,"sourceGray");}
     public static File sourceTiffFile(){return new File(logFolder,"sourceTiff");}
-    public static File stockPrefixFile(){return new File(logFolder,"stockPrefix");}
-    public static File stockNumberFile(){return new File(logFolder,"stockNumber");}
 
     public static boolean hasEtichette(){
         return (!sourceEtichette.isEmpty()||targetEtichetteLog.exists());
@@ -157,7 +234,7 @@ public class objGlobals {
 
     public static boolean hasInputs(){
         variables();
-        return hasEtichette()&&hasJobSorter()&&!stockPrefix.isEmpty()&&stockNumber>0;
+        return hasEtichette()&&hasJobSorter()&&hasStockFile();
     }
 
     public static String logFolder() throws Exception{
@@ -250,11 +327,6 @@ public class objGlobals {
 
     public static String sorterExport() {
         File file = new File(outputFolder, "sorterExport_");
-        return file.toString();
-    }
-
-    public static String stockTxt() {
-        File file = new File(outputFolder, "pacco_primo_e_ultimo.txt");
         return file.toString();
     }
 
