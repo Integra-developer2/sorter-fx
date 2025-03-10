@@ -94,6 +94,7 @@ public class objGlobals {
     public static File stockPrefixFile;
     public static File stockNumberFile;
     public static String logObjToPdf;
+    public static String notPredictedLog;
 
     public static void variables(){
         try{
@@ -136,6 +137,7 @@ public class objGlobals {
             allBlackFiles=allBlackFiles();
             sorterExport=sorterExport();
             logObjToPdf=logObjToPdf();
+            notPredictedLog=notPredictedLog();
             objDoneStock.add(String.valueOf(stockNumber));
         } catch (Exception e) { printError(e,true);}
     }
@@ -300,6 +302,11 @@ public class objGlobals {
 
     public static String errorLog() {
         File file =new File(logFolder, "error.log");
+        return file.toString();
+    }
+
+    public static String notPredictedLog() {
+        File file =new File(logFolder, "nonPrevisti.log");
         return file.toString();
     }
 

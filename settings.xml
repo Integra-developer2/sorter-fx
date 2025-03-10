@@ -3,7 +3,7 @@
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
   <jar>C:\Users\tsousasilva\Desktop\projects\sorter-fx\1.0.2\target\sorter-fx-1.0.2.jar</jar>
-  <outfile>C:\Users\tsousasilva\Desktop\projects\sorter-fx\1.0.2\sorterFx-1.0.2.exe</outfile>
+  <outfile>C:\Users\tsousasilva\Desktop\projects\sorter-fx\1.0.2\java-sorter 1.0.2.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
@@ -11,9 +11,9 @@
   <downloadUrl></downloadUrl>
   <supportUrl></supportUrl>
   <stayAlive>false</stayAlive>
-  <restartOnCrash>false</restartOnCrash>
+  <restartOnCrash>true</restartOnCrash>
   <manifest></manifest>
-  <icon>C:\Users\tsousasilva\Desktop\projects\sorter-fx\1.0.2\src\main\resources\app\img\appIcon.ico</icon>
+  <icon>C:\Users\tsousasilva\Desktop\projects\sorter-fx\1.0.2\src\main\resources\app\img\appIcon2.ico</icon>
   <jre>
     <path>C:\Java\jdk22;%PATH%;</path>
     <requiresJdk>false</requiresJdk>
