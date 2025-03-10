@@ -165,6 +165,17 @@ public class functions {
         }
     }
 
+    public static void logNotPredicted(String text, Exception e){
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(objGlobals.notPredictedLog,true))) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            writer.append(text+";"+e.toString()).append(System.lineSeparator());
+        } catch (Exception ee) {
+            alert("ERROR LOG",ee.toString());
+        }
+    }
+
     public static void writeOnce(File file, String line){
         if(file.exists()){
             file.delete();

@@ -22,7 +22,7 @@ import static app.functions.makeStockNumber;
 import static app.functions.moveErrors;
 import static app.functions.moveStock2;
 import static app.functions.printError;
-import static app.functions.logError;
+import static app.functions.logNotPredicted;
 import static app.functions.readEtichette;
 import static app.functions.readStockFile;
 import app.o1_sorter_move_files.functions;
@@ -341,7 +341,7 @@ public class objAnomalies extends functions{
                             moveStock2(group, file, "target");
                         }
                         else{
-                            logError("SITUAZIONE NON PREVISTA GROUP:"+group+" BARCODE: "+barcode,new Exception());
+                            logNotPredicted("SITUAZIONE NON PREVISTA GROUP:"+group+" BARCODE: "+barcode,new Exception());
                             moveStock2(group, file, "log");
                         }
                     }
