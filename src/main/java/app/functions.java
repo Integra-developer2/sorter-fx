@@ -154,14 +154,17 @@ public class functions {
         logError(text,e);
     }
 
-    public static void logError(String text, Exception e){
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(objGlobals.errorLog,true))) {
+    public static void logError(String text, Exception e) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(objGlobals.errorLog, true))) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            writer.append(text+";"+e.toString()).append(System.lineSeparator());
+            writer.append(text).append(";").append(e.toString())
+                .append(System.lineSeparator())
+                .append(sw.toString())
+                .append(System.lineSeparator());
         } catch (Exception ee) {
-            alert("ERROR LOG",ee.toString());
+            alert("ERROR LOG", ee.toString());
         }
     }
 
