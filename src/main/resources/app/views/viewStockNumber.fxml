@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" prefHeight="920.0" spacing="20.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.views.viewStockNumber">
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+   <VBox alignment="CENTER" VBox.vgrow="ALWAYS">
+      <SplitPane dividerPositions="0.34665792922673655" VBox.vgrow="ALWAYS">
+         <TableView fx:id="tableView2" editable="true" prefHeight="815.0" prefWidth="430.0" HBox.hgrow="ALWAYS">
+            <columns>
+               <TableColumn fx:id="A1" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PROG" />
+               <TableColumn fx:id="G1" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="AGENZIA" />
+               <TableColumn fx:id="B1" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="GRUPPO" />
+               <TableColumn fx:id="C1" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="BARCODE" />
+               <TableColumn fx:id="D1" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="FILE" />
+               <TableColumn fx:id="E1" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="LOGICA" />
+               <TableColumn fx:id="F1" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PREFISSO" />
+            </columns>
+            <HBox.margin>
+               <Insets right="30.0" />
+            </HBox.margin>
+         </TableView>
+         <TableView fx:id="tableView" editable="true" prefHeight="920.0" HBox.hgrow="ALWAYS">
+            <columns>
+               <TableColumn fx:id="r" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="RIGA" />
+               <TableColumn fx:id="A" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PRIMO BARCODE" />
+               <TableColumn fx:id="B" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="ULTIMO BARCODE" />
+               <TableColumn fx:id="C" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="SCATOLO" />
+               <TableColumn fx:id="D" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PEDANA" />
+               <TableColumn fx:id="E" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="GRUPPO" />
+               <TableColumn fx:id="F" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PROG.INI" />
+               <TableColumn fx:id="G" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PROG.FIN" />
+               <TableColumn fx:id="H" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="LOGICA" />
+               <TableColumn fx:id="I" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PREFISSO" />
+               <TableColumn fx:id="J" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PACCO" />
+               <TableColumn fx:id="K" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="AGENZIA" />
+               <TableColumn fx:id="deleteColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="ELIMINA RIGA" />
+            </columns>
+         </TableView>
+      </SplitPane>
+   </VBox>
+   <VBox alignment="CENTER_RIGHT" VBox.vgrow="ALWAYS">
+      <HBox alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="887.0">
+         <Button fx:id="btnForward" alignment="CENTER" minWidth="263.0" prefHeight="59.0" style="-fx-background-color: #005075;" text="AVANTI" textFill="WHITE">
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
+            <font>
+               <Font name="Arial Black" size="20.0" />
+            </font>
+         </Button>
+      </HBox>
+   </VBox>
+</VBox>
