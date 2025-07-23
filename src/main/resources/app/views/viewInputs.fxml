@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" prefHeight="458.0" prefWidth="417.0" spacing="10.0" stylesheets="@styles.css"
+      xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.views.viewInputs">
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+   </padding>
+   <VBox id="body" alignment="CENTER" spacing="10.0" VBox.vgrow="ALWAYS">
+      <VBox.margin>
+         <Insets/>
+      </VBox.margin>
+      <padding>
+         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+      </padding>
+      <HBox id="row" fx:id="etichette" alignment="CENTER" VBox.vgrow="ALWAYS">
+         <VBox.margin>
+            <Insets/>
+         </VBox.margin>
+         <ImageView fitHeight="48.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true"
+                    HBox.hgrow="ALWAYS">
+            <Image url="@../img/excel.png"/>
+         </ImageView>
+         <Label text="FILE ETICHETTE" HBox.hgrow="ALWAYS">
+            <font>
+               <Font name="System Bold" size="24.0"/>
+            </font>
+         </Label>
+         <ImageView fx:id="gifEtichette" fitHeight="23.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true"
+                    HBox.hgrow="ALWAYS">
+            <Image url="@../img/edit.gif"/>
+         </ImageView>
+      </HBox>
+      <HBox id="row" fx:id="jobSorter" alignment="CENTER" VBox.vgrow="ALWAYS">
+         <VBox.margin>
+            <Insets/>
+         </VBox.margin>
+         <ImageView fitHeight="48.0" fitWidth="165.0" pickOnBounds="true" preserveRatio="true"
+                    HBox.hgrow="ALWAYS">
+            <Image url="@../img/excel.png"/>
+         </ImageView>
+         <Label text="FILES JOB SORTER" HBox.hgrow="ALWAYS">
+            <font>
+               <Font name="System Bold" size="24.0"/>
+            </font>
+         </Label>
+         <ImageView fx:id="gifJobSorter" fitHeight="18.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true"
+                    HBox.hgrow="ALWAYS">
+            <Image url="@../img/edit.gif"/>
+         </ImageView>
+      </HBox>
+      <HBox id="row" fx:id="gray" alignment="CENTER" VBox.vgrow="ALWAYS">
+         <VBox.margin>
+            <Insets/>
+         </VBox.margin>
+         <ImageView fitHeight="48.0" fitWidth="165.0" pickOnBounds="true" preserveRatio="true"
+                    HBox.hgrow="ALWAYS">
+            <Image url="@../img/folder.png"/>
+         </ImageView>
+         <Label text="CARTELLA DEI GRIGI" HBox.hgrow="ALWAYS">
+            <font>
+               <Font name="System Bold" size="24.0"/>
+            </font>
+            <HBox.margin>
+               <Insets/>
+            </HBox.margin>
+         </Label>
+         <ImageView fx:id="gifGray" fitHeight="23.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true"
+                    HBox.hgrow="ALWAYS">
+            <Image url="@../img/edit.gif"/>
+         </ImageView>
+      </HBox>
+      <HBox id="row" fx:id="tiff" alignment="CENTER" VBox.vgrow="ALWAYS">
+         <VBox.margin>
+            <Insets/>
+         </VBox.margin>
+         <ImageView fitHeight="48.0" fitWidth="165.0" pickOnBounds="true" preserveRatio="true"
+                    HBox.hgrow="ALWAYS">
+            <Image url="@../img/folder.png"/>
+         </ImageView>
+         <Label text="CARTELLA DEI TIFF" HBox.hgrow="ALWAYS">
+            <font>
+               <Font name="System Bold" size="24.0"/>
+            </font>
+         </Label>
+         <ImageView fx:id="gifTiff" fitHeight="30.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true"
+                    HBox.hgrow="ALWAYS">
+            <Image url="@../img/edit.gif"/>
+         </ImageView>
+      </HBox>
+   </VBox>
+</VBox>

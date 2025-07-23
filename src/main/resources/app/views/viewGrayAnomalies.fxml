@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="appBox" alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/22"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.views.viewGrayAnomalies">
+   <VBox fx:id="header" alignment="CENTER">
+      <StackPane>
+         <VBox.margin>
+            <Insets top="30.0"/>
+         </VBox.margin>
+         <ImageView fx:id="progressImg" fitHeight="33.0" fitWidth="239.0" pickOnBounds="true">
+            <Image url="@../img/progress-00.gif"/>
+         </ImageView>
+         <Label fx:id="progressLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="35.0"
+                prefWidth="240.0" text="0/0" StackPane.alignment="CENTER">
+            <font>
+               <Font size="24.0"/>
+            </font>
+         </Label>
+      </StackPane>
+   </VBox>
+   <VBox id="body" alignment="CENTER" style="-fx-padding: 20;">
+      <HBox alignment="CENTER">
+         <HBox HBox.hgrow="ALWAYS">
+            <StackPane fx:id="parentFront" alignment="TOP_CENTER" style="-fx-background-color: #DCDCDC;"
+                       HBox.hgrow="ALWAYS">
+               <ImageView fx:id="front" pickOnBounds="true" preserveRatio="true"/>
+               <HBox maxHeight="10.0" style="-fx-padding: 10;">
+                  <ImageView fx:id="frontLeft" fitHeight="37.0" fitWidth="38.0" pickOnBounds="true"
+                             preserveRatio="true">
+                     <HBox.margin>
+                        <Insets right="5.0"/>
+                     </HBox.margin>
+                     <Image url="@../img/rotate-left.png"/>
+                  </ImageView>
+                  <ImageView fx:id="frontRight" fitHeight="37.0" fitWidth="38.0" pickOnBounds="true"
+                             preserveRatio="true">
+                     <Image url="@../img/rotate-right.png"/>
+                  </ImageView>
+               </HBox>
+            </StackPane>
+         </HBox>
+         <HBox prefWidth="100.0">
+            <ImageView fitHeight="1.0" fitWidth="1.0" pickOnBounds="true"
+                       preserveRatio="true"/>
+         </HBox>
+         <HBox HBox.hgrow="ALWAYS">
+            <StackPane fx:id="parentBack" alignment="TOP_CENTER" style="-fx-background-color: #DCDCDC;"
+                       HBox.hgrow="ALWAYS">
+               <ImageView fx:id="back" pickOnBounds="true" preserveRatio="true"/>
+               <HBox maxHeight="10.0" style="-fx-padding: 10;">
+                  <ImageView fx:id="backLeft" fitHeight="37.0" fitWidth="38.0" pickOnBounds="true"
+                             preserveRatio="true">
+                     <HBox.margin>
+                        <Insets right="5.0"/>
+                     </HBox.margin>
+                     <Image url="@../img/rotate-left.png"/>
+                  </ImageView>
+                  <ImageView fx:id="backRight" fitHeight="37.0" fitWidth="38.0" pickOnBounds="true"
+                             preserveRatio="true">
+                     <Image url="@../img/rotate-right.png"/>
+                  </ImageView>
+               </HBox>
+            </StackPane>
+         </HBox>
+         <VBox alignment="CENTER_RIGHT" nodeOrientation="LEFT_TO_RIGHT" prefHeight="314.0" prefWidth="66.0"
+               HBox.hgrow="NEVER">
+            <HBox.margin>
+               <Insets left="50.0"/>
+            </HBox.margin>
+            <Button fx:id="btnEqual" mnemonicParsing="false" prefHeight="88.0" prefWidth="74.0"
+                    VBox.vgrow="NEVER">
+               <graphic>
+                  <ImageView fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@../img/same.png"/>
+                  </ImageView>
+               </graphic>
+               <VBox.margin>
+                  <Insets top="50.0"/>
+               </VBox.margin>
+            </Button>
+            <Button fx:id="btnNotEqual" mnemonicParsing="false" VBox.vgrow="NEVER">
+               <graphic>
+                  <ImageView fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@../img/notSame.png"/>
+                  </ImageView>
+               </graphic>
+               <VBox.margin>
+                  <Insets top="50.0"/>
+               </VBox.margin>
+            </Button>
+         </VBox>
+      </HBox>
+      <Label fx:id="fileName" text="FILE" VBox.vgrow="ALWAYS">
+         <VBox.margin>
+            <Insets top="50.0"/>
+         </VBox.margin>
+         <font>
+            <Font name="System Bold" size="20.0"/>
+         </font>
+      </Label>
+   </VBox>
+   <HBox fx:id="footer" alignment="CENTER_RIGHT" prefHeight="55.0" prefWidth="610.0" style="-fx-padding: 20;"
+         VBox.vgrow="NEVER">
+      <Button id="btn" fx:id="btnBackwards" alignment="CENTER" contentDisplay="CENTER" disable="true"
+              mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" text="INDIETRO">
+         <font>
+            <Font name="System Bold" size="21.0"/>
+         </font>
+         <HBox.margin>
+            <Insets right="30.0"/>
+         </HBox.margin>
+      </Button>
+      <Button id="btn" fx:id="btnForward" alignment="CENTER" contentDisplay="CENTER" disable="true"
+              mnemonicParsing="false" prefHeight="50.0" prefWidth="300.0" text="AVANTI">
+         <font>
+            <Font name="System Bold" size="21.0"/>
+         </font>
+      </Button>
+   </HBox>
+</VBox>

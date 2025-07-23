@@ -1,0 +1,179 @@
+#printPane {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #005075;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    background-color: #ffffff;
+    border-color: #005075;
+    border-width: 2px;
+    border-radius: 5px;
+}
+#printPane:hover {
+    -fx-background-color: #cde5f0;
+    -fx-border-color: #005075;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-cursor: hand;
+    background-color: #cde5f0;
+    border-color: #005075;
+    border-width: 2px;
+    border-radius: 5px;
+    cursor: hand;
+}
+#title,#body{
+    -fx-background-color: rgb(238, 238, 238);
+    background-color: rgb(238, 238, 238);
+}
+
+/*noinspection ALL*/
+#row{
+    -fx-background-color: white;
+    -fx-border-color: rgb(175, 175, 175);
+    -fx-border-width: 0.5px;
+    -fx-border-radius: 5px;
+    background-color: white;
+    border-color: rgb(175, 175, 175);
+    border-width: 0.5px;
+    border-radius: 5px;
+    -fx-start-margin: 2px;
+    -fx-text-fill: #005075;
+}
+#row:hover{
+    -fx-background-color: #005075;
+    -fx-border-width: 0px;
+    -fx-start-margin: 2px;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    background-color: #005075;
+    border-width: 0px;
+    cursor: hand;
+}
+#row:hover .label {
+    -fx-text-fill: white;
+}
+#row .label {
+    -fx-text-fill:#005075;
+}
+#printPane{
+    background-color: #005075;
+    -fx-background-color:  #005075;
+    border-color:white;
+    -fx-border-color: white;
+    border-width:1px;
+    -fx-border-width: 1px;
+    border-radius:5px;
+    -fx-border-radius: 5px;
+    -fx-start-margin: 2px;
+    -fx-text-fill: #005075;
+}
+
+/*noinspection ALL*/
+#stepOne, #stepTwo{
+    background-color:white;
+    -fx-background-color: white;
+    border-color:rgb(175, 175, 175);
+    -fx-border-color: rgb(175, 175, 175);
+    border-width:0.5px;
+    -fx-border-width: 0.5px;
+    border-radius:5px;
+    -fx-border-radius: 5px;
+    -fx-start-margin: 2px;
+    -fx-text-fill: #005075;
+}
+#stepOne:hover .label, #stepTwo:hover .label {
+    -fx-text-fill: white;
+}
+#stepOne .label, #stepTwo .label {
+    -fx-text-fill:#005075;
+}
+#stepOne:hover, #stepTwo:hover{
+    -fx-background-color: #005075;
+    -fx-border-width: 0px;
+    -fx-start-margin: 2px;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    background-color: #005075;
+    border-width: 0px;
+    cursor: hand;
+}
+#stepOne:hover #stepOneImg {
+    -fx-image: url("../img/stepOneHover.png");
+}
+#stepTwo:hover #stepTwoImg {
+    -fx-image: url("../img/stepTwoHover.png");
+}
+#stepOneImg {
+    -fx-image: url("../img/stepOne.png");
+}
+#stepTwoImg {
+    -fx-image: url("../img/stepTwo.png");
+}
+#stockNumber {
+    -fx-border-width: 0;
+    -fx-prompt-text-fill: grey;
+    border-width: 0;
+}
+#stockNumber .text-field .prompt-text {
+    -fx-fill: #005075;
+    -fx-font-size: 16px;
+    -fx-opacity: 1.0;
+    fill: #005075;
+    font-size: 16px;
+    opacity: 1.0;
+}
+.btn, #stepOne, #stepTwo, #stepThree,#etichette,#jobSorter,#gray,#tiff {
+    -fx-background-color:#005075;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    background-color:#005075;
+    cursor: hand;
+}
+.btn:hover, #stepOne:hover, #stepTwo:hover, #stepThree:hover,#etichette:hover,#jobSorter:hover,#gray:hover,#tiff:hover {
+    -fx-opacity: 0.4;
+    opacity: 0.4;
+}
+.btn .label, #stepOne .label,#stepTwo .label, #stepThree .label,#etichette .label,#jobSorter .label,#gray .label,#tiff .label{
+    -fx-text-fill: white;
+}
+
+.table-row-cell.group-color-1 {
+    -fx-background-color: #c7d4de;
+}
+
+.table-row-cell.group-color-1:hover,.table-row-cell.group-color-2:hover {
+    -fx-background-color:#005075;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    background-color:#005075;
+    cursor: hand;
+}
+
+.table-row-cell.group-color-1:selected,
+.table-row-cell.group-color-2:selected {
+    -fx-background-color: #005075;
+    -fx-text-fill: white;
+}
+
+.table-row-cell.group-color-1:selected:hover,
+.table-row-cell.group-color-2:selected:hover {
+    -fx-background-color: #00405f;
+    -fx-text-fill: white;
+}
+
+.table-row-cell:focused .table-cell {
+    -fx-text-fill: white;
+}
+
+
+.table-row-cell.group-color-2 {
+    -fx-background-color: #ffffff;
+}
+
+
+.table-cell {
+    -fx-text-fill: black;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: white;
+}

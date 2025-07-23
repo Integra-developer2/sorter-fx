@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox id="body" alignment="CENTER" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.views.viewWorkingFolder">
+   <VBox id="workingFolder" fx:id="workingFolder" alignment="CENTER" style="-fx-background-color: #ffffff;" VBox.vgrow="ALWAYS">
+      <VBox.margin>
+         <Insets />
+      </VBox.margin>
+      <padding>
+         <Insets bottom="150.0" left="50.0" right="50.0" top="50.0" />
+      </padding>
+      <HBox alignment="CENTER" VBox.vgrow="NEVER" styleClass="btn">
+         <ImageView fitHeight="44.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="NEVER" VBox.vgrow="NEVER">
+            <Image url="@../img/folder.png" />
+         </ImageView>
+         <Label prefHeight="27.0" prefWidth="101.0" text="SELEZIONA" HBox.hgrow="ALWAYS" VBox.vgrow="NEVER">
+            <font>
+               <Font name="System Bold" size="18.0" />
+            </font>
+         </Label>
+         <ImageView fx:id="gifImageView" fitHeight="19.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="NEVER">
+            <Image url="@../img/edit.gif" />
+         </ImageView>
+      </HBox>
+   </VBox>
+   <padding>
+      <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+   </padding>
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
+</VBox>

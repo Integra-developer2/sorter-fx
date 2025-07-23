@@ -1,27 +1,69 @@
 package app;
 
-import static app.functions.load;
-import static app.functions.printError;
+import app.classes.Api;
+import app.classes.UI;
+import app.objects.objLogTimeline;
+import app.objects.objProgressBar;
+import app.objects.objProgressItem;
+import app.tasks.taskWorkingFolder;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-/**
- * JavaFX App
- */
+import javafx.stage.StageStyle;
+import javafx.util.Duration;
+
 public class App extends Application {
-    @Override
-    public void start(@SuppressWarnings("exports") Stage _stage) {
-        try {
-            load(_stage,"viewWorkingFolder",510,300);
-        } catch (Exception e) {
-            printError(e,true);
-        }
-    }
 
     public static void main(String[] args) {
-        try {
-            launch();
-        } catch (Exception e) {
-            printError(e,true);
-        }
+        launch(args);
     }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        UI.setPages();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(UI.page(0)));
+        AnchorPane root = loader.load();
+        UI.main = loader.getController();
+        setupFlusher();
+        Scene scene = new Scene(root);
+        primaryStage.initStyle(StageStyle.UNDECORATED);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+        taskWorkingFolder.run();
+
+    }
+
+    private void setupFlusher() {
+        Timeline logFlusher = new Timeline(
+            new KeyFrame(Duration.millis(300), _ -> {
+                if (!objProgressBar.objProgressItems.isEmpty()) {
+                    for(objProgressItem pi:objProgressBar.objProgressItems.keySet()) {
+                        Integer count = objProgressBar.objProgressItems.get(pi);
+                        Platform.runLater(() -> {
+                            pi.progressBar().setProgress( (double) count / pi.total());
+                            pi.label().setText(pi.labelText()+ " : (" + count + "/" + pi.total()+")");
+                        });
+                        objProgressBar.objProgressItems.remove(pi);
+                    }
+                }
+                if(!objLogTimeline.logQueue.isEmpty()){
+                    for(String page:objLogTimeline.logQueue.keySet()){
+                        UI.main.appendLog(objLogTimeline.logQueue.get(page));
+                        objLogTimeline.logQueue.remove(page);
+                    }
+                }
+                Api.updateApiFile();
+            })
+        );
+        logFlusher.setCycleCount(Animation.INDEFINITE);
+        logFlusher.play();
+    }
+
 }

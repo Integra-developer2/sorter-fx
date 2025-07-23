@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<VBox alignment="CENTER" prefHeight="920.0" spacing="20.0" xmlns="http://javafx.com/javafx/22"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.views.viewStockToShoot">
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+   </padding>
+   <VBox alignment="CENTER" VBox.vgrow="ALWAYS">
+      <TableView fx:id="tableView" editable="true" prefHeight="920.0" prefWidth="1300.0" VBox.vgrow="ALWAYS">
+         <columns>
+            <TableColumn fx:id="box1" editable="false" minWidth="290.0" text="RIFERIMENTO SCATOLO"/>
+            <TableColumn fx:id="pallet1" editable="false" minWidth="290.0" text="RIFERIMENTO PEDANA"/>
+            <TableColumn fx:id="shoot1" editable="false" maxWidth="47.0" minWidth="47.0" prefWidth="47.0" text="SPARA"/>
+            <TableColumn fx:id="box2" editable="false" minWidth="290.0" text="RIFERIMENTO SCATOLO"/>
+            <TableColumn fx:id="pallet2" editable="false" minWidth="290.0" text="RIFERIMENTO PEDANA"/>
+            <TableColumn fx:id="shoot2" editable="false" maxWidth="47.0" minWidth="47.0" prefWidth="47.0" text="SPARA"/>
+         </columns>
+      </TableView>
+   </VBox>
+   <HBox alignment="CENTER" prefHeight="27.0" prefWidth="887.0">
+      <HBox fx:id="printPane" alignment="CENTER" style="-fx-background-color: #005075; -fx-text-fill: white;"
+            HBox.hgrow="NEVER">
+         <padding>
+            <Insets bottom="10.0" left="40.0" right="50.0" top="10.0"/>
+         </padding>
+         <HBox.margin>
+            <Insets right="10.0"/>
+         </HBox.margin>
+         <ImageView fitHeight="35.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true"
+                    HBox.hgrow="ALWAYS">
+            <HBox.margin>
+               <Insets right="10.0"/>
+            </HBox.margin>
+            <Image url="@../img/print.png"/>
+         </ImageView>
+         <Label text="STAMPA" textAlignment="CENTER" textFill="WHITE" HBox.hgrow="NEVER">
+            <font>
+               <Font name="Arial Black" size="20.0"/>
+            </font>
+         </Label>
+      </HBox>
+   </HBox>
+</VBox>
