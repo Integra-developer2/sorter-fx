@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static app.functions.printError;
 
@@ -69,7 +70,7 @@ public class objGlobals {
     public static String logSourceJobSorter  = "";
     public static String pdfs = "";
     public static File urlFile;
-    public static boolean shouldUpdateUrlFile = false;
+    public static AtomicBoolean shouldUpdateUrlFile = new AtomicBoolean(false);
     public static String apiOption;
     public static void variables(){
         logFolder=logFolder();
@@ -120,7 +121,7 @@ public class objGlobals {
 
         errorMap= new objErrorMap();
 
-        if(objGlobals.urlFile.exists()&&!shouldUpdateUrlFile){
+        if(objGlobals.urlFile.exists()&&!shouldUpdateUrlFile.get()){
             Api.setApiUrl();
         }
     }

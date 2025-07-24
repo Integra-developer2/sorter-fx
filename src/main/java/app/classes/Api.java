@@ -80,12 +80,12 @@ public class Api {
     }
 
     public static void updateApiFile(){
-        if(objGlobals.shouldUpdateUrlFile && objGlobals.urlFile != null){
-            loadUrls();
-            objGlobals.shouldUpdateUrlFile=false;
-            Thread t = new Thread(new Task<>(){
-                @Override
-                protected Void call() {
+        Thread thread = new Thread(new Task<>() {
+            @Override
+            protected Void call() {
+                if(objGlobals.shouldUpdateUrlFile.get() && objGlobals.urlFile != null){
+                    loadUrls();
+                    objGlobals.shouldUpdateUrlFile.set(false);
                     if(objGlobals.urlFile.exists()){
                         if(!objGlobals.urlFile.delete()){
                             logError("setApiSiteUrl",new Exception("could not delete file"));
@@ -97,18 +97,20 @@ public class Api {
                     catch(Exception e){
                         logError("setApiSiteUrl",e);
                     }
-                    return null;
+
                 }
-            });
-            t.setDaemon(true);
-            t.start();
-        }
+                return null;
+            }
+        });
+        thread.setDaemon(true);
+        thread.start();
+
     }
 
     public static void setApiSiteUrl(String option) {
         loadUrls();
         Api.siteUrl = urls.get(option);
-        objGlobals.shouldUpdateUrlFile = true;
+        objGlobals.shouldUpdateUrlFile.set(true);
         objGlobals.apiOption = option;
     }
 
