@@ -1,6 +1,7 @@
 package app.steps;
 
 import app.Routing;
+import app.classes.Pc;
 import app.classes.Pdfs;
 import app.classes.UI;
 import app.classes.ValidTiffs;
@@ -164,7 +165,7 @@ public class pdf {
                 objLogTimeline.add("refreshThreads","[ generatePdfs ] running "+text);
             }
         }
-        if(cpuUsage()<70.00){
+        if(Pc.usage.get("cpu")<90.00 && Pc.usage.get("disk")<90.00){
             objGlobals.totalThreads += 100;
             sleep(500);
         }

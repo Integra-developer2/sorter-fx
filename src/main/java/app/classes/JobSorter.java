@@ -72,6 +72,7 @@ public class JobSorter {
                             }
                         }
                     }
+                    objGlobals.sourceJobSorter.add(path.toString());
                 }
                 return FileVisitResult.CONTINUE;
             }

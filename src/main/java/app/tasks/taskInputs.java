@@ -71,7 +71,7 @@ public class taskInputs {
         t.start();
     }
 
-    private static void writeSource(String path, String source){
+    public static void writeSource(String path, String source){
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             writer.write(source);
         }
@@ -80,7 +80,7 @@ public class taskInputs {
         }
     }
 
-    private static void writeSource(String path, ArrayList<String> source){
+    public static void writeSource(String path, ArrayList<String> source){
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             for(String to : source){
                 writer.write(to);

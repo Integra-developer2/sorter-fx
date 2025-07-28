@@ -9,14 +9,14 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static app.functions.barcode;
 
 public class objFilesBlack {
     public static ArrayList<String> list = new ArrayList<>();
     public static ArrayList<String> all = new ArrayList<>();
-    public static HashMap<String, ArrayList<String>> barcodeFiles = new HashMap<>();
+    public static ConcurrentHashMap<String, ArrayList<String>> barcodeFiles = new ConcurrentHashMap<>();
 
     public static void list() throws Exception{
         Path startPath = Paths.get(objGlobals.targetTiff);
@@ -52,7 +52,7 @@ public class objFilesBlack {
     public static void refreshBarcodeFiles() throws Exception{
         UI.controller.addSpinner("Aggiorno barcode files");
         Path startPath = Paths.get(objGlobals.targetTiff);
-        barcodeFiles = new HashMap<>();
+        barcodeFiles = new ConcurrentHashMap<>();
         Files.walkFileTree(startPath, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {

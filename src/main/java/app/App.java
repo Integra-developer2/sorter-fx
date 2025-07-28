@@ -1,6 +1,7 @@
 package app;
 
 import app.classes.Api;
+import app.classes.Pc;
 import app.classes.UI;
 import app.objects.objLogTimeline;
 import app.objects.objProgressBar;
@@ -31,6 +32,7 @@ public class App extends Application {
         AnchorPane root = loader.load();
         UI.main = loader.getController();
         setupFlusher();
+        setupFlusherOneSec();
         Scene scene = new Scene(root);
         primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.setScene(scene);
@@ -60,7 +62,16 @@ public class App extends Application {
                     }
                 }
                 Api.updateApiFile();
+                Pc.cpu();
             })
+        );
+        logFlusher.setCycleCount(Animation.INDEFINITE);
+        logFlusher.play();
+    }
+
+    private void setupFlusherOneSec() {
+        Timeline logFlusher = new Timeline(
+            new KeyFrame(Duration.millis(1000), _ -> Pc.disk())
         );
         logFlusher.setCycleCount(Animation.INDEFINITE);
         logFlusher.play();

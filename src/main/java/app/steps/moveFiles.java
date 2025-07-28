@@ -2,6 +2,7 @@ package app.steps;
 
 import app.classes.AllBlackFiles;
 import app.Routing;
+import app.classes.Pc;
 import app.classes.UI;
 import app.objects.objGlobals;
 import app.objects.objLogTimeline;
@@ -84,7 +85,7 @@ public class moveFiles {
                 objLogTimeline.add("refreshThreads","[ copyFiles ] running "+text);
             }
         }
-        if(cpuUsage()<70.00){
+        if(Pc.usage.get("cpu")<90.00 && Pc.usage.get("disk")<90.00){
             objGlobals.totalThreads += add;
             sleep(500);
         }

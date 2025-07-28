@@ -72,9 +72,11 @@ public class objGlobals {
     public static File urlFile;
     public static AtomicBoolean shouldUpdateUrlFile = new AtomicBoolean(false);
     public static String apiOption;
+    public static String partition;
+
     public static void variables(){
         logFolder=logFolder();
-
+        partition=partition();
         targetGray=new File(new File(workingFolder, "FILE_TEMPORANEI"), "GRIGI").toString();
         targetTiff=new File(new File(workingFolder, "FILE_TEMPORANEI"), "TIFF").toString();
         jobSorterFolder=new File(new File(workingFolder, "FILE_TEMPORANEI"),"JOB-SORTER").toString();
@@ -124,6 +126,16 @@ public class objGlobals {
         if(objGlobals.urlFile.exists()&&!shouldUpdateUrlFile.get()){
             Api.setApiUrl();
         }
+    }
+
+    private static String partition(){
+        Path path = Paths.get(workingFolder);
+        Path root = path.getRoot();
+        if (root != null) {
+            return root.toString().substring(0, 1);
+        }
+        printError(new Exception("partition not found"),true);
+        return null;
     }
 
     public static String logFolder() {

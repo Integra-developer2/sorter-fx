@@ -2,6 +2,7 @@ package app.steps;
 
 import app.classes.JobSorter;
 import app.Routing;
+import app.classes.Pc;
 import app.classes.UI;
 import app.objects.*;
 import javafx.concurrent.Task;
@@ -106,7 +107,7 @@ public class gray {
                 objLogTimeline.add("refreshThreads","[ readBarcodes ] running "+text);
             }
         }
-        if(cpuUsage()<90.00){
+        if(Pc.usage.get("cpu")<90.00 && Pc.usage.get("disk")<90.00){
             objGlobals.totalThreads += 1;
             sleep(500);
         }
@@ -290,13 +291,17 @@ public class gray {
         HashMap<String, ArrayList<String>> retA = barcodeFiles(barcodesA);
         HashMap<String, ArrayList<String>> retB = barcodeFiles(barcodesB);
         for (String barcode : retA.keySet()) {
-            if(!ret.containsKey(barcode)){
-                ret.put(barcode, retA.get(barcode));
+            if(!barcode.isEmpty()){
+                if(!ret.containsKey(barcode)){
+                    ret.put(barcode, retA.get(barcode));
+                }
             }
         }
         for (String barcode : retB.keySet()) {
-            if(!ret.containsKey(barcode)){
-                ret.put(barcode, retB.get(barcode));
+            if(!barcode.isEmpty()){
+                if(!ret.containsKey(barcode)){
+                    ret.put(barcode, retB.get(barcode));
+                }
             }
         }
 
@@ -311,7 +316,7 @@ public class gray {
                 ArrayList<String> files = objFilesBlack.barcodeFiles.get(barcode);
                 barcodeFiles.put(barcode, files);
             }
-            else if(objFilesBlack.barcodeFiles.containsKey(alternative)){
+            else if(alternative!=null && !alternative.isEmpty() && objFilesBlack.barcodeFiles.containsKey(alternative)){
                 ArrayList<String> files = objFilesBlack.barcodeFiles.get(alternative);
                 barcodeFiles.put(alternative, files);
             }

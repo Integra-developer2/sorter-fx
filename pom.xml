@@ -10,6 +10,16 @@
         <maven.compiler.target>22</maven.compiler.target>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>6.8.2</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-access</artifactId>
+            <version>1.5.18</version>
+        </dependency>
         <!-- JavaFX Dependencies -->
         <dependency>
             <groupId>org.openjfx</groupId>

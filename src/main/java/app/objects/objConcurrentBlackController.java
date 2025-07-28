@@ -87,13 +87,19 @@ public class objConcurrentBlackController {
          for (String barcode : barcodeStatus.keySet()) {
             ArrayList<String> files = objFilesBlack.barcodeFiles.get(barcode);
             String code = barcodeStatus.get(barcode);
-            for (String fileStr : files) {
-               File file = new File(fileStr);
-               if(!objGlobals.errorMap.success.contains(code)&&file.exists()){
-                  moveFilesBlackWithDir(code, fileStr);
-               }
-               String line = fileStr+";"+barcode+";"+barcodeStatus.get(barcode);
+            if(files.isEmpty()){
+               String line = "files is empty;"+barcode+";"+barcodeStatus.get(barcode);
                writer.append(line).append("\n");
+            }
+            else{
+               for (String fileStr : files) {
+                  File file = new File(fileStr);
+                  if(!objGlobals.errorMap.success.contains(code)&&file.exists()){
+                     moveFilesBlackWithDir(code, fileStr);
+                  }
+                  String line = fileStr+";"+barcode+";"+barcodeStatus.get(barcode);
+                  writer.append(line).append("\n");
+               }
             }
          }
       }

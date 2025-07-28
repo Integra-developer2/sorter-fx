@@ -1,15 +1,7 @@
 package app;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.management.ManagementFactory;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import app.objects.*;
 import app.classes.SimpleImageInfo;
-import com.sun.management.OperatingSystemMXBean;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -285,13 +276,6 @@ public class functions {
         if (file.getParentFile() != null) {
             Files.createDirectories(file.getParentFile().toPath());
         }
-    }
-
-    public static double cpuUsage(){
-        OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        double systemCpuLoad = osBean.getCpuLoad() * 100;
-        objLogTimeline.add("cpuUsage","System CPU Load: "+systemCpuLoad);
-        return systemCpuLoad;
     }
 
 }

@@ -73,7 +73,7 @@ public class taskStepChoice {
                                             objGlobals.targetEtichette = latestFileEtichette.toString();
                                         }
                                         JobSorter.getData();
-                                        if(JobSorter.barcodeRow.isEmpty()){
+                                        if(JobSorter.barcodeRow.isEmpty()||objGlobals.sourceJobSorter.isEmpty()){
                                             JobSorter.hasData = false;
                                             canGoNext=false;
                                             objGlobals.runStep = "";
@@ -81,6 +81,10 @@ public class taskStepChoice {
                                             taskStepChoice.run();
                                         }
                                         if(canGoNext){
+                                            taskInputs.writeSource(objGlobals.logSourceTiff,objGlobals.targetTiff);
+                                            taskInputs.writeSource(objGlobals.logSourceGray,objGlobals.targetGray);
+                                            taskInputs.writeSource(objGlobals.logSourceEtichette,objGlobals.sourceEtichette);
+                                            taskInputs.writeSource(objGlobals.logSourceJobSorter,objGlobals.sourceJobSorter);
                                             Routing.end("moveFiles");
                                             Routing.stepChoice = "end";
                                             Routing.next();

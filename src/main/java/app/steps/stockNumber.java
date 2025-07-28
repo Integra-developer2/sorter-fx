@@ -1,5 +1,6 @@
 package app.steps;
 
+import app.classes.Pc;
 import app.classes.StockFile;
 import app.classes.UI;
 import app.classes.ValidTiffs;
@@ -12,7 +13,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static app.functions.cpuUsage;
 import static app.functions.printError;
 import static java.lang.Thread.sleep;
 
@@ -127,7 +127,7 @@ public class stockNumber {
                 objLogTimeline.add("refreshThreads","[ getStock ] running "+text);
             }
         }
-        if(cpuUsage()<70.00){
+        if(Pc.usage.get("cpu")<90.00 && Pc.usage.get("disk")<90.00){
             objGlobals.totalThreads += 1;
             sleep(500);
         }
