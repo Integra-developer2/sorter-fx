@@ -45,7 +45,7 @@ public class viewMain {
     private boolean isMaximized = false;
     private double prevW, prevH, prevX, prevY;
     private boolean terminalVisible = false;
-    private int countLogs = 0;
+
 
     @FXML public void initialize() {
         Platform.runLater(() -> {
@@ -270,14 +270,7 @@ public class viewMain {
 
     public void appendLog( String text) {
         if(!objGlobals.terminalPause){
-            Platform.runLater(() -> {
-                if(countLogs>100){
-                    countLogs=0;
-                    terminalOutput.clear();
-                }
-                terminalOutput.appendText(LocalDateTime.now() + ":" + text + "\n");
-                countLogs++;
-            });
+            Platform.runLater(() -> terminalOutput.appendText(LocalDateTime.now()+":"+ text + "\n"));
         }
     }
 
