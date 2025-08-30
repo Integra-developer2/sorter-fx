@@ -25,7 +25,7 @@ public class taskStockAnomalies {
                 @Override protected Void call() {
                     Platform.runLater(() -> {
                         UI.loadViewStatusBar(4,"VERIFICO SE CI SONO ANOMALIE");
-                        UI.controller.addSpinner("VERIFICO SE CI SONO ANOMALIE");
+                        UI.controller.addSpinner("MI PREPARO");
                         runAfter();
                     });
                     return null;
@@ -86,6 +86,14 @@ public class taskStockAnomalies {
             HashMap<String, objStockFile> toApi = new HashMap<>();
             ArrayList<String>allBarcodes=new ArrayList<>();
 
+            UI.controller.removeSpinner();
+            if(!AllBlackFiles.hasData){
+                UI.controller.addSpinner("Faccio elenco dei file tiff");
+                AllBlackFiles.getData();
+                UI.controller.removeSpinner();
+            }
+            objProgressItem pi = UI.controller.addProgress("Verifico se ci sono anomalie", StockFile.rowObject().size());
+            int count = 0;
             for (Integer row : StockFile.rowObject().keySet()) {
                 objStock obj = StockFile.rowObject(row);
                 if(obj.firstBarcode.isEmpty()){
@@ -165,6 +173,7 @@ public class taskStockAnomalies {
                     allBarcodes.addAll(barcodes);
 
                 }
+                UI.controller.refresh(pi,++count);
             }
 
             JsonObject prefixJson = objApiBarcode(allBarcodes);
@@ -173,6 +182,8 @@ public class taskStockAnomalies {
                 printError(new Exception("API Non raggiungibile"),true);
             }
             else{
+                objProgressItem pi2 = UI.controller.addProgress("Prendo i dati dal API",toApi.size());
+                int count2 = 0;
                 for(String firstBarcode:toApi.keySet()){
                     objStockFile objStockFile = toApi.get(firstBarcode);
                     String prefix="";
@@ -180,6 +191,9 @@ public class taskStockAnomalies {
                     String logic = "";
                     String error = objStockFile.error;
                     String agency = "";
+                    String agencyID = "";
+                    String cppCode = "";
+                    String customer = "";
                     if(error.isEmpty()){
                         for(String barcode: objStockFile.barcodes){
                             JsonObject json;
@@ -193,6 +207,9 @@ public class taskStockAnomalies {
                                 logic = json.get("auto_stock_logic").getAsString();
                                 stockNumber = Objects.requireNonNullElse(json.get("auto_stock_number").getAsString(),"0");
                                 agency = Objects.requireNonNullElse(json.get("agency").getAsString(),"");
+                                agencyID = Objects.requireNonNullElse(json.get("ID").getAsString(),"");
+                                cppCode = Objects.requireNonNullElse(json.get("cpp_code").getAsString(),"");
+                                customer = Objects.requireNonNullElse(json.get("customer").getAsString(),"");
 
                                 if(logic.equals("lotto")){
                                     prefix = json.get("flow_name").getAsString();
@@ -203,7 +220,10 @@ public class taskStockAnomalies {
                                 break;
                             }
                         }
-                        if(prefix.isEmpty()||stockNumber.isEmpty()||logic.isEmpty()){
+                        if(logic.equals("lotto") && prefix.equals("ND") ){
+                            error+="Numero lotto non presente \n";
+                        }
+                        else if(prefix.isEmpty()||stockNumber.isEmpty()||logic.isEmpty()){
                             error+="Barcode non trovato nei prodotti postali \n";
                         }
                     }
@@ -216,13 +236,14 @@ public class taskStockAnomalies {
                         }
 
                         objStockFile.obj.extraFromJobSorter(objStockFile.groupFrom,String.valueOf(objStockFile.indexFrom),String.valueOf(objStockFile.indexTo));
-                        objStockFile.obj.extraFromStockFile(logic,prefix,stockNumber,agency);
+                        objStockFile.obj.extraFromStockFile(logic,prefix,stockNumber,agency,agencyID,cppCode,customer);
                         StockFile.rowObject.put(objStockFile.row, objStockFile.obj);
                     }
                     else{
                         StockFile.addStockFXCollections(objStockFile.row, objStockFile.obj, error);
                     }
 
+                    UI.controller.refresh(pi2,++count2);
                 }
 
             }

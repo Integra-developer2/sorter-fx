@@ -13,8 +13,9 @@ public class modelStock {
     private final StringProperty F;
     private final StringProperty G;
     private final StringProperty H;
+    private final StringProperty I;
 
-    public modelStock(Integer row, String A, String B, String C, String D, String E, String F, String G, String H) {
+    public modelStock(Integer row, String A, String B, String C, String D, String E, String F, String G, String H, String I) {
         this.row = new SimpleStringProperty(String.format("%04d",row));
         this.A = new SimpleStringProperty(A);
         this.B = new SimpleStringProperty(B);
@@ -24,6 +25,7 @@ public class modelStock {
         this.F = new SimpleStringProperty(F);
         this.G = new SimpleStringProperty(G);
         this.H = new SimpleStringProperty(H);
+        this.I = new SimpleStringProperty(I);
     }
     public StringProperty row() { return row;}
     public StringProperty A() { return A;}
@@ -34,4 +36,5 @@ public class modelStock {
     public StringProperty F() { return F;}
     public StringProperty G() { return G;}
     public StringProperty H() { return H;}
+    public StringProperty I() { return I;}
 }

@@ -74,6 +74,7 @@ public class ValidTiffs {
                         objValidTiff.agency  + ";" +
                         objValidTiff.obs  + ";" +
                         objValidTiff.stockLabel + ";" +
+                        objValidTiff.passo + ";" +
                         "\n"
                     );
                     if(!StockFile.groupObject.containsKey(group)){
@@ -119,6 +120,7 @@ public class ValidTiffs {
                         String agency = "";
                         String obs = "";
                         String stockLabel = "";
+                        String passo = "";
 
                         if(split.length>0){
                             barcode = Objects.requireNonNullElse(split[0],"");
@@ -150,6 +152,9 @@ public class ValidTiffs {
                         if(split.length>10){
                             stockLabel = Objects.requireNonNullElse(split[10], "");
                         }
+                        if(split.length>11){
+                            passo = Objects.requireNonNullElse(split[10], "");
+                        }
 
                         if((new File(file+"-FRONTE.tiff")).exists()||(new File(file+"-RETRO.tiff")).exists()){
                             objValidTiff objValidTiff = new objValidTiff(file, group, Integer.parseInt(index), barcode, agency);
@@ -168,6 +173,9 @@ public class ValidTiffs {
                             }
                             if (!stockLabel.isEmpty() && !stockLabel.equals("null")) {
                                 objValidTiff.stockLabel = stockLabel;
+                            }
+                            if (!passo.isEmpty() && !passo.equals("null")) {
+                                objValidTiff.passo = passo;
                             }
 
                             barcodeObject.put(barcode, objValidTiff);
@@ -189,6 +197,9 @@ public class ValidTiffs {
         objValidTiff.stockNumber = objStock.stockNumber;
         objValidTiff.obs = objStock.obs;
         objValidTiff.stockLabel = objStock.stockLabel;
+        if(objValidTiff.passo == null){
+            objValidTiff.passo = new File(objValidTiff.file).getParentFile().getParentFile().getName();
+        }
     }
 
 }

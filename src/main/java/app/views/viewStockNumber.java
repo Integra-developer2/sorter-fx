@@ -49,6 +49,7 @@ public class viewStockNumber implements Initializable {
     @FXML private TableColumn<modelStockNumber, String> I;
     @FXML private TableColumn<modelStockNumber, String> J;
     @FXML private TableColumn<modelStockNumber, String> K;
+    @FXML private TableColumn<modelStockNumber, String> L;
     @FXML private TableColumn<modelStockNumber, Void> deleteColumn;
     @FXML private Button btnForward;
     public String colorDefault = "group-color-1";
@@ -87,13 +88,14 @@ public class viewStockNumber implements Initializable {
         I.setCellValueFactory(cellData -> cellData.getValue().I());
         J.setCellValueFactory(cellData -> cellData.getValue().J());
         K.setCellValueFactory(cellData -> cellData.getValue().K());
+        L.setCellValueFactory(cellData -> cellData.getValue().L());
 
         r.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
         A.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
         B.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
         C.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
         D.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
-
+        E.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
 
         setupTableView();
         setupTableView2();
@@ -121,7 +123,11 @@ public class viewStockNumber implements Initializable {
                 modelStockNumber.H().get(),
                 modelStockNumber.I().get(),
                 modelStockNumber.J().get(),
-                modelStockNumber.K().get()
+                modelStockNumber.K().get(),
+                modelStockNumber.L().get(),
+                "",
+                "",
+                ""
             ));
         }
 
@@ -188,6 +194,7 @@ public class viewStockNumber implements Initializable {
                 String lastBarcode = "";
                 String reference = "";
                 String obs = "";
+                String cassetto = "";
                 String group = "";
                 String progStart = "";
                 String progEnd = "";
@@ -213,13 +220,17 @@ public class viewStockNumber implements Initializable {
                     lastBarcode,
                     reference,
                     obs,
+                    cassetto,
                     group,
                     progStart,
                     progEnd,
                     logicStart,
                     prefixStart,
                     stockNumber,
-                    agency
+                    agency,
+                    "",
+                    "",
+                    ""
                 )));
                 success = true;
             }

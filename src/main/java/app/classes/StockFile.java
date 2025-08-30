@@ -56,15 +56,19 @@ public class StockFile {
                         String lastBarcode = values[1].toUpperCase().replace(" ", "");
                         String reference = values[2].toUpperCase();
                         String obs = (values.length > 3) ? values[3].toUpperCase() : "";
-                        String group = (values.length > 4) ? values[4].toUpperCase() : "";
-                        String progStart = (values.length > 5) ? Optional.ofNullable(values[5]).orElse(""):"";
-                        String progEnd = (values.length > 6) ? Optional.ofNullable(values[6]).orElse(""):"";
-                        String logic = (values.length > 7) ? values[7].toUpperCase() : "";
-                        String prefix = (values.length > 8) ? values[8].toUpperCase() : "";
-                        String stockNumber = (values.length > 9) ? Optional.ofNullable(values[9]).orElse(""):"";
-                        String agency = (values.length > 10) ? Optional.ofNullable(values[10]).orElse(""):"";
+                        String cassetto = (values.length > 4) ? values[4].toUpperCase() : "";
+                        String group = (values.length > 5) ? values[5].toUpperCase() : "";
+                        String progStart = (values.length > 6) ? Optional.ofNullable(values[6]).orElse(""):"";
+                        String progEnd = (values.length > 7) ? Optional.ofNullable(values[7]).orElse(""):"";
+                        String logic = (values.length > 8) ? values[8].toUpperCase() : "";
+                        String prefix = (values.length > 9) ? values[9].toUpperCase() : "";
+                        String stockNumber = (values.length > 10) ? Optional.ofNullable(values[10]).orElse(""):"";
+                        String agency = (values.length > 11) ? Optional.ofNullable(values[11]).orElse(""):"";
+                        String agencyID = (values.length > 12) ? Optional.ofNullable(values[12]).orElse(""):"";
+                        String cppCode = (values.length > 13) ? Optional.ofNullable(values[13]).orElse(""):"";
+                        String customer = (values.length > 14) ? Optional.ofNullable(values[14]).orElse(""):"";
                         if (!(firstBarcode.isEmpty() && lastBarcode.isEmpty() && reference.isEmpty() && obs.isEmpty())) {
-                            rowObject.put(count,new objStock(count, firstBarcode, lastBarcode, reference, obs, group, progStart, progEnd,logic,prefix,stockNumber,agency));
+                            rowObject.put(count,new objStock(count, firstBarcode, lastBarcode, reference, obs, cassetto, group, progStart, progEnd,logic,prefix,stockNumber,agency,agencyID,cppCode,customer));
                         }
                     }
                 }
@@ -85,7 +89,7 @@ public class StockFile {
     public static void writeNewFile() {
         String filename = newTargetEtichetta();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-            writer.write("PRIMO BARCODE;ULTIMO BARCODE;SCATOLO;PEDANA;GRUPPO;PROG INIZIO;PROG FINE;LOGICA;PREFISSO;PACCO;AGENZIA");
+            writer.write("PRIMO BARCODE;ULTIMO BARCODE;SCATOLO;PEDANA;CASSETTO;GRUPPO;PROG INIZIO;PROG FINE;LOGICA;PREFISSO;PACCO;AGENZIA;ID AGENZIA;CODICE PRODOTTO;CLIENTE");
             writer.newLine();
             for (Map.Entry<Integer, objStock> entry : rowObject.entrySet()) {
                 objStock data = entry.getValue();
@@ -94,13 +98,17 @@ public class StockFile {
                     data.lastBarcode,
                     data.stockLabel,
                     data.obs,
+                    data.cassetto,
                     data.group,
                     Objects.requireNonNullElse(String.valueOf(data.progStart),""),
                     Objects.requireNonNullElse(String.valueOf(data.progEnd),""),
                     Objects.requireNonNullElse(data.logic,""),
                     Objects.requireNonNullElse(data.prefix,""),
                     Objects.requireNonNullElse(data.stockNumber,""),
-                    Objects.requireNonNullElse(data.agency,"")
+                    Objects.requireNonNullElse(data.agency,""),
+                    Objects.requireNonNullElse(data.agencyID,""),
+                    Objects.requireNonNullElse(data.cppCode,""),
+                    Objects.requireNonNullElse(data.customer,"")
                 );
                 writer.append(row);
                 writer.newLine();
@@ -137,7 +145,7 @@ public class StockFile {
     }
 
     public static void addStockFXCollections(Integer row, objStock obj, String error){
-        stockAnomaliesFXCollections.add(new modelStock(row,obj.firstBarcode,obj.lastBarcode,obj.stockLabel, obj.obs,obj.logic,obj.prefix,obj.stockNumber,error));
+        stockAnomaliesFXCollections.add(new modelStock(row,obj.firstBarcode,obj.lastBarcode,obj.stockLabel, obj.obs,obj.cassetto,obj.logic,obj.prefix,obj.stockNumber,error));
     }
 
 }

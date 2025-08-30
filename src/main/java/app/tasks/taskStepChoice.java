@@ -54,41 +54,28 @@ public class taskStepChoice {
                             switch (Routing.stepChoice) {
                                 case "moveFiles" -> taskInputs.run();
                                 case "gray" -> {
-                                    if (!fileExists()) {
-                                        alert("ERRORE", "SE VUOI SALTARE IL PRIMO STEP DEVI IMPOSTARE I FILE CONFORME CARTELLA __MODELLO__");
+                                    if(cantGoNext()){
                                         objGlobals.runStep = "";
                                         taskStepChoice.run();
                                     }
-                                    else {
-                                        boolean canGoNext=true;
-                                        File latestFileEtichette = StockFile.LatestFileEtichette();
-                                        if(latestFileEtichette==null) {
-                                            canGoNext=false;
-                                            objGlobals.runStep = "";
-                                            alert("ERRORE", "MANCA IL FILE ETICHETTE");
-                                            taskStepChoice.run();
-                                        }
-                                        else{
-                                            objGlobals.sourceEtichette = latestFileEtichette.toString();
-                                            objGlobals.targetEtichette = latestFileEtichette.toString();
-                                        }
-                                        JobSorter.getData();
-                                        if(JobSorter.barcodeRow.isEmpty()||objGlobals.sourceJobSorter.isEmpty()){
-                                            JobSorter.hasData = false;
-                                            canGoNext=false;
-                                            objGlobals.runStep = "";
-                                            alert("ERRORE", "MANCANO I FILE JOB SORTER");
-                                            taskStepChoice.run();
-                                        }
-                                        if(canGoNext){
-                                            taskInputs.writeSource(objGlobals.logSourceTiff,objGlobals.targetTiff);
-                                            taskInputs.writeSource(objGlobals.logSourceGray,objGlobals.targetGray);
-                                            taskInputs.writeSource(objGlobals.logSourceEtichette,objGlobals.sourceEtichette);
-                                            taskInputs.writeSource(objGlobals.logSourceJobSorter,objGlobals.sourceJobSorter);
-                                            Routing.end("moveFiles");
-                                            Routing.stepChoice = "end";
-                                            Routing.next();
-                                        }
+                                    else{
+                                        Routing.end("moveFiles");
+                                        Routing.stepChoice = "end";
+                                        Routing.next();
+                                    }
+                                }
+                                case "stockAndPdf"  -> {
+                                    if(cantGoNext()){
+                                        objGlobals.runStep = "";
+                                        taskStepChoice.run();
+                                    }
+                                    else{
+                                        Routing.reset();
+                                        Routing.end("moveFiles");
+                                        Routing.end("gray");
+                                        Routing.end("grayAnomalies");
+                                        Routing.stepChoice = "end";
+                                        Routing.next();
                                     }
                                 }
                             }
@@ -103,6 +90,41 @@ public class taskStepChoice {
         t.setName("taskStepChoiceAfter");
         t.setDaemon(true);
         t.start();
+    }
+
+    private static boolean cantGoNext(){
+        boolean cantGoNext=false;
+
+        if (!fileExists()) {
+            alert("ERRORE", "SE VUOI SALTARE IL PRIMO STEP DEVI IMPOSTARE I FILE CONFORME CARTELLA __MODELLO__");
+            cantGoNext=true;
+        }
+        else {
+
+            File latestFileEtichette = StockFile.LatestFileEtichette();
+            if(latestFileEtichette==null) {
+                cantGoNext=true;
+                alert("ERRORE", "MANCA IL FILE ETICHETTE");
+            }
+            else{
+                objGlobals.sourceEtichette = latestFileEtichette.toString();
+                objGlobals.targetEtichette = latestFileEtichette.toString();
+            }
+            JobSorter.getData();
+            if(JobSorter.barcodeRow.isEmpty()||objGlobals.sourceJobSorter.isEmpty()){
+                JobSorter.hasData = false;
+                cantGoNext=true;
+                alert("ERRORE", "MANCANO I FILE JOB SORTER");
+            }
+            if(cantGoNext){
+                taskInputs.writeSource(objGlobals.logSourceTiff,objGlobals.targetTiff);
+                taskInputs.writeSource(objGlobals.logSourceGray,objGlobals.targetGray);
+                taskInputs.writeSource(objGlobals.logSourceEtichette,objGlobals.sourceEtichette);
+                taskInputs.writeSource(objGlobals.logSourceJobSorter,objGlobals.sourceJobSorter);
+            }
+        }
+
+        return cantGoNext;
     }
 
     private static boolean fileExists() {

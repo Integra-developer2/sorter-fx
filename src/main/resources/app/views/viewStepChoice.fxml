@@ -52,6 +52,26 @@
                </font>
             </Label>
          </HBox>
+         <HBox id="stepTwo" fx:id="stepThree" alignment="CENTER">
+            <children>
+               <HBox alignment="CENTER" prefHeight="50.0">
+                  <opaqueInsets>
+                     <Insets />
+                  </opaqueInsets>
+                  <padding>
+                     <Insets right="10.0" />
+                  </padding>
+                  <children>
+                     <Circle fill="#1c8099" radius="7.0" stroke="TRANSPARENT" strokeType="INSIDE" HBox.hgrow="NEVER" />
+                  </children>
+               </HBox>
+               <Label alignment="CENTER" text="PACCO E PDF">
+                  <font>
+                     <Font name="System Bold" size="20.0" />
+                  </font>
+               </Label>
+            </children>
+         </HBox>
       </VBox>
       <padding>
          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

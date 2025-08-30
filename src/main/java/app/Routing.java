@@ -44,6 +44,17 @@ public class Routing {
         steps.put("pdf",new File(objGlobals.logStep,"pdf_end"));
     }
 
+    public static void reset(){
+        for(String step : steps.keySet()){
+            File stepFile = steps.get(step);
+            if(stepFile.exists()){
+                if(!stepFile.delete()){
+                    printError(new Exception("file step not deleted"),true);
+                }
+            }
+        }
+    }
+
     public static void end(String step) {
         if(steps.isEmpty()) {
             steps();

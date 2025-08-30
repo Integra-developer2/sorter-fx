@@ -17,6 +17,7 @@ public class modelStockNumber {
     private final StringProperty I;
     private final StringProperty J;
     private final StringProperty K;
+    private final StringProperty L;
 
 
     public modelStockNumber(objStock obj) {
@@ -25,13 +26,14 @@ public class modelStockNumber {
         this.B = new SimpleStringProperty(obj.lastBarcode);
         this.C = new SimpleStringProperty(obj.stockLabel);
         this.D = new SimpleStringProperty(obj.obs);
-        this.E = new SimpleStringProperty(obj.group);
-        this.F = new SimpleStringProperty(obj.progStart);
-        this.G = new SimpleStringProperty(obj.progEnd);
-        this.H = new SimpleStringProperty(obj.logic);
-        this.I = new SimpleStringProperty(obj.prefix);
-        this.J = new SimpleStringProperty(obj.stockNumber);
-        this.K = new SimpleStringProperty(obj.agency);
+        this.E = new SimpleStringProperty(obj.cassetto);
+        this.F = new SimpleStringProperty(obj.group);
+        this.G = new SimpleStringProperty(obj.progStart);
+        this.H = new SimpleStringProperty(obj.progEnd);
+        this.I = new SimpleStringProperty(obj.logic);
+        this.J = new SimpleStringProperty(obj.prefix);
+        this.K = new SimpleStringProperty(obj.stockNumber);
+        this.L = new SimpleStringProperty(obj.agency);
     }
 
     public StringProperty row() { return row;}
@@ -46,5 +48,5 @@ public class modelStockNumber {
     public StringProperty I() { return I;}
     public StringProperty J() { return J;}
     public StringProperty K() { return K;}
-
+    public StringProperty L() { return L;}
 }

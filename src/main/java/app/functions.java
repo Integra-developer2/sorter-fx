@@ -51,10 +51,13 @@ public class functions {
         if(!objGlobals.stop){
             alert("ERROR",e.toString());
         }
+
+        logError("ERROR",e);
+
         if(shouldStopPropagation){
             objGlobals.stop=true;
+            objGlobals.terminalPause=true;
         }
-        logError("ERROR",e);
     }
 
     public static void printError(String text, Exception e, Boolean shouldStopPropagation){

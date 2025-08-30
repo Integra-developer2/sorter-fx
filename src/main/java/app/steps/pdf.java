@@ -1,10 +1,7 @@
 package app.steps;
 
 import app.Routing;
-import app.classes.Pc;
-import app.classes.Pdfs;
-import app.classes.UI;
-import app.classes.ValidTiffs;
+import app.classes.*;
 import app.objects.*;
 import javafx.concurrent.Task;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -22,11 +19,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static app.functions.*;
 import static java.lang.Thread.sleep;
@@ -34,16 +30,35 @@ import static java.lang.Thread.sleep;
 public class pdf {
     private static final ArrayList<Thread> threads = new ArrayList<>();
     private static Thread threadSorteExport = null;
+    private static Thread threadGeneratePdfs = null;
+    private static Thread threadFileEtichette = null;
+    private static final ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicInteger>> stockPdfs = new ConcurrentHashMap<>();
 
     public static void start(){
         try{
+            UI.controller.addSpinner("mi preparo a generare i pdf");
             objGlobals.totalThreads = 1 ;
             ValidTiffs.getFromFile();
-            sorterExport();
+            UI.controller.removeSpinner();
+
             generatePdfs();
+
+            controlloQualita();
+
+            while (threadGeneratePdfs.isAlive()) {
+                objLogTimeline.add("pdf",threadGeneratePdfs.getName()+" running");
+            }
+
+            fileEtichette();
+
             while (threadSorteExport.isAlive()) {
                 objLogTimeline.add("pdf",threadSorteExport.getName()+" running");
             }
+
+            while (threadFileEtichette.isAlive()) {
+                objLogTimeline.add("pdf",threadFileEtichette.getName()+" running");
+            }
+
             Pdfs.writeToFile();
             Routing.pdf = "end";
         }
@@ -52,129 +67,187 @@ public class pdf {
         }
     }
 
-    private static void sorterExport(){
-        threadSorteExport = sorterExportThread();
+    private static void controlloQualita(){
+        threadSorteExport = controlloQualitaThread();
         threadSorteExport.setDaemon(true);
         threadSorteExport.start();
-
     }
 
-    private static Thread sorterExportThread(){
+    private static void generatePdfs(){
+        threadGeneratePdfs = generatePdfsThread();
+        threadGeneratePdfs.setDaemon(true);
+        threadGeneratePdfs.start();
+    }
+
+    private static void fileEtichette(){
+        threadFileEtichette = fileEtichetteThread();
+        threadFileEtichette.setDaemon(true);
+        threadFileEtichette.start();
+    }
+
+    private static Thread controlloQualitaThread(){
         return new Thread(new Task<Void>(){
             @Override
             protected Void call() {
-                HashMap<String,HashMap<String,ArrayList<objValidTiff>>> sorterExport = new HashMap<>();
-                UI.controller.addSpinner("mi preparo a fare il sorterExport");
-                for(String barcode : ValidTiffs.barcodeObject.keySet()){
+                objProgressItem pi = UI.controller.addProgress("File controllo qualita", ValidTiffs.barcodeObject.size());
+                int count = 0;
+
+                for (String barcode : ValidTiffs.barcodeObject.keySet()) {
                     objValidTiff obj = ValidTiffs.barcodeObject.get(barcode);
                     String passo = new File(obj.file).getParentFile().getParentFile().getName();
 
-                    if(obj.stockNumber !=null){
-                        sorterExport.computeIfAbsent(passo, _-> new HashMap<>());
-                        sorterExport.get(passo).computeIfAbsent(obj.group, _-> new ArrayList<>());
-                        sorterExport.get(passo).get(obj.group).add(obj);
-                    }
+                    File out = new File(objGlobals.controlloQualita + passo + ".csv");
 
-                }
+                    mkdir(out.getAbsolutePath());
 
-                for (HashMap<String, ArrayList<objValidTiff>> groupMap : sorterExport.values()) {
-                    for (ArrayList<objValidTiff> list : groupMap.values()) {
-                        list.sort(Comparator
-                            .comparing(
-                                (objValidTiff obj) -> safeParseInt(obj.stockNumber),
-                                Comparator.nullsFirst(Integer::compareTo)
-                            )
-                            .thenComparing(
-                                obj -> obj.index,
-                                Comparator.nullsFirst(Comparator.naturalOrder())
-                            )
-                        );
+                    boolean needsHeader = !out.exists() || out.length() == 0;
 
-                    }
-                }
-
-                UI.controller.removeSpinner();
-
-                objProgressItem pi = UI.controller.addProgress("sorterExport",ValidTiffs.barcodeObject.size());
-
-                for(String passo : sorterExport.keySet()){
-                    try(BufferedWriter bw = new BufferedWriter(new FileWriter(objGlobals.sorterExport + passo + ".csv"))){
-                        for(String group : sorterExport.get(passo).keySet()){
-                            int count = 0;
-                            bw.write("soggetto;"+group);
-                            bw.newLine();
-                            bw.write("N.Pacco-Anno;Sequenza nel Pacco;Barcode;Riferimento Scatolo");
-                            bw.newLine();
-                            for(objValidTiff obj : sorterExport.get(passo).get(group)){
-                                String stringIndex = String.format("%06d",obj.index);
-                                bw.write(obj.prefix+obj.stockNumber+";"+(++count)+";"+obj.barcode+"-"+stringIndex.substring(0,3)+"-"+stringIndex.substring(3)+";"+obj.stockLabel);
-                                bw.newLine();
-                                UI.controller.refresh(pi,count);
-                            }
-                            bw.write("");
+                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(out, true))) {
+                        if (needsHeader) {
+                            bw.write("Barcode");
                             bw.newLine();
                         }
-
-                    }
-                    catch(IOException e){
-                        printError(e,true);
+                        bw.write(obj.barcode);
+                        bw.newLine();
+                        UI.controller.refresh(pi, ++count);
+                    } catch (IOException e) {
+                        printError(e, true);
                     }
                 }
-
                 return null;
             }
         });
     }
 
-    private static void generatePdfs() throws InterruptedException {
-        if (!ValidTiffs.barcodeObject.isEmpty()) {
-            AtomicInteger count = new AtomicInteger(0);
-            Integer total = ValidTiffs.barcodeObject.size();
-            objProgressItem pi = UI.controller.addProgress("Creo i file pdf",total);
+    private static Thread generatePdfsThread() {
+        Thread t = new Thread(new Task<Void>(){
+            @Override
+            protected Void call() {
+                if (!ValidTiffs.barcodeObject.isEmpty()) {
+                    AtomicInteger count = new AtomicInteger(0);
+                    Integer total = ValidTiffs.barcodeObject.size();
+                    objProgressItem pi = UI.controller.addProgress("Creo i file pdf", total);
 
-            for (String barcode : ValidTiffs.barcodeObject.keySet()) {
+                    for (String barcode : ValidTiffs.barcodeObject.keySet()) {
 
-                objValidTiff objValidTiff = ValidTiffs.barcodeObject.get(barcode);
+                        objValidTiff objValidTiff = ValidTiffs.barcodeObject.get(barcode);
 
-                while (threads.size() >= objGlobals.totalThreads) {
-                    refreshThreads(count, pi, objValidTiff.barcode);
+                        while (threads.size() >= objGlobals.totalThreads) {
+                            refreshThreads(count, pi, objValidTiff.barcode);
+                        }
+
+                        Thread newThread = newThread(objValidTiff, "generatePdfs-"+count.get());
+                        newThread.start();
+                        threads.add(newThread);
+
+                    }
+
+                    while (!threads.isEmpty()) {
+                        refreshThreads(count, pi, String.valueOf(count));
+                    }
                 }
-
-                Thread newThread = newThread(objValidTiff, "generatePdfs-"+count.get());
-                newThread.start();
-                threads.add(newThread);
-
+                return null;
             }
-
-            while (!threads.isEmpty()) {
-                refreshThreads(count, pi, String.valueOf(count));
-            }
-        }
+        });
+        t.setDaemon(true);
+        t.setName("generatePdfs");
+        return t;
     }
 
-    private static void refreshThreads(AtomicInteger count, objProgressItem pi, String text) throws InterruptedException {
-        Iterator<Thread> it = pdf.threads.iterator();
-        while (it.hasNext()) {
-            Thread t = it.next();
-            if (!t.isAlive()) {
-                it.remove();
-                UI.controller.refresh(pi, count.incrementAndGet());
-                objLogTimeline.add("refreshThreads","[ generatePdfs ] done "+text);
-            }
-            else{
-                objLogTimeline.add("refreshThreads","[ generatePdfs ] running "+text);
-            }
-        }
-        if(Pc.usage.get("cpu")<90.00 && Pc.usage.get("disk")<90.00){
-            objGlobals.totalThreads += 100;
-            sleep(500);
-        }
-        else if(objGlobals.totalThreads > 1)
-        {
-            objGlobals.totalThreads -= 100;
-        }
-        objLogTimeline.add("generatePdfs","[ objGlobals.totalThreads ] : "+objGlobals.totalThreads);
+    private static Thread fileEtichetteThread(){
+        Thread t = new Thread(new Task<Void>(){
+            @Override
+            protected Void call() {
+                objProgressItem pi = UI.controller.addProgress("fileEtichette", StockFile.rowObject().size());
+                int count = 0;
 
+                LinkedHashMap<Integer, objStock> orderStock = orderStock();
+
+                for (objStock obj : orderStock.values()) {
+
+                    File outEtichette = new File(objGlobals.fileEtichette + ValidTiffs.barcodeObject.get(obj.firstBarcode).passo + ".csv");
+
+                    mkdir(outEtichette.getAbsolutePath());
+
+                    boolean needsHeader = !outEtichette.exists() || outEtichette.length() == 0;
+
+                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(outEtichette, true))) {
+                        if (needsHeader) {
+                            bw.write("Agenzia Mittente;Cliente Mittente;Numero pacco;Quantita;Primo Barcode;Ultimo Barcode;Data Archiviazione;Tipologia;Note;Entity;Riferimento Scatolo");
+                            bw.newLine();
+                        }
+                        String stock = obj.logic.equals("lotto") ? obj.prefix + "/" + obj.stockNumber : obj.prefix + obj.stockNumber;
+                        bw.write(
+                        obj.agency+";"+
+                            obj.group+";"+
+                            stock+";"+
+                            stockPdfs.get(obj.prefix).get(obj.stockNumber)+";"+
+                            obj.firstBarcode+";"+
+                            obj.lastBarcode+";"+
+                            LocalDate.now(java.time.ZoneId.of("Europe/Rome")).format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))+";"+
+                            obj.cppCode+";"+
+                            ";"+
+                            obj.agencyID+";"+
+                            obj.stockLabel
+                        );
+                        bw.newLine();
+                        UI.controller.refresh(pi, ++count);
+                    } catch (IOException e) {
+                        printError(e, true);
+                    }
+                }
+                return  null;
+            }
+        });
+        t.setDaemon(true);
+        t.setName("fileEtichette");
+        return t;
+    }
+
+    private static LinkedHashMap<Integer, objStock> orderStock() {
+        return StockFile.rowObject.entrySet().stream()
+                .sorted(
+                        Comparator
+                                .comparingInt((Map.Entry<Integer, objStock> e) -> Integer.parseInt(e.getValue().cassetto))
+                                .thenComparingInt(e -> Integer.parseInt(e.getValue().stockNumber))
+                )
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, _) -> a,
+                        LinkedHashMap::new
+                ));
+    }
+
+
+    private static void refreshThreads(AtomicInteger count, objProgressItem pi, String text)  {
+        try{
+
+            Iterator<Thread> it = pdf.threads.iterator();
+            while (it.hasNext()) {
+                Thread t = it.next();
+                if (!t.isAlive()) {
+                    it.remove();
+                    UI.controller.refresh(pi, count.incrementAndGet());
+                    objLogTimeline.add("refreshThreads","[ generatePdfs ] done "+text);
+                }
+                else{
+                    objLogTimeline.add("refreshThreads","[ generatePdfs ] running "+text);
+                }
+            }
+            if(Pc.usage.get("cpu")<90.00 && Pc.usage.get("disk")<90.00){
+                objGlobals.totalThreads += 100;
+                sleep(500);
+            }
+            else if(objGlobals.totalThreads > 1)
+            {
+                objGlobals.totalThreads -= 100;
+            }
+            objLogTimeline.add("generatePdfs","[ objGlobals.totalThreads ] : "+objGlobals.totalThreads);
+        }
+        catch (Exception e){
+            printError(e,false);
+        }
     }
 
     private static Thread newThread(objValidTiff objValidTiff,String name){
@@ -207,11 +280,19 @@ public class pdf {
                 to,
                 objValidTiff.file
             ));
+            addStockPdfs(objValidTiff);
         }
         catch (IOException e) {
             printError(e,true);
         }
 
+    }
+
+    private static void addStockPdfs(objValidTiff v){
+        stockPdfs
+            .computeIfAbsent(v.prefix, _ -> new ConcurrentHashMap<>())
+            .computeIfAbsent(v.stockNumber, _ -> new AtomicInteger(0))
+            .incrementAndGet();
     }
 
     public static String outputPdfFile(objValidTiff objValidTiff){
@@ -322,14 +403,6 @@ public class pdf {
         }
         catch (IOException e) {
             logError("rotateWithJai "+path, e);
-        }
-    }
-    private static Integer safeParseInt(String s) {
-        try {
-            return s != null ? Integer.parseInt(s) : null;
-        }
-        catch (NumberFormatException e) {
-            return null;
         }
     }
 

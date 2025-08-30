@@ -1,7 +1,6 @@
 package app.classes;
 
 import app.objects.objGlobals;
-import app.objects.objProgressBar;
 import app.views.viewMain;
 import app.views.viewStatusBar;
 import javafx.fxml.FXMLLoader;
@@ -33,7 +32,7 @@ public class UI  {
     }
 
     public static String page(Integer index){
-        objProgressBar.objProgressItems.clear();
+        viewStatusBar.objProgressItems.clear();
         return pages.get(index);
     }
 

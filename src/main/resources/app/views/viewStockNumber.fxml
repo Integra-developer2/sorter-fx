@@ -37,13 +37,14 @@
                <TableColumn fx:id="B" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="ULTIMO BARCODE" />
                <TableColumn fx:id="C" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="SCATOLO" />
                <TableColumn fx:id="D" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PEDANA" />
-               <TableColumn fx:id="E" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="GRUPPO" />
-               <TableColumn fx:id="F" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PROG.INI" />
-               <TableColumn fx:id="G" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PROG.FIN" />
-               <TableColumn fx:id="H" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="LOGICA" />
-               <TableColumn fx:id="I" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PREFISSO" />
-               <TableColumn fx:id="J" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PACCO" />
-               <TableColumn fx:id="K" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="AGENZIA" />
+               <TableColumn fx:id="E" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="CASSETTA" />
+               <TableColumn fx:id="F" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="GRUPPO" />
+               <TableColumn fx:id="G" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PROG.INI" />
+               <TableColumn fx:id="H" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PROG.FIN" />
+               <TableColumn fx:id="I" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="LOGICA" />
+               <TableColumn fx:id="J" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PREFISSO" />
+               <TableColumn fx:id="K" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="PACCO" />
+               <TableColumn fx:id="L" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="AGENZIA" />
                <TableColumn fx:id="deleteColumn" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="ELIMINA RIGA" />
             </columns>
          </TableView>

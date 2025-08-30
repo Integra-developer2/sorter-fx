@@ -15,10 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.print.PrinterJob;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -31,6 +28,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.util.Callback;
 import javafx.util.converter.DefaultStringConverter;
 
 import static app.functions.*;
@@ -47,6 +45,7 @@ public class viewStockAnomalies implements Initializable {
     @FXML private TableColumn<modelStock, String> F;
     @FXML private TableColumn<modelStock, String> G;
     @FXML private TableColumn<modelStock, String> H;
+    @FXML private TableColumn<modelStock, String> I;
     @FXML private TableColumn<modelStock, Void> deleteColumn;
     @FXML private HBox printPane;
     @FXML private Button btnForward;
@@ -54,6 +53,21 @@ public class viewStockAnomalies implements Initializable {
     @SuppressWarnings("deprecation")
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        Callback<TableColumn<modelStock, String>, TableCell<modelStock, String>> copyableReadOnlyCell = _ -> new TableCell<>() {
+            final TextField tf = new TextField();
+            {
+                tf.setEditable(false);
+                tf.setFocusTraversable(true);
+                tf.setStyle("-fx-background-color: transparent; -fx-background-insets: 0; -fx-padding: 0;");
+            }
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { setGraphic(null); }
+                else { tf.setText(item); setGraphic(tf); }
+            }
+            @Override public void startEdit() {}
+        };
+
         tableView.setEditable(true);
         addDeleteButtonToTable();
         btnForward.setOnAction(_ -> btnForward());
@@ -67,6 +81,7 @@ public class viewStockAnomalies implements Initializable {
         F.setCellValueFactory(cellData -> cellData.getValue().F());
         G.setCellValueFactory(cellData -> cellData.getValue().G());
         H.setCellValueFactory(cellData -> cellData.getValue().H());
+        I.setCellValueFactory(cellData -> cellData.getValue().I());
 
         A.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
         B.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
@@ -94,6 +109,14 @@ public class viewStockAnomalies implements Initializable {
             }
         });
 
+        C.setCellFactory(copyableReadOnlyCell);
+        D.setCellFactory(copyableReadOnlyCell);
+        E.setCellFactory(copyableReadOnlyCell);
+        F.setCellFactory(copyableReadOnlyCell);
+        G.setCellFactory(copyableReadOnlyCell);
+        H.setCellFactory(copyableReadOnlyCell);
+        I.setCellFactory(copyableReadOnlyCell);
+
         tableView.setItems(StockFile.stockAnomaliesFXCollections);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -113,6 +136,7 @@ public class viewStockAnomalies implements Initializable {
             String lastBarcode = item.B().get();
             String reference = item.C().get();
             String obs = item.D().get();
+            String cassetto = item.E().get();
             int indexFrom = Optional.ofNullable(AllBlackFiles.barcodeIndex(firstBarcode)).orElse(0) ;
             int indexTo = Optional.ofNullable(AllBlackFiles.barcodeIndex(lastBarcode)).orElse(0) ;
             if(indexFrom == 0 ){
@@ -124,7 +148,7 @@ public class viewStockAnomalies implements Initializable {
             else{
                 int min = Math.min(indexFrom, indexTo);
                 int max = Math.max(indexFrom, indexTo);
-                objStock objStock = new objStock(rowValue,firstBarcode,lastBarcode,reference,obs);
+                objStock objStock = new objStock(rowValue,firstBarcode,lastBarcode,reference,obs,cassetto);
                 objStock.extraFromJobSorter(JobSorter.barcodeGroup(firstBarcode), String.valueOf(min), String.valueOf(max));
                 StockFile.rowObject.put(rowValue, objStock);
             }
@@ -132,7 +156,7 @@ public class viewStockAnomalies implements Initializable {
         for (Integer deletedRow : deletedRows) {
             StockFile.rowObject.remove(deletedRow);
         }
-        StockFile.writeNewFile();
+
         Routing.stockAnomalies = "end";
     }
 

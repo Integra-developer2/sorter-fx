@@ -29,7 +29,6 @@ public class stockNumber {
             ValidTiffs.modelStockToShootFXCollections.clear();
             getStock();
             ValidTiffs.writeToFile();
-            StockFile.writeNewFile();
             for(String pk:pkObjStockToShoot.keySet()){
                 ValidTiffs.modelStockToShootFXCollections.add(new modelStockToShoot(pkObjStockToShoot.get(pk)));
             }
@@ -46,11 +45,20 @@ public class stockNumber {
 
         if (!StockFile.rowObject().isEmpty()) {
             List<Map.Entry<Integer, objStock>> entries = new ArrayList<>(StockFile.rowObject().entrySet());
-            entries.sort(Comparator
-                .comparing((Map.Entry<Integer, objStock> e) -> e.getValue().logic, Comparator.nullsFirst(String::compareTo))
-                .thenComparing(e -> e.getValue().prefix, Comparator.nullsFirst(String::compareTo))
-                .thenComparing(Map.Entry::getKey)
+            entries.sort(
+                    Comparator
+                            .comparing((Map.Entry<Integer, objStock> e) -> e.getValue().logic, Comparator.nullsFirst(Comparator.naturalOrder()))
+                            .thenComparing(e -> e.getValue().prefix, Comparator.nullsFirst(Comparator.naturalOrder()))
+                            .thenComparing(
+                                    e -> {
+                                        String prog = e.getValue().progStart;
+                                        return prog == null ? null : Integer.parseInt(prog);
+                                    },
+                                    Comparator.nullsFirst(Integer::compareTo)
+                            )
+                            .thenComparing(Map.Entry::getKey)
             );
+
             StockFile.rowObject.clear();
 
             for(Map.Entry<Integer, objStock> entry : entries){
@@ -73,13 +81,17 @@ public class stockNumber {
                     entry.getValue().lastBarcode,
                     entry.getValue().stockLabel,
                     entry.getValue().obs,
+                    entry.getValue().cassetto,
                     entry.getValue().group,
                     entry.getValue().progStart,
                     entry.getValue().progEnd,
                     entry.getValue().logic,
                     prefix,
                     stockNumber == 0 ? "" :String.valueOf(stockNumber),
-                    entry.getValue().agency
+                    entry.getValue().agency,
+                    entry.getValue().agencyID,
+                    entry.getValue().cppCode,
+                    entry.getValue().customer
                 );
 
                 modelStockNumber modelStockNumber = new modelStockNumber(objStock);
@@ -88,6 +100,44 @@ public class stockNumber {
                 StockFile.groupObject.computeIfAbsent(entry.getValue().group, _ -> new ArrayList<>()).add(objStock);
                 StockFile.stockNumberFXCollections.add(modelStockNumber);
 
+            }
+
+            for(String group:StockFile.groupObject.keySet()){
+                List<objStock> objStocks = StockFile.groupObject.get(group);
+                int count=0;
+                if(objStocks.size()>1){
+                    for(objStock objStock:objStocks){
+                        HashMap<Integer,List<objOverlap>> objOverlaps = new HashMap<>();
+                        if(objStocks.size()>=count+2){
+                            int currentStart = Integer.parseInt(objStock.progStart);
+                            int currentEnd = Integer.parseInt(objStock.progEnd);
+                            int nextStart = Integer.parseInt(objStocks.get(count+1).progStart);
+
+                            if(count==0){
+                                boolean onLapEnd = currentEnd < nextStart;
+                                if(onLapEnd){
+                                    objOverlaps
+                                            .computeIfAbsent(count, k -> new ArrayList<>())
+                                            .add(new objOverlap(currentStart,currentEnd,false,true ));
+                                }
+                            }
+                            else if(count+1 == objStocks.size()){
+
+                            }
+                            else{
+                                int previousEnd = Integer.parseInt(objStocks.get(count-1).progEnd);
+                                boolean onLapStart = currentStart < previousEnd;
+                                boolean onLapEnd = currentEnd < nextStart;
+                                if(onLapStart || onLapEnd){
+                                    objOverlaps
+                                            .computeIfAbsent(count, k -> new ArrayList<>())
+                                            .add(new objOverlap(currentStart,currentEnd,onLapStart,onLapEnd));
+                                }
+                            }
+                        }
+                        count++;
+                    }
+                }
             }
 
             AtomicInteger count = new AtomicInteger(0);

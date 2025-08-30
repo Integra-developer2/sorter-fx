@@ -80,7 +80,6 @@ public class taskStockToShoot {
                         break;
                     }
                     case "end":{
-                        StockFile.writeNewFile();
                         Routing.next();
                     }
                 }

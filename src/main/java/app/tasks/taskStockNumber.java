@@ -48,8 +48,6 @@ public class taskStockNumber {
                         else{
                             scheduler.shutdown();
 
-                            StockFile.writeNewFile();
-
                             Routing.stockAnomalies = "";
                             Routing.goBackTo("stockAnomalies");
 
