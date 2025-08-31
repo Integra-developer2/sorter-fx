@@ -7,6 +7,7 @@ public class objStock {
     public String stockLabel;
     public String obs;
     public String cassetto;
+    public String pacco;
     public String group;
     public String progStart;
     public String progEnd;
@@ -17,25 +18,25 @@ public class objStock {
     public String agencyID;
     public String cppCode;
     public String customer;
-    public objStock(Integer row, String firstBarcode, String lastBarcode, String stockLabel, String obs, String cassetto){
+    public objStock(Integer row, String firstBarcode, String lastBarcode, String stockLabel, String obs){
         this.row = row;
         this.firstBarcode=firstBarcode;
         this.lastBarcode=lastBarcode;
         this.stockLabel = stockLabel;
         this.obs=obs;
-        this.cassetto=cassetto;
         this.group="";
         this.progStart="";
         this.progEnd="";
     }
 
-    public objStock(Integer row, String firstBarcode, String lastBarcode, String stockLabel, String obs, String cassetto, String group, String progStart, String progEnd, String logicStart, String prefixStart, String stockNumber, String agency, String agencyID, String cppCode, String customer){
+    public objStock(Integer row, String firstBarcode, String lastBarcode, String stockLabel, String obs, String cassetto, String pacco, String group, String progStart, String progEnd, String logicStart, String prefixStart, String stockNumber, String agency, String agencyID, String cppCode, String customer){
         this.row = row;
         this.firstBarcode=firstBarcode;
         this.lastBarcode=lastBarcode;
         this.stockLabel = stockLabel;
         this.obs=obs;
         this.cassetto=cassetto;
+        this.pacco=pacco;
         this.group=group;
         this.logic =logicStart;
         this.prefix =prefixStart;

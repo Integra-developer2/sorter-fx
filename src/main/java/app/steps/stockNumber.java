@@ -82,6 +82,7 @@ public class stockNumber {
                     entry.getValue().stockLabel,
                     entry.getValue().obs,
                     entry.getValue().cassetto,
+                    entry.getValue().pacco,
                     entry.getValue().group,
                     entry.getValue().progStart,
                     entry.getValue().progEnd,
@@ -100,44 +101,6 @@ public class stockNumber {
                 StockFile.groupObject.computeIfAbsent(entry.getValue().group, _ -> new ArrayList<>()).add(objStock);
                 StockFile.stockNumberFXCollections.add(modelStockNumber);
 
-            }
-
-            for(String group:StockFile.groupObject.keySet()){
-                List<objStock> objStocks = StockFile.groupObject.get(group);
-                int count=0;
-                if(objStocks.size()>1){
-                    for(objStock objStock:objStocks){
-                        HashMap<Integer,List<objOverlap>> objOverlaps = new HashMap<>();
-                        if(objStocks.size()>=count+2){
-                            int currentStart = Integer.parseInt(objStock.progStart);
-                            int currentEnd = Integer.parseInt(objStock.progEnd);
-                            int nextStart = Integer.parseInt(objStocks.get(count+1).progStart);
-
-                            if(count==0){
-                                boolean onLapEnd = currentEnd < nextStart;
-                                if(onLapEnd){
-                                    objOverlaps
-                                            .computeIfAbsent(count, k -> new ArrayList<>())
-                                            .add(new objOverlap(currentStart,currentEnd,false,true ));
-                                }
-                            }
-                            else if(count+1 == objStocks.size()){
-
-                            }
-                            else{
-                                int previousEnd = Integer.parseInt(objStocks.get(count-1).progEnd);
-                                boolean onLapStart = currentStart < previousEnd;
-                                boolean onLapEnd = currentEnd < nextStart;
-                                if(onLapStart || onLapEnd){
-                                    objOverlaps
-                                            .computeIfAbsent(count, k -> new ArrayList<>())
-                                            .add(new objOverlap(currentStart,currentEnd,onLapStart,onLapEnd));
-                                }
-                            }
-                        }
-                        count++;
-                    }
-                }
             }
 
             AtomicInteger count = new AtomicInteger(0);
