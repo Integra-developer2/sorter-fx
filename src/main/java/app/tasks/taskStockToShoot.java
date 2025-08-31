@@ -1,7 +1,6 @@
 package app.tasks;
 
 import app.Routing;
-import app.classes.StockFile;
 import app.classes.UI;
 import app.classes.ValidTiffs;
 import app.objects.objLogTimeline;

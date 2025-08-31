@@ -194,7 +194,6 @@ public class viewStockNumber implements Initializable {
                 String lastBarcode = "";
                 String reference = "";
                 String obs = "";
-                String cassetto = "";
                 String group = "";
                 String progStart = "";
                 String progEnd = "";

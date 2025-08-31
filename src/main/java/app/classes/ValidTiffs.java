@@ -22,6 +22,7 @@ public class ValidTiffs {
     public static ObservableList<modelStockToShoot> modelStockToShootFXCollections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
     public static ObservableList<modelStockToShoot> modelStockShootingFXCollections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
     public static HashMap<String,objValidTiff> barcodeObject = new HashMap<>();
+    public static HashMap<String,objValidTiff> groupIndexObject = new HashMap<>();
     public static HashMap<String, List<objValidTiff>> groupObject = new HashMap<>();
     public static String shootingAt="";
     public static int shootingIndex;
@@ -42,6 +43,7 @@ public class ValidTiffs {
                         objValidTiff objValidTiff = new objValidTiff(file, group, index, barcode,JobSorter.barcodeRow.get(barcode)[0]);
 
                         barcodeObject.put(barcode, objValidTiff);
+                        groupIndexObject.put(group+"-"+index, objValidTiff);
                         groupObject.computeIfAbsent(group, _ -> new ArrayList<>()).add(objValidTiff);
                         bw.write(barcode + ";" + file + ";" + group + ";" + index + "\n");
                     }
@@ -179,6 +181,7 @@ public class ValidTiffs {
                             }
 
                             barcodeObject.put(barcode, objValidTiff);
+                            groupIndexObject.put(group+"-"+index, objValidTiff);
                             groupObject.computeIfAbsent(group, _ -> new ArrayList<>()).add(objValidTiff);
                         }
 

@@ -28,6 +28,7 @@ public class UI  {
         pages.put(8,"/app/views/viewStockToShoot.fxml");
         pages.put(9,"/app/views/viewStockShooting.fxml");
         pages.put(10,"/app/views/viewEnd.fxml");
+        pages.put(11,"/app/views/viewStockFile.fxml");
 
     }
 

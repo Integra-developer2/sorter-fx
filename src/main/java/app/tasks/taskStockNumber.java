@@ -35,7 +35,7 @@ public class taskStockNumber {
         Thread t = new Thread(new Task<>() {
             @Override protected Void call() {
                 stockNumber.start();
-                if(StockFile.stockNumberFXCollections.isEmpty()){
+                if(StockFile.stockNumberFXCollections.isEmpty() && StockFile.stockFileFXCollections.isEmpty()){
                     Routing.stockNumber = "end";
                     Routing.next();
                 }
@@ -48,14 +48,29 @@ public class taskStockNumber {
                         else{
                             scheduler.shutdown();
 
+                            if(!StockFile.stockFileFXCollections.isEmpty()){
+                                StockFile.stockFileFXCollections.clear();
+                                Routing.stockNumber = "";
+                            }
+
                             Routing.stockAnomalies = "";
                             Routing.goBackTo("stockAnomalies");
-
                             Routing.next();
                         }
                     },0,300, TimeUnit.MILLISECONDS);
 
-                    Platform.runLater(() -> UI.loadDefault(7,"VERIFICA SE CI SONO ANOMALIE DA SISTEMARE"));
+
+                    if(!StockFile.stockFileFXCollections.isEmpty()){
+                        Platform.runLater(() -> UI.loadDefault(11,"SISTEMA LE ANOMALIE PRIMA DI CONTINUARE"));
+                    }
+                    else if(!ValidTiffs.stockAnomaliesFXCollections.isEmpty()){
+                        Platform.runLater(() -> UI.loadDefault(7,"VERIFICA SE CI SONO ANOMALIE DA SISTEMARE"));
+                    }
+                    else{
+                        Routing.stockNumber="end";
+                        Routing.next();
+                    }
+
                 }
 
 

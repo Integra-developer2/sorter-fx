@@ -18,6 +18,7 @@ public class objStock {
     public String agencyID;
     public String cppCode;
     public String customer;
+
     public objStock(Integer row, String firstBarcode, String lastBarcode, String stockLabel, String obs){
         this.row = row;
         this.firstBarcode=firstBarcode;

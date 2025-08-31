@@ -126,7 +126,7 @@ public class objGlobals {
         controlloQualita=new File(outputFolder, "controllo_qualità_").toString();
         fileEtichette=new File(outputFolder, "etichette_").toString();
 
-        ApiResponseTxt=new File(cacheFolder, "apiResponse").toString();
+        ApiResponseTxt=new File(cacheFolder, "apiResponse.txt").toString();
 
         errorMap= new objErrorMap();
 
