@@ -29,7 +29,25 @@ public class objStock {
         this.progEnd="";
     }
 
-    public objStock(Integer row, String firstBarcode, String lastBarcode, String stockLabel, String obs, String cassetto, String pacco, String group, String progStart, String progEnd, String logicStart, String prefixStart, String stockNumber, String agency, String agencyID, String cppCode, String customer){
+    public objStock(
+            Integer row,
+            String firstBarcode,
+            String lastBarcode,
+            String stockLabel,
+            String obs,
+            String cassetto,
+            String pacco,
+            String group,
+            String progStart,
+            String progEnd,
+            String logicStart,
+            String prefixStart,
+            String stockNumber,
+            String agency,
+            String agencyID,
+            String cppCode,
+            String customer
+    ){
         this.row = row;
         this.firstBarcode=firstBarcode;
         this.lastBarcode=lastBarcode;

@@ -76,6 +76,7 @@ public class objGlobals {
     public static String apiOption;
     public static String partition;
     public static AtomicInteger lastProgressBar = new AtomicInteger(0);
+    public static String ApiResponseTxt;
 
     public static void variables(){
         logFolder=logFolder();
@@ -124,6 +125,8 @@ public class objGlobals {
         pdfNoStockFolder=new File(logFolder, "PDFS [paccomancante]").toString();
         controlloQualita=new File(outputFolder, "controllo_qualità_").toString();
         fileEtichette=new File(outputFolder, "etichette_").toString();
+
+        ApiResponseTxt=new File(cacheFolder, "apiResponse").toString();
 
         errorMap= new objErrorMap();
 

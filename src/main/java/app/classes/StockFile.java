@@ -1,6 +1,7 @@
 package app.classes;
 
 import app.models.modelStock;
+import app.models.modelStockFile;
 import app.models.modelStockNumber;
 import app.objects.objStock;
 import app.objects.objGlobals;
@@ -17,6 +18,7 @@ import static app.functions.printError;
 public class StockFile {
     public static ObservableList<modelStockNumber> stockNumberFXCollections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
     public static ObservableList<modelStock> stockAnomaliesFXCollections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
+    public static ObservableList<modelStockFile> stockFileFXCollections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
     public static HashMap<String,Integer> prefixNumber = new HashMap<>();
     public static HashMap<String,List<objStock>> groupObject = new HashMap<>();
     private static boolean hasData=false;
@@ -69,7 +71,25 @@ public class StockFile {
                         String cppCode = (values.length > 14) ? Optional.ofNullable(values[14]).orElse(""):"";
                         String customer = (values.length > 15) ? Optional.ofNullable(values[15]).orElse(""):"";
                         if (!(firstBarcode.isEmpty() && lastBarcode.isEmpty() && reference.isEmpty() && obs.isEmpty())) {
-                            rowObject.put(count,new objStock(count, firstBarcode, lastBarcode, reference, obs, cassetto, pacco, group, progStart, progEnd,logic,prefix,stockNumber,agency,agencyID,cppCode,customer));
+                            rowObject.put(count,new objStock(
+                                    count,
+                                    firstBarcode,
+                                    lastBarcode,
+                                    reference,
+                                    obs,
+                                    cassetto,
+                                    pacco,
+                                    group,
+                                    progStart,
+                                    progEnd,
+                                    logic,
+                                    prefix,
+                                    stockNumber,
+                                    agency,
+                                    agencyID,
+                                    cppCode,
+                                    customer
+                            ));
                         }
                     }
                 }
