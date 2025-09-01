@@ -4,15 +4,23 @@ import app.objects.objGlobals;
 import app.objects.objPdf;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static app.functions.logError;
 import static app.functions.printError;
 
 public class Pdfs {
     public static ConcurrentHashMap<String, ArrayList<objPdf>> prefixPdf=new ConcurrentHashMap<>();
     public static void writeToFile(){
+        File pdfFile = new File(objGlobals.pdfs);
+        if(pdfFile.exists()){
+            if(!pdfFile.delete()){
+                logError("Pdfs",new Exception("pdfFile not deleted"));
+            }
+        }
         try(BufferedWriter bw = new BufferedWriter(new FileWriter(objGlobals.pdfs))){
             bw.write("prefix;number;barcode;filePdf;fileTiff");
             bw.newLine();
