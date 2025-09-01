@@ -49,7 +49,7 @@ public class viewStockFile implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        StockFile.writeNewFile();
         addDeleteButtonToTable();
         btnForward.setOnAction(_ -> btnForward());
 

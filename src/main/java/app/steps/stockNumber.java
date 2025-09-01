@@ -162,7 +162,9 @@ public class stockNumber {
                 }
                 assert !entryStockNumber.isEmpty();
 
-                Integer stockNumber = Integer.parseInt(entryStockNumber) + 1;
+                int intEntryStockNumber = Integer.parseInt(entryStockNumber);
+
+                Integer stockNumber = intEntryStockNumber == 0 || intEntryStockNumber == 1 ? 1 : intEntryStockNumber + 1;
 
                 if(StockFile.prefixNumber.containsKey(entryValue.prefix)){
                     stockNumber = StockFile.prefixNumber.get(prefix)+1;

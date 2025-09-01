@@ -28,10 +28,7 @@ import static app.functions.*;
 import static java.lang.Thread.sleep;
 
 public class pdf {
-    private static final ArrayList<Thread> threads = new ArrayList<>();
-    private static Thread threadSorteExport = null;
-    private static Thread threadGeneratePdfs = null;
-    private static Thread threadFileEtichette = null;
+    private static Thread threadSorterExport = null;
     private static final ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicInteger>> stockPdfs = new ConcurrentHashMap<>();
 
     public static void start(){
@@ -45,18 +42,10 @@ public class pdf {
 
             controlloQualita();
 
-            while (threadGeneratePdfs.isAlive()) {
-                objLogTimeline.add("pdf",threadGeneratePdfs.getName()+" running");
-            }
-
             fileEtichette();
 
-            while (threadSorteExport.isAlive()) {
-                objLogTimeline.add("pdf",threadSorteExport.getName()+" running");
-            }
-
-            while (threadFileEtichette.isAlive()) {
-                objLogTimeline.add("pdf",threadFileEtichette.getName()+" running");
+            while (threadSorterExport.isAlive()) {
+                objLogTimeline.add("pdf",threadSorterExport.getName()+" running");
             }
 
             Pdfs.writeToFile();
@@ -68,21 +57,78 @@ public class pdf {
     }
 
     private static void controlloQualita(){
-        threadSorteExport = controlloQualitaThread();
-        threadSorteExport.setDaemon(true);
-        threadSorteExport.start();
+        threadSorterExport = controlloQualitaThread();
+        threadSorterExport.setDaemon(true);
+        threadSorterExport.start();
     }
 
     private static void generatePdfs(){
-        threadGeneratePdfs = generatePdfsThread();
-        threadGeneratePdfs.setDaemon(true);
-        threadGeneratePdfs.start();
+        ValidTiffs.getData();
+        ArrayList<Thread> threads = new ArrayList<>();
+        if (!ValidTiffs.barcodeObject.isEmpty()) {
+            AtomicInteger count = new AtomicInteger(0);
+            Integer total = ValidTiffs.barcodeObject.size();
+            objProgressItem pi = UI.controller.addProgress("Creo i file pdf", total);
+
+            for (String barcode : ValidTiffs.barcodeObject.keySet()) {
+
+                objValidTiff objValidTiff = ValidTiffs.barcodeObject.get(barcode);
+
+                while (threads.size() >= objGlobals.totalThreads) {
+                    refreshThreads(count, pi, objValidTiff.barcode,threads);
+                }
+
+                Thread newThread = newThread(objValidTiff, "generatePdfs-"+count.get());
+                threads.add(newThread);
+                newThread.start();
+
+            }
+
+            while (!threads.isEmpty()) {
+                refreshThreads(count, pi, String.valueOf(count),threads);
+            }
+        }
     }
 
     private static void fileEtichette(){
-        threadFileEtichette = fileEtichetteThread();
-        threadFileEtichette.setDaemon(true);
-        threadFileEtichette.start();
+        objProgressItem pi = UI.controller.addProgress("fileEtichette", StockFile.rowObject().size());
+        int count = 0;
+
+        LinkedHashMap<Integer, objStock> orderStock = orderStock();
+
+        for (objStock obj : orderStock.values()) {
+
+            File outEtichette = new File(objGlobals.fileEtichette + ValidTiffs.barcodeObject.get(obj.firstBarcode).passo + ".csv");
+
+            mkdir(outEtichette.getAbsolutePath());
+
+            boolean needsHeader = !outEtichette.exists() || outEtichette.length() == 0;
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(outEtichette, true))) {
+                if (needsHeader) {
+                    bw.write("Agenzia Mittente;Cliente Mittente;Numero pacco;Quantita;Primo Barcode;Ultimo Barcode;Data Archiviazione;Tipologia;Note;Entity;Riferimento Scatolo");
+                    bw.newLine();
+                }
+                String stock = obj.logic.equals("lotto") ? obj.prefix + "/" + obj.stockNumber : obj.prefix + obj.stockNumber;
+                bw.write(
+                        obj.agency+";"+
+                                obj.group+";"+
+                                stock+";"+
+                                stockPdfs.get(obj.prefix).get(obj.stockNumber)+";"+
+                                obj.firstBarcode+";"+
+                                obj.lastBarcode+";"+
+                                LocalDate.now(java.time.ZoneId.of("Europe/Rome")).format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))+";"+
+                                obj.cppCode+";"+
+                                ";"+
+                                obj.agencyID+";"+
+                                obj.stockLabel
+                );
+                bw.newLine();
+                UI.controller.refresh(pi, ++count);
+            } catch (IOException e) {
+                printError(e, true);
+            }
+        }
     }
 
     private static Thread controlloQualitaThread(){
@@ -119,91 +165,6 @@ public class pdf {
         });
     }
 
-    private static Thread generatePdfsThread() {
-        Thread t = new Thread(new Task<Void>(){
-            @Override
-            protected Void call() {
-                if (!ValidTiffs.barcodeObject.isEmpty()) {
-                    AtomicInteger count = new AtomicInteger(0);
-                    Integer total = ValidTiffs.barcodeObject.size();
-                    objProgressItem pi = UI.controller.addProgress("Creo i file pdf", total);
-
-                    for (String barcode : ValidTiffs.barcodeObject.keySet()) {
-
-                        objValidTiff objValidTiff = ValidTiffs.barcodeObject.get(barcode);
-
-                        while (threads.size() >= objGlobals.totalThreads) {
-                            refreshThreads(count, pi, objValidTiff.barcode);
-                        }
-
-                        Thread newThread = newThread(objValidTiff, "generatePdfs-"+count.get());
-                        newThread.start();
-                        threads.add(newThread);
-
-                    }
-
-                    while (!threads.isEmpty()) {
-                        refreshThreads(count, pi, String.valueOf(count));
-                    }
-                }
-                return null;
-            }
-        });
-        t.setDaemon(true);
-        t.setName("generatePdfs");
-        return t;
-    }
-
-    private static Thread fileEtichetteThread(){
-        Thread t = new Thread(new Task<Void>(){
-            @Override
-            protected Void call() {
-                objProgressItem pi = UI.controller.addProgress("fileEtichette", StockFile.rowObject().size());
-                int count = 0;
-
-                LinkedHashMap<Integer, objStock> orderStock = orderStock();
-
-                for (objStock obj : orderStock.values()) {
-
-                    File outEtichette = new File(objGlobals.fileEtichette + ValidTiffs.barcodeObject.get(obj.firstBarcode).passo + ".csv");
-
-                    mkdir(outEtichette.getAbsolutePath());
-
-                    boolean needsHeader = !outEtichette.exists() || outEtichette.length() == 0;
-
-                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(outEtichette, true))) {
-                        if (needsHeader) {
-                            bw.write("Agenzia Mittente;Cliente Mittente;Numero pacco;Quantita;Primo Barcode;Ultimo Barcode;Data Archiviazione;Tipologia;Note;Entity;Riferimento Scatolo");
-                            bw.newLine();
-                        }
-                        String stock = obj.logic.equals("lotto") ? obj.prefix + "/" + obj.stockNumber : obj.prefix + obj.stockNumber;
-                        bw.write(
-                        obj.agency+";"+
-                            obj.group+";"+
-                            stock+";"+
-                            stockPdfs.get(obj.prefix).get(obj.stockNumber)+";"+
-                            obj.firstBarcode+";"+
-                            obj.lastBarcode+";"+
-                            LocalDate.now(java.time.ZoneId.of("Europe/Rome")).format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))+";"+
-                            obj.cppCode+";"+
-                            ";"+
-                            obj.agencyID+";"+
-                            obj.stockLabel
-                        );
-                        bw.newLine();
-                        UI.controller.refresh(pi, ++count);
-                    } catch (IOException e) {
-                        printError(e, true);
-                    }
-                }
-                return  null;
-            }
-        });
-        t.setDaemon(true);
-        t.setName("fileEtichette");
-        return t;
-    }
-
     private static LinkedHashMap<Integer, objStock> orderStock() {
         return StockFile.rowObject.entrySet().stream()
                 .sorted(
@@ -220,10 +181,9 @@ public class pdf {
     }
 
 
-    private static void refreshThreads(AtomicInteger count, objProgressItem pi, String text)  {
+    private static void refreshThreads(AtomicInteger count, objProgressItem pi, String text,ArrayList<Thread> threads)  {
         try{
-
-            Iterator<Thread> it = pdf.threads.iterator();
+            Iterator<Thread> it = threads.iterator();
             while (it.hasNext()) {
                 Thread t = it.next();
                 if (!t.isAlive()) {
@@ -246,7 +206,7 @@ public class pdf {
             objLogTimeline.add("generatePdfs","[ objGlobals.totalThreads ] : "+objGlobals.totalThreads);
         }
         catch (Exception e){
-            printError(e,false);
+            logError("pdf",e);
         }
     }
 
