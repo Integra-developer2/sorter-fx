@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static app.functions.printError;
 import static java.lang.Thread.sleep;
@@ -35,11 +36,23 @@ public class stockNumber {
             getStock();
             checkStockFile();
             if(!StockFile.stockFileFXCollections.isEmpty()){
-                Comparator<modelStockFile> byGroup =
-                        Comparator.comparing(msf -> msf.group().get(),
-                                Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
+                Comparator<modelStockFile> byGroupThenProgStart =
+                        Comparator
+                                .comparing((modelStockFile msf) -> msf.group() == null ? null : msf.group().get(), Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER))
+                                .thenComparing(msf -> {
+                                    String s = msf.progStart() == null ? null : msf.progStart().get();
+                                    if (s == null || s.isBlank()) {
+                                        return null;
+                                    }
+                                    try {
+                                        return Integer.valueOf(s);
+                                    } catch (NumberFormatException e) {
+                                        return null;
+                                    }
+                                }, Comparator.nullsLast(Integer::compareTo));
 
-                FXCollections.sort(StockFile.stockFileFXCollections, byGroup);
+                FXCollections.sort(StockFile.stockFileFXCollections, byGroupThenProgStart);
+
             }
             else{
                 getStockByTiff();
@@ -57,8 +70,9 @@ public class stockNumber {
     }
 
     private static void checkStockFile(){
+        ArrayList<String> groupsWithError = new ArrayList<>();
         for(String group:StockFile.groupObject.keySet()){
-            boolean groupHasError = false;
+
             List<objStock> objStockList =  StockFile.groupObject.get(group);
             int count = 1, i = -1, n = objStockList.size();
 
@@ -70,7 +84,7 @@ public class stockNumber {
 
                 if(objStock.pacco == null || objStock.pacco.isEmpty()){
                     if(objStockList.size()==1){
-                        objStock.pacco = "1";
+                        objStock.pacco = "1001";
                     }
                     else{
                         Matcher m = Pattern.compile("\\bPACCO\\D*(\\d+)", Pattern.CASE_INSENSITIVE).matcher(objStock.stockLabel);
@@ -82,7 +96,6 @@ public class stockNumber {
                             int intPacco = Integer.parseInt(pacco);
                             if(intPacco != count){
                                 error=error(error,"Pacco non è in ordine");
-                                groupHasError = true;
                             }
                             else {
                                 objStock.pacco = pacco;
@@ -114,11 +127,8 @@ public class stockNumber {
                     }
                 }
 
-                if(groupHasError && error.isEmpty()){
-                    error += "-";
-                }
-
                 if(!error.isEmpty()){
+                    groupsWithError.add(group);
                     StockFile.stockFileFXCollections.add(new modelStockFile(objStock,error));
                 }
 
@@ -128,6 +138,19 @@ public class stockNumber {
 
         }
 
+        Set<String> seen = StockFile.stockFileFXCollections.stream()
+                .map(m -> m.row.get())
+                .collect(Collectors.toCollection(HashSet::new));
+
+        for (String group : groupsWithError) {
+            List<objStock> list = StockFile.groupObject.getOrDefault(group, Collections.emptyList());
+            for (objStock s : list) {
+                String key = String.valueOf(s.row);
+                if (seen.add(key)) {
+                    StockFile.stockFileFXCollections.add(new modelStockFile(s, "-"));
+                }
+            }
+        }
     }
 
     private static String error(String error, String message){

@@ -169,6 +169,14 @@ public class taskStockAnomalies {
                         error+="raggruppamento diverso \n";
                     }
 
+                    if(StockFile.barcodeManualProgStart.containsKey(obj.firstBarcode)){
+                        indexFrom = Integer.parseInt(StockFile.barcodeManualProgStart.get(obj.firstBarcode));
+                    }
+
+                    if(StockFile.barcodeManualProgEnd.containsKey(obj.lastBarcode)){
+                        indexTo = Integer.parseInt(StockFile.barcodeManualProgEnd.get(obj.lastBarcode));
+                    }
+
                     toApi.put(obj.firstBarcode,new objStockFile(error,barcodes,indexFrom,indexTo,groupFrom,groupTo,obj,row));
                     allBarcodes.addAll(barcodes);
 

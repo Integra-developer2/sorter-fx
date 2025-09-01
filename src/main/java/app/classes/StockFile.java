@@ -19,6 +19,8 @@ public class StockFile {
     public static ObservableList<modelStockNumber> stockNumberFXCollections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
     public static ObservableList<modelStock> stockAnomaliesFXCollections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
     public static ObservableList<modelStockFile> stockFileFXCollections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
+    public static HashMap<String,String> barcodeManualProgStart =  new HashMap<>();
+    public static HashMap<String,String> barcodeManualProgEnd = new HashMap<>();
     public static HashMap<String,Integer> prefixNumber = new HashMap<>();
     public static HashMap<String,List<objStock>> groupObject = new HashMap<>();
     private static boolean hasData=false;

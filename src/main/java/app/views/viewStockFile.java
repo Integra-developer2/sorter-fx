@@ -83,6 +83,20 @@ public class viewStockFile implements Initializable {
         pacco.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
         error.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
 
+        progStart.setOnEditCommit(event -> {
+            String newValue = event.getNewValue();
+            modelStockFile modelStockFile = event.getTableView().getItems().get(event.getTablePosition().getRow());
+            StockFile.barcodeManualProgStart.put(modelStockFile.firstBarcode().get(),newValue);
+            modelStockFile.progStart().set(newValue);
+        });
+
+        progEnd.setOnEditCommit(event -> {
+            String newValue = event.getNewValue();
+            modelStockFile modelStockFile = event.getTableView().getItems().get(event.getTablePosition().getRow());
+            StockFile.barcodeManualProgEnd.put(modelStockFile.lastBarcode.get(),newValue);
+            modelStockFile.progEnd().set(newValue);
+        });
+
         toggleStripedTableView();
         colorDefault = "group-color-1";
 
