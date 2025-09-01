@@ -47,7 +47,7 @@ public class viewMain {
     private boolean isMaximized = false;
     private double prevW, prevH, prevX, prevY;
     private boolean terminalVisible = false;
-    private AtomicInteger logged = new AtomicInteger(0);
+    private final AtomicInteger logged = new AtomicInteger(0);
 
 
     @FXML public void initialize() {
@@ -276,9 +276,9 @@ public class viewMain {
     public void appendLog( String text) {
         if(!objGlobals.terminalPause){
             int count = logged.incrementAndGet();
-            if(count > 1000){
+            if(count > 100){
                 Platform.runLater(() -> terminalOutput.clear());
-                logged = new AtomicInteger(0);
+                logged.set(0);
             }
             else{
                 Platform.runLater(() -> terminalOutput.appendText(LocalDateTime.now()+":"+ text + "\n"));
