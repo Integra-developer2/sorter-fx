@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class viewMain {
 
@@ -46,6 +47,7 @@ public class viewMain {
     private boolean isMaximized = false;
     private double prevW, prevH, prevX, prevY;
     private boolean terminalVisible = false;
+    private final AtomicInteger logged = new AtomicInteger(0);
 
 
     @FXML public void initialize() {
@@ -273,7 +275,14 @@ public class viewMain {
 
     public void appendLog( String text) {
         if(!objGlobals.terminalPause){
-            Platform.runLater(() -> terminalOutput.appendText(LocalDateTime.now()+":"+ text + "\n"));
+            int count = logged.incrementAndGet();
+            if(count > 1000){
+                Platform.runLater(() -> terminalOutput.clear());
+            }
+            else{
+                Platform.runLater(() -> terminalOutput.appendText(LocalDateTime.now()+":"+ text + "\n"));
+            }
+
         }
     }
 

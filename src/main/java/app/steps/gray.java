@@ -109,7 +109,7 @@ public class gray {
         }
         if(Pc.usage.get("cpu")<90.00 && Pc.usage.get("disk")<90.00){
             objGlobals.totalThreads += 1;
-            sleep(500);
+            sleep(100);
         }
         else if(objGlobals.totalThreads > 1)
         {
