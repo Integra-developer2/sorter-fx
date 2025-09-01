@@ -49,6 +49,7 @@ public class pdf {
             }
 
             Pdfs.writeToFile();
+            ValidTiffs.writeToFile();
             Routing.pdf = "end";
         }
         catch (Exception e){
@@ -78,9 +79,9 @@ public class pdf {
                     refreshThreads(count, pi, objValidTiff.barcode,threads);
                 }
 
-                Thread newThread = newThread(objValidTiff, "generatePdfs-"+count.get());
-                threads.add(newThread);
-                newThread.start();
+                Thread newPdfThread = newPdfThread(objValidTiff, "generatePdfs-"+count.get());
+                threads.add(newPdfThread);
+                newPdfThread.start();
 
             }
 
@@ -210,7 +211,7 @@ public class pdf {
         }
     }
 
-    private static Thread newThread(objValidTiff objValidTiff,String name){
+    private static Thread newPdfThread(objValidTiff objValidTiff,String name){
         Thread t = new Thread(new Task<Void>() {
             @Override
             protected Void call() {
@@ -227,23 +228,25 @@ public class pdf {
         String tiffFile1 = objValidTiff.file + "-FRONTE.tiff";
         String tiffFile2 = objValidTiff.file + "-RETRO.tiff";
         String to = outputPdfFile(objValidTiff);
-        try {
-            mkDir(to);
-            rotateIfNeeded(tiffFile1);
-            rotateIfNeeded(tiffFile2);
-            mergeTiffToPdf(tiffFile1, tiffFile2, to);
-            Pdfs.prefixPdf.computeIfAbsent(objValidTiff.prefix, _-> new ArrayList<>());
-            Pdfs.prefixPdf.get(objValidTiff.prefix).add(new objPdf(
-                objValidTiff.prefix,
-                objValidTiff.barcode,
-                Integer.parseInt(objValidTiff.stockNumber),
-                to,
-                objValidTiff.file
-            ));
-            addStockPdfs(objValidTiff);
-        }
-        catch (IOException e) {
-            printError(e,true);
+        if(!to.isEmpty()){
+            try {
+                mkDir(to);
+                rotateIfNeeded(tiffFile1);
+                rotateIfNeeded(tiffFile2);
+                mergeTiffToPdf(tiffFile1, tiffFile2, to);
+                Pdfs.prefixPdf.computeIfAbsent(objValidTiff.prefix, _-> new ArrayList<>());
+                Pdfs.prefixPdf.get(objValidTiff.prefix).add(new objPdf(
+                        objValidTiff.prefix,
+                        objValidTiff.barcode,
+                        Integer.parseInt(objValidTiff.stockNumber),
+                        to,
+                        objValidTiff.file
+                ));
+                addStockPdfs(objValidTiff);
+            }
+            catch (IOException e) {
+                printError(e,true);
+            }
         }
 
     }
@@ -263,18 +266,24 @@ public class pdf {
         String year = String.valueOf(LocalDate.now().getYear());
         String stock;
         File folder;
+        String filename;
+        String ret = "";
         if(objValidTiff.prefix==null||objValidTiff.stockNumber==null){
-            stock =  "[paccomancante]" ;
-            folder = new File(objGlobals.pdfNoStockFolder,objValidTiff.group);
+            if(!objGlobals.onlyStockPdf){
+                stock =  "[paccomancante]" ;
+                folder = new File(objGlobals.pdfNoStockFolder,objValidTiff.group);
+                filename = barcode + "-sorter-" +status + "-" + entity + "-" + year + "-" + stock + ".pdf";
+                ret = new File(folder,filename).getPath();
+            }
         }
         else{
             stock = objValidTiff.prefix + objValidTiff.stockNumber;
             folder = new File(objGlobals.pdfFolder,objValidTiff.group);
+            filename = barcode + "-sorter-" +status + "-" + entity + "-" + year + "-" + stock + ".pdf";
+            ret = new File(folder,filename).getPath();
         }
 
-        String filename = barcode + "-sorter-" +status + "-" + entity + "-" + year + "-" + stock + ".pdf";
-
-        return new File(folder,filename).getPath();
+        return ret;
     }
 
     public static void mergeTiffToPdf(String tiffFile1, String tiffFile2, String outputPdfFile) throws IOException {

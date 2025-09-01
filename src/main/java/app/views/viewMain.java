@@ -31,6 +31,7 @@ public class viewMain {
     @FXML public RadioButton dev;
     @FXML public RadioButton preprod;
     @FXML public RadioButton prod;
+    @FXML public RadioButton pdfChoice;
 
     @FXML public RadioButton stepChoice;
     @FXML public RadioButton moveFiles;
@@ -190,6 +191,8 @@ public class viewMain {
             preprod = new RadioButton("API In Preprod");
             prod = new RadioButton("API In Prod");
 
+            pdfChoice = new RadioButton("Solo pdf con pacco");
+
             stepChoice = new RadioButton("stepChoice");
             moveFiles = new RadioButton("moveFiles");
             gray = new RadioButton("gray");
@@ -207,8 +210,7 @@ public class viewMain {
             dev.setOnAction(_ -> Api.setApiSiteUrl("dev"));
             preprod.setOnAction(_ -> Api.setApiSiteUrl("preprod"));
             prod.setOnAction(_ -> Api.setApiSiteUrl("prod"));
-
-
+            pdfChoice.setOnAction(_ -> objGlobals.onlyStockPdf = true);
 
             HBox options = new HBox();
             options.setPadding(new Insets(30));
@@ -222,7 +224,7 @@ public class viewMain {
                 )
             );
             options.setSpacing(20);
-            options.getChildren().addAll(dev, preprod, prod, stepChoice,moveFiles,gray,grayAnomalies,stockAnomalies,stockNumber,stockToShoot,pdf);
+            options.getChildren().addAll(dev, preprod, prod,pdfChoice, stepChoice,moveFiles,gray,grayAnomalies,stockAnomalies,stockNumber,stockToShoot,pdf);
 
             terminalPanel.getChildren().addAll(options);
 
@@ -232,6 +234,7 @@ public class viewMain {
             terminalPanel.setManaged(false);
 
             prod.setSelected(true);
+            pdfChoice.setSelected(false);
 
             stepChoice.setSelected(true);
             moveFiles.setSelected(true);

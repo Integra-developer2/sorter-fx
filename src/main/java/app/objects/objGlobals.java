@@ -77,6 +77,7 @@ public class objGlobals {
     public static String partition;
     public static AtomicInteger lastProgressBar = new AtomicInteger(0);
     public static String ApiResponseTxt;
+    public static boolean onlyStockPdf = false;
 
     public static void variables(){
         logFolder=logFolder();

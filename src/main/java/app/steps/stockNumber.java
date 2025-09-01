@@ -59,11 +59,16 @@ public class stockNumber {
     private static void checkStockFile(){
         for(String group:StockFile.groupObject.keySet()){
             boolean groupHasError = false;
-            int count = 1;
             List<objStock> objStockList =  StockFile.groupObject.get(group);
+            int count = 1, i = -1, n = objStockList.size();
+
             for(objStock objStock:objStockList){
                 String error = "";
-                if(objStock.pacco.isEmpty()){
+                i++;
+                objStock prev = i > 0 ? objStockList.get(i - 1) : null;
+                objStock next = i + 1 < n ? objStockList.get(i + 1) : null;
+
+                if(objStock.pacco == null || objStock.pacco.isEmpty()){
                     if(objStockList.size()==1){
                         objStock.pacco = "1";
                     }
@@ -71,26 +76,41 @@ public class stockNumber {
                         Matcher m = Pattern.compile("\\bPACCO\\D*(\\d+)", Pattern.CASE_INSENSITIVE).matcher(objStock.stockLabel);
                         String pacco = m.find() ? m.group(1) : null;
                         if(pacco == null){
-                            error+="Pacco non è presente";
+                            error=error(error,"Pacco non è presente");
                         }
                         else{
                             int intPacco = Integer.parseInt(pacco);
                             if(intPacco != count){
-                                error+="Pacco non è in ordine";
+                                error=error(error,"Pacco non è in ordine");
                                 groupHasError = true;
+                            }
+                            else {
+                                objStock.pacco = pacco;
                             }
                         }
                     }
                 }
 
-                if(objStock.cassetto.isEmpty()){
+                if(objStock.cassetto == null || objStock.cassetto.isEmpty()){
                     Matcher m = Pattern.compile("\\bCASSETTO\\D*(\\d+)", Pattern.CASE_INSENSITIVE).matcher(objStock.stockLabel);
                     String cassetto = m.find() ? m.group(1) : null;
                     if(cassetto == null){
-                        if(!error.isEmpty()){
-                            error += ", ";
-                        }
-                        error+="Cassetto non è presente";
+                        error=error(error,"Cassetto non è presente");
+                    }
+                    else{
+                        objStock.cassetto = cassetto;
+                    }
+                }
+
+                if(prev != null){
+                    if(Integer.parseInt(objStock.progStart) < Integer.parseInt(prev.progEnd)){
+                        error = error(error,"ProgInizio in sovrapposizione");
+                    }
+                }
+
+                if(next != null){
+                    if(Integer.parseInt(objStock.progEnd) > Integer.parseInt(next.progStart)){
+                        error = error(error,"ProgFine in sovrapposizione");
                     }
                 }
 
@@ -110,6 +130,14 @@ public class stockNumber {
 
     }
 
+    private static String error(String error, String message){
+        if(!error.isEmpty()){
+            error += ", ";
+        }
+        error+=message;
+        return error;
+    }
+
     private static void getStockByTiff() throws InterruptedException {
         AtomicInteger count = new AtomicInteger(0);
         Integer total = ValidTiffs.groupObject.size();
@@ -123,9 +151,9 @@ public class stockNumber {
                 refreshThreads(count, threads, pi, group);
             }
 
-            Thread newThread = newThread(group, "stockNumber-"+count.get());
-            newThread.start();
-            threads.add(newThread);
+            Thread newStockByTiffThread = newStockByTiffThread(group, "stockNumber-"+count.get());
+            newStockByTiffThread.start();
+            threads.add(newStockByTiffThread);
         }
 
         while (!threads.isEmpty()) {
@@ -250,7 +278,7 @@ public class stockNumber {
 
     }
 
-    private static Thread newThread(String group, String name){
+    private static Thread newStockByTiffThread(String group, String name){
         Thread t = new Thread(new Task<Void>() {
             @Override
             protected Void call() {

@@ -199,6 +199,7 @@ public class ValidTiffs {
         objValidTiff.prefix = objStock.prefix;
         objValidTiff.stockNumber = objStock.stockNumber;
         objValidTiff.obs = objStock.obs;
+        objValidTiff.agency = objStock.agency;
         objValidTiff.stockLabel = objStock.stockLabel;
         if(objValidTiff.passo == null){
             objValidTiff.passo = new File(objValidTiff.file).getParentFile().getParentFile().getName();
