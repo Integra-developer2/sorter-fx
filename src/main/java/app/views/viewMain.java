@@ -276,7 +276,7 @@ public class viewMain {
     public void appendLog( String text) {
         if(!objGlobals.terminalPause){
             int count = logged.incrementAndGet();
-            if(count > 100){
+            if(count > 30){
                 Platform.runLater(() -> terminalOutput.clear());
                 logged.set(0);
             }
