@@ -57,14 +57,14 @@ public class taskStockAnomalies {
                             scheduler.shutdown();
 
                             Platform.runLater(() -> {
+
                                 if (objGlobals.stop) {
                                     objLogTimeline.add("taskStockAnomalies","[ taskStockAnomalies runAfter ] Stopped by objGlobals.stop");
                                     return;
                                 }
 
                                 Routing.stockAnomalies = "";
-
-                                Routing.next();
+                                runAfter();
 
                             });
                         }
