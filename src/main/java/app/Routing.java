@@ -1,6 +1,7 @@
 package app;
 
 import app.classes.GrayFiles;
+import app.classes.StockFile;
 import app.classes.UI;
 import app.objects.objGlobals;
 import app.objects.objLogTimeline;
