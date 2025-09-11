@@ -35,7 +35,7 @@ public class taskStockNumber {
         Thread t = new Thread(new Task<>() {
             @Override protected Void call() {
                 stockNumber.start();
-                if(StockFile.stockNumberFXCollections.isEmpty() && StockFile.stockFileFXCollections.isEmpty()){
+                if(StockFile.stockFileFXCollections.isEmpty()){
                     Routing.stockNumber = "end";
                     Routing.next();
                 }

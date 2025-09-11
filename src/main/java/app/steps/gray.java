@@ -7,10 +7,11 @@ import app.classes.UI;
 import app.objects.*;
 import javafx.concurrent.Task;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,9 +23,10 @@ public class gray {
     public static void start(){
         try{
             objGlobals.totalThreads = 1;
+            JobSorter.getData();
+            readLogs();
             grayFiles();
             blackFiles();
-            JobSorter.getData();
             readBarcodes();
             prints();
             grayFileNotFound();
@@ -34,6 +36,59 @@ public class gray {
             printError(e,true);
         }
 
+    }
+
+    private static void readLogs(){
+        if(new File(objGlobals.logGray).exists()){
+            try{
+                Files.walkFileTree(Paths.get(objGlobals.logGray),new SimpleFileVisitor<>() {
+                    @Override
+                    public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+                        BufferedReader br = new BufferedReader(new FileReader(path.toFile()));
+                        String line = br.readLine().trim();
+                        String[] split = line.split(";");
+                        String filePath = split[0].replace("BacksideCamera","PREFIX").replace("Camera", "PREFIX");
+                        objFilesGray.loggedLine.computeIfAbsent(filePath, _ -> new ArrayList<>()).add(line);
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+            }
+            catch(Exception e){
+                printError(e,true);
+            }
+        }
+
+       for(String basePath : objFilesGray.loggedLine.keySet()){
+           ArrayList<String> lines = objFilesGray.loggedLine.get(basePath);
+           if(lines.size()==2){
+               ArrayList<String> resultsFront = new ArrayList<>();
+               String pathFront = "";
+               ArrayList<String> resultsBack = new ArrayList<>();
+               String pathBack = "";
+
+               for(String line : lines){
+                   String[] split = line.trim().split(";");
+                   if(split[0].equals(basePath.replace("PREFIX", "Camera"))){
+                       pathFront = split[0];
+                       resultsFront.addAll(Arrays.asList(split).subList(2, split.length));
+                   }
+                   else if(split[0].equals(basePath.replace("PREFIX", "BacksideCamera"))){
+                       pathBack = split[0];
+                       resultsBack.addAll(Arrays.asList(split).subList(2, split.length));
+                   }
+
+               }
+
+                if(!pathFront.isEmpty()&&!pathBack.isEmpty()){
+                    objReadBarcode objReadBarcode = new objReadBarcode(pathFront,pathBack);
+                    objReadBarcode.resultsFront =  resultsFront;
+                    objReadBarcode.resultsBack = resultsBack;
+                    objReadBarcode.equals = objReadBarcode.equals(resultsFront ,resultsBack);
+                    objFilesGray.loggedFileObj.put(basePath,objReadBarcode);
+                }
+
+           }
+       }
     }
 
     private static void prints(){
@@ -138,7 +193,8 @@ public class gray {
 
         if (objFilesGray.all.isEmpty()) {
             throw new Exception("Nessun File Grigio");
-        } else {
+        }
+        else {
             for (String file : objFilesGray.files) {
                 String front = file.replace("PREFIX", "Camera");
                 String back = file.replace("PREFIX", "BacksideCamera");
@@ -240,8 +296,15 @@ public class gray {
         try{
             String pathFront = path.replace("PREFIX", "Camera");
             String pathBack = path.replace("PREFIX", "BacksideCamera");
-            objReadBarcode objReadBarcode = new objReadBarcode(pathFront, pathBack);
-            objReadBarcode.readBarCodesDoingWhites();
+
+            objReadBarcode objReadBarcode;
+            if(objFilesGray.loggedFileObj.containsKey(path)){
+                objReadBarcode =  objFilesGray.loggedFileObj.get(path);
+            }
+            else{
+                objReadBarcode = new objReadBarcode(pathFront, pathBack);
+                objReadBarcode.readBarCodesDoingWhites();
+            }
             ArrayList<String> barcodesJobSorter = checkInJobSorter(objReadBarcode.resultsFront, objReadBarcode.resultsBack);
             if(barcodesJobSorter.isEmpty()){
                 objReadBarcode.logGrayResults("notInJobSorter");

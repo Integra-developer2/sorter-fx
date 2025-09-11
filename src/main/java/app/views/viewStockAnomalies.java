@@ -155,7 +155,7 @@ public class viewStockAnomalies implements Initializable {
         }
 
         Routing.stockAnomalies = "end";
-        StockFile.writeNewFile();
+        StockFile.writeBaseFile();
     }
 
     @FXML private void printPane() {

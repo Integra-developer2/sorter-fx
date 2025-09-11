@@ -66,21 +66,17 @@ public class taskStockToShoot {
                 scheduler.shutdown();
 
                 switch (Routing.stockToShoot){
-                    case "shoot":{
+                    case "shoot"->{
                         Routing.stockToShoot = "";
                         scheduleNext();
                         Platform.runLater(() -> UI.loadDefault(9,"SISTEMA LE ANOMALIE"));
-                        break;
                     }
-                    case "back":{
+                    case "back"->{
                         Routing.stockToShoot = "";
                         scheduleNext();
                         Platform.runLater(() -> UI.loadDefault(8,"SISTEMA LE ANOMALIE"));
-                        break;
                     }
-                    case "end":{
-                        Routing.next();
-                    }
+                    case "end"-> Routing.next();
                 }
             }
 

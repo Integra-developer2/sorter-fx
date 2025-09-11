@@ -156,8 +156,17 @@ public class pdf {
                         }
                         bw.write(obj.barcode);
                         bw.newLine();
+
+                        String alternativeBarcode = JobSorter.alternativeBarcode(obj.barcode);
+
+                        if(alternativeBarcode!=null && !alternativeBarcode.isEmpty()){
+                            bw.write(alternativeBarcode);
+                            bw.newLine();
+                        }
+
                         UI.controller.refresh(pi, ++count);
-                    } catch (IOException e) {
+                    }
+                    catch (IOException e) {
                         printError(e, true);
                     }
                 }

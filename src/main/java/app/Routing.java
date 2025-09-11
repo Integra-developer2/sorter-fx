@@ -85,6 +85,7 @@ public class Routing {
     public static void next() {
         if(!objGlobals.stop){
             String currentStep = currentStep();
+            logError(currentStep,new Exception(currentStep));
             switch (currentStep) {
                 case "stepChoice" -> {
                     if(!UI.main.stepChoice.isSelected()){
@@ -92,13 +93,7 @@ public class Routing {
                     }
                     else{
                         if(stepChoice.isEmpty()){
-                            if(inputsAreDone()){
-                                end("stepChoice");
-                                next();
-                            }
-                            else{
-                                taskStepChoice.run();
-                            }
+                            taskStepChoice.run();
                         }
                         else if(stepChoice.equals("end")) {
                             end("stepChoice");

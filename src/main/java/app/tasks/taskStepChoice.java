@@ -52,7 +52,15 @@ public class taskStepChoice {
                             }
 
                             switch (Routing.stepChoice) {
-                                case "moveFiles" -> taskInputs.run();
+                                case "moveFiles" -> {
+                                    if(Routing.inputsAreDone()){
+                                        Routing.end("stepChoice");
+                                        Routing.next();
+                                    }
+                                    else{
+                                        taskInputs.run();
+                                    }
+                                }
                                 case "gray" -> {
                                     if(cantGoNext()){
                                         objGlobals.runStep = "";

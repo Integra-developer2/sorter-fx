@@ -142,6 +142,27 @@ public class StockFile {
         }
     }
 
+    public static void writeBaseFile() {
+        String filename = newTargetEtichetta();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            writer.write("PRIMO BARCODE;ULTIMO BARCODE;SCATOLO;PEDANA");
+            writer.newLine();
+            for (Map.Entry<Integer, objStock> entry : rowObject.entrySet()) {
+                objStock data = entry.getValue();
+                String row = String.join(";",
+                        data.firstBarcode,
+                        data.lastBarcode,
+                        data.stockLabel,
+                        data.obs
+                );
+                writer.append(row);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            printError(e, true);
+        }
+    }
+
     public static String newTargetEtichetta(){
         File newFileName = getEtichetteFile();
         String ret = newFileName.getAbsolutePath();
