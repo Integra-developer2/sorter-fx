@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class viewMain {
 
@@ -31,6 +32,7 @@ public class viewMain {
     @FXML public RadioButton dev;
     @FXML public RadioButton preprod;
     @FXML public RadioButton prod;
+    @FXML public RadioButton pdfChoice;
 
     @FXML public RadioButton stepChoice;
     @FXML public RadioButton moveFiles;
@@ -45,6 +47,7 @@ public class viewMain {
     private boolean isMaximized = false;
     private double prevW, prevH, prevX, prevY;
     private boolean terminalVisible = false;
+    private final AtomicInteger logged = new AtomicInteger(0);
 
 
     @FXML public void initialize() {
@@ -190,6 +193,8 @@ public class viewMain {
             preprod = new RadioButton("API In Preprod");
             prod = new RadioButton("API In Prod");
 
+            pdfChoice = new RadioButton("Solo pdf con pacco");
+
             stepChoice = new RadioButton("stepChoice");
             moveFiles = new RadioButton("moveFiles");
             gray = new RadioButton("gray");
@@ -207,8 +212,7 @@ public class viewMain {
             dev.setOnAction(_ -> Api.setApiSiteUrl("dev"));
             preprod.setOnAction(_ -> Api.setApiSiteUrl("preprod"));
             prod.setOnAction(_ -> Api.setApiSiteUrl("prod"));
-
-
+            pdfChoice.setOnAction(_ -> objGlobals.onlyStockPdf = true);
 
             HBox options = new HBox();
             options.setPadding(new Insets(30));
@@ -222,7 +226,7 @@ public class viewMain {
                 )
             );
             options.setSpacing(20);
-            options.getChildren().addAll(dev, preprod, prod, stepChoice,moveFiles,gray,grayAnomalies,stockAnomalies,stockNumber,stockToShoot,pdf);
+            options.getChildren().addAll(dev, preprod, prod,pdfChoice, stepChoice,moveFiles,gray,grayAnomalies,stockAnomalies,stockNumber,stockToShoot,pdf);
 
             terminalPanel.getChildren().addAll(options);
 
@@ -232,6 +236,7 @@ public class viewMain {
             terminalPanel.setManaged(false);
 
             prod.setSelected(true);
+            pdfChoice.setSelected(false);
 
             stepChoice.setSelected(true);
             moveFiles.setSelected(true);
@@ -270,7 +275,15 @@ public class viewMain {
 
     public void appendLog( String text) {
         if(!objGlobals.terminalPause){
-            Platform.runLater(() -> terminalOutput.appendText(LocalDateTime.now()+":"+ text + "\n"));
+            int count = logged.incrementAndGet();
+            if(count > 30){
+                Platform.runLater(() -> terminalOutput.clear());
+                logged.set(0);
+            }
+            else{
+                Platform.runLater(() -> terminalOutput.appendText(LocalDateTime.now()+":"+ text + "\n"));
+            }
+
         }
     }
 

@@ -88,12 +88,13 @@ public class viewStockNumber implements Initializable {
         J.setCellValueFactory(cellData -> cellData.getValue().J());
         K.setCellValueFactory(cellData -> cellData.getValue().K());
 
+
         r.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
         A.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
         B.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
         C.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
         D.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
-
+        E.setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
 
         setupTableView();
         setupTableView2();
@@ -115,13 +116,18 @@ public class viewStockNumber implements Initializable {
                 modelStockNumber.B().get(),
                 modelStockNumber.C().get(),
                 modelStockNumber.D().get(),
+                "",
+                "",
                 modelStockNumber.E().get(),
                 modelStockNumber.F().get(),
                 modelStockNumber.G().get(),
                 modelStockNumber.H().get(),
                 modelStockNumber.I().get(),
                 modelStockNumber.J().get(),
-                modelStockNumber.K().get()
+                modelStockNumber.K().get(),
+                "",
+                "",
+                ""
             ));
         }
 
@@ -213,13 +219,18 @@ public class viewStockNumber implements Initializable {
                     lastBarcode,
                     reference,
                     obs,
+                    "",
+                    "",
                     group,
                     progStart,
                     progEnd,
                     logicStart,
                     prefixStart,
                     stockNumber,
-                    agency
+                    agency,
+                    "",
+                    "",
+                    ""
                 )));
                 success = true;
             }

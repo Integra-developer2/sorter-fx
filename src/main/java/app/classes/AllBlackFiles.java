@@ -2,6 +2,7 @@ package app.classes;
 
 import app.objects.objAllBlackFilesCache;
 import app.objects.objGlobals;
+import app.objects.objLogTimeline;
 
 import java.io.*;
 import java.nio.file.*;
@@ -50,37 +51,48 @@ public class AllBlackFiles {
     }
 
     private static void readFolder() throws IOException {
-        Files.walkFileTree(Paths.get(objGlobals.targetTiff), new SimpleFileVisitor<>()  {
-            @Override
-            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
-                String file = path.toString();
-                if(file.contains(".tiff")){
-                    String fileName = file.replace("-FRONTE.tiff", "").replace("-RETRO.tiff", "");
-                    String barcode = getBarcode(file);
-                    int index = Integer.parseInt(getIndex(fileName).replace("-", ""));
-                    if(!barcodeFile.containsKey(barcode)){
-                        barcodeFile.put(barcode,fileName);
-                        barcodeIndex.put(barcode,index);
-                    }
-                    else{
-                        int currentIndex = Integer.parseInt(getIndex(barcodeFile.get(barcode)).replace("-", ""));
-                        if(index>currentIndex){
-                            barcodeFile.put(barcode,fileName);
-                            barcodeIndex.put(barcode,index);
+        Path txtOut = Paths.get(objGlobals.allBlackFiles.getAbsolutePath());
+        try (BufferedWriter writer = Files.newBufferedWriter(txtOut)) {
+            Files.walkFileTree(Paths.get(objGlobals.targetTiff), new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+                    String file = path.toString();
+                    if (file.endsWith(".tiff")) {
+                        String fileName = file.replace("-FRONTE.tiff", "").replace("-RETRO.tiff", "");
+                        String barcode = getBarcode(file);
+                        int index = Integer.parseInt(getIndex(fileName).replace("-", ""));
+
+                        if (!barcodeFile.containsKey(barcode)) {
+                            barcodeFile.put(barcode, fileName);
+                            barcodeIndex.put(barcode, index);
+                        } else {
+                            int currentIndex = Integer.parseInt(getIndex(barcodeFile.get(barcode)).replace("-", ""));
+                            if (index > currentIndex) {
+                                barcodeFile.put(barcode, fileName);
+                                barcodeIndex.put(barcode, index);
+                            }
                         }
+
+                        if (!barcodesFromFiles.contains(barcode)) {
+                            barcodesFromFiles.add(barcode);
+                        }
+
+                        String alternative = JobSorter.alternativeBarcode(barcode);
+                        if (alternative != null && !alternative.isEmpty() && !barcodesFromFiles.contains(alternative)) {
+                            barcodesFromFiles.add(alternative);
+                        }
+
+                        all.add(file);
+                        objLogTimeline.add("AllBlackFiles", "read: " + file);
+
+                        writer.write(barcode + ";" + index + ";" + file );
+                        writer.newLine();
                     }
-                    if(!barcodesFromFiles.contains(barcode)){
-                        barcodesFromFiles.add(barcode);
-                    }
-                    String alternative = JobSorter.alternativeBarcode(barcode);
-                    if(alternative!=null&&!alternative.isEmpty()&&!barcodesFromFiles.contains(alternative)){
-                        barcodesFromFiles.add(alternative);
-                    }
-                    all.add(file);
+                    return FileVisitResult.CONTINUE;
                 }
-                return FileVisitResult.CONTINUE;
-            }
-        });
+            });
+        }
+
         objAllBlackFilesCache cache = new objAllBlackFilesCache();
         cache.barcodeFile = barcodeFile;
         cache.barcodesFromFiles = barcodesFromFiles;
@@ -90,6 +102,7 @@ public class AllBlackFiles {
 
         hasData = true;
     }
+
 
     public static String getBarcode(String filename){
         String[] split = split(filename);
@@ -108,7 +121,7 @@ public class AllBlackFiles {
         return filename.split("-");
     }
 
-    private static void getData(){
+    public static void getData(){
         if(!hasData){
             if(new File(cachePath).exists()){
                 try {

@@ -4,9 +4,9 @@ import app.classes.Api;
 import app.classes.Pc;
 import app.classes.UI;
 import app.objects.objLogTimeline;
-import app.objects.objProgressBar;
 import app.objects.objProgressItem;
 import app.tasks.taskWorkingFolder;
+import app.views.viewStatusBar;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -45,16 +45,17 @@ public class App extends Application {
     private void setupFlusher() {
         Timeline logFlusher = new Timeline(
             new KeyFrame(Duration.millis(300), _ -> {
-                if (!objProgressBar.objProgressItems.isEmpty()) {
-                    for(objProgressItem pi:objProgressBar.objProgressItems.keySet()) {
-                        Integer count = objProgressBar.objProgressItems.get(pi);
+                if (!viewStatusBar.objProgressItems.isEmpty()) {
+                    for (Integer id : viewStatusBar.objProgressItems.keySet()) {
+                        objProgressItem pi = viewStatusBar.objProgressItems.get(id);
+                        int count = pi.count;
                         Platform.runLater(() -> {
-                            pi.progressBar().setProgress( (double) count / pi.total());
-                            pi.label().setText(pi.labelText()+ " : (" + count + "/" + pi.total()+")");
+                            pi.progressBar.setProgress((double) count / pi.total);
+                            pi.label.setText(pi.labelText + " : (" + count + "/" + pi.total + ")");
                         });
-                        objProgressBar.objProgressItems.remove(pi);
                     }
                 }
+
                 if(!objLogTimeline.logQueue.isEmpty()){
                     for(String page:objLogTimeline.logQueue.keySet()){
                         UI.main.appendLog(objLogTimeline.logQueue.get(page));
@@ -63,6 +64,7 @@ public class App extends Application {
                 }
                 Api.updateApiFile();
                 Pc.cpu();
+                Pc.disk();
             })
         );
         logFlusher.setCycleCount(Animation.INDEFINITE);

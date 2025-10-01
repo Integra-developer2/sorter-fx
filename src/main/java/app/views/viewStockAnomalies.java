@@ -15,10 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.print.PrinterJob;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -31,6 +28,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.util.Callback;
 import javafx.util.converter.DefaultStringConverter;
 
 import static app.functions.*;
@@ -54,6 +52,21 @@ public class viewStockAnomalies implements Initializable {
     @SuppressWarnings("deprecation")
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        Callback<TableColumn<modelStock, String>, TableCell<modelStock, String>> copyableReadOnlyCell = _ -> new TableCell<>() {
+            final TextField tf = new TextField();
+            {
+                tf.setEditable(false);
+                tf.setFocusTraversable(true);
+                tf.setStyle("-fx-background-color: transparent; -fx-background-insets: 0; -fx-padding: 0;");
+            }
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { setGraphic(null); }
+                else { tf.setText(item); setGraphic(tf); }
+            }
+            @Override public void startEdit() {}
+        };
+
         tableView.setEditable(true);
         addDeleteButtonToTable();
         btnForward.setOnAction(_ -> btnForward());
@@ -94,6 +107,13 @@ public class viewStockAnomalies implements Initializable {
             }
         });
 
+        C.setCellFactory(copyableReadOnlyCell);
+        D.setCellFactory(copyableReadOnlyCell);
+        E.setCellFactory(copyableReadOnlyCell);
+        F.setCellFactory(copyableReadOnlyCell);
+        G.setCellFactory(copyableReadOnlyCell);
+        H.setCellFactory(copyableReadOnlyCell);
+
         tableView.setItems(StockFile.stockAnomaliesFXCollections);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -108,6 +128,7 @@ public class viewStockAnomalies implements Initializable {
 
     @FXML private void btnForward() {
         for (modelStock item : tableView.getItems()) {
+
             Integer rowValue = Integer.valueOf(item.row().get());
             String firstBarcode = item.A().get();
             String lastBarcode = item.B().get();
@@ -132,8 +153,9 @@ public class viewStockAnomalies implements Initializable {
         for (Integer deletedRow : deletedRows) {
             StockFile.rowObject.remove(deletedRow);
         }
-        StockFile.writeNewFile();
+
         Routing.stockAnomalies = "end";
+        StockFile.writeBaseFile();
     }
 
     @FXML private void printPane() {

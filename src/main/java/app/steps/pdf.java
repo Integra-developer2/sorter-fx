@@ -1,10 +1,7 @@
 package app.steps;
 
 import app.Routing;
-import app.classes.Pc;
-import app.classes.Pdfs;
-import app.classes.UI;
-import app.classes.ValidTiffs;
+import app.classes.*;
 import app.objects.*;
 import javafx.concurrent.Task;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -22,29 +19,37 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static app.functions.*;
 import static java.lang.Thread.sleep;
 
 public class pdf {
-    private static final ArrayList<Thread> threads = new ArrayList<>();
-    private static Thread threadSorteExport = null;
+    private static Thread threadSorterExport = null;
+    private static final ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicInteger>> stockPdfs = new ConcurrentHashMap<>();
 
     public static void start(){
         try{
+            UI.controller.addSpinner("mi preparo a generare i pdf");
             objGlobals.totalThreads = 1 ;
             ValidTiffs.getFromFile();
-            sorterExport();
+            UI.controller.removeSpinner();
+
             generatePdfs();
-            while (threadSorteExport.isAlive()) {
-                objLogTimeline.add("pdf",threadSorteExport.getName()+" running");
+
+            controlloQualita();
+
+            fileEtichette();
+
+            while (threadSorterExport.isAlive()) {
+                objLogTimeline.add("pdf",threadSorterExport.getName()+" running");
             }
+
             Pdfs.writeToFile();
+            ValidTiffs.writeToFile();
             Routing.pdf = "end";
         }
         catch (Exception e){
@@ -52,132 +57,170 @@ public class pdf {
         }
     }
 
-    private static void sorterExport(){
-        threadSorteExport = sorterExportThread();
-        threadSorteExport.setDaemon(true);
-        threadSorteExport.start();
-
+    private static void controlloQualita(){
+        threadSorterExport = controlloQualitaThread();
+        threadSorterExport.setDaemon(true);
+        threadSorterExport.start();
     }
 
-    private static Thread sorterExportThread(){
-        return new Thread(new Task<Void>(){
-            @Override
-            protected Void call() {
-                HashMap<String,HashMap<String,ArrayList<objValidTiff>>> sorterExport = new HashMap<>();
-                UI.controller.addSpinner("mi preparo a fare il sorterExport");
-                for(String barcode : ValidTiffs.barcodeObject.keySet()){
-                    objValidTiff obj = ValidTiffs.barcodeObject.get(barcode);
-                    String passo = new File(obj.file).getParentFile().getParentFile().getName();
-
-                    if(obj.stockNumber !=null){
-                        sorterExport.computeIfAbsent(passo, _-> new HashMap<>());
-                        sorterExport.get(passo).computeIfAbsent(obj.group, _-> new ArrayList<>());
-                        sorterExport.get(passo).get(obj.group).add(obj);
-                    }
-
-                }
-
-                for (HashMap<String, ArrayList<objValidTiff>> groupMap : sorterExport.values()) {
-                    for (ArrayList<objValidTiff> list : groupMap.values()) {
-                        list.sort(Comparator
-                            .comparing(
-                                (objValidTiff obj) -> safeParseInt(obj.stockNumber),
-                                Comparator.nullsFirst(Integer::compareTo)
-                            )
-                            .thenComparing(
-                                obj -> obj.index,
-                                Comparator.nullsFirst(Comparator.naturalOrder())
-                            )
-                        );
-
-                    }
-                }
-
-                UI.controller.removeSpinner();
-
-                objProgressItem pi = UI.controller.addProgress("sorterExport",ValidTiffs.barcodeObject.size());
-
-                for(String passo : sorterExport.keySet()){
-                    try(BufferedWriter bw = new BufferedWriter(new FileWriter(objGlobals.sorterExport + passo + ".csv"))){
-                        for(String group : sorterExport.get(passo).keySet()){
-                            int count = 0;
-                            bw.write("soggetto;"+group);
-                            bw.newLine();
-                            bw.write("N.Pacco-Anno;Sequenza nel Pacco;Barcode;Riferimento Scatolo");
-                            bw.newLine();
-                            for(objValidTiff obj : sorterExport.get(passo).get(group)){
-                                String stringIndex = String.format("%06d",obj.index);
-                                bw.write(obj.prefix+obj.stockNumber+";"+(++count)+";"+obj.barcode+"-"+stringIndex.substring(0,3)+"-"+stringIndex.substring(3)+";"+obj.stockLabel);
-                                bw.newLine();
-                                UI.controller.refresh(pi,count);
-                            }
-                            bw.write("");
-                            bw.newLine();
-                        }
-
-                    }
-                    catch(IOException e){
-                        printError(e,true);
-                    }
-                }
-
-                return null;
-            }
-        });
-    }
-
-    private static void generatePdfs() throws InterruptedException {
+    private static void generatePdfs(){
+        ValidTiffs.getData();
+        ArrayList<Thread> threads = new ArrayList<>();
         if (!ValidTiffs.barcodeObject.isEmpty()) {
             AtomicInteger count = new AtomicInteger(0);
             Integer total = ValidTiffs.barcodeObject.size();
-            objProgressItem pi = UI.controller.addProgress("Creo i file pdf",total);
+            objProgressItem pi = UI.controller.addProgress("Creo i file pdf", total);
 
             for (String barcode : ValidTiffs.barcodeObject.keySet()) {
 
                 objValidTiff objValidTiff = ValidTiffs.barcodeObject.get(barcode);
 
                 while (threads.size() >= objGlobals.totalThreads) {
-                    refreshThreads(count, pi, objValidTiff.barcode);
+                    refreshThreads(count, pi, objValidTiff.barcode,threads);
                 }
 
-                Thread newThread = newThread(objValidTiff, "generatePdfs-"+count.get());
-                newThread.start();
-                threads.add(newThread);
+                Thread newPdfThread = newPdfThread(objValidTiff, "generatePdfs-"+count.get());
+                threads.add(newPdfThread);
+                newPdfThread.start();
 
             }
 
             while (!threads.isEmpty()) {
-                refreshThreads(count, pi, String.valueOf(count));
+                refreshThreads(count, pi, String.valueOf(count),threads);
             }
         }
     }
 
-    private static void refreshThreads(AtomicInteger count, objProgressItem pi, String text) throws InterruptedException {
-        Iterator<Thread> it = pdf.threads.iterator();
-        while (it.hasNext()) {
-            Thread t = it.next();
-            if (!t.isAlive()) {
-                it.remove();
-                UI.controller.refresh(pi, count.incrementAndGet());
-                objLogTimeline.add("refreshThreads","[ generatePdfs ] done "+text);
-            }
-            else{
-                objLogTimeline.add("refreshThreads","[ generatePdfs ] running "+text);
-            }
-        }
-        if(Pc.usage.get("cpu")<90.00 && Pc.usage.get("disk")<90.00){
-            objGlobals.totalThreads += 100;
-            sleep(500);
-        }
-        else if(objGlobals.totalThreads > 1)
-        {
-            objGlobals.totalThreads -= 100;
-        }
-        objLogTimeline.add("generatePdfs","[ objGlobals.totalThreads ] : "+objGlobals.totalThreads);
+    private static void fileEtichette(){
+        objProgressItem pi = UI.controller.addProgress("fileEtichette", StockFile.rowObject().size());
+        int count = 0;
 
+        LinkedHashMap<Integer, objStock> orderStock = orderStock();
+
+        for (objStock obj : orderStock.values()) {
+
+            File outEtichette = new File(objGlobals.fileEtichette + ValidTiffs.barcodeObject.get(obj.firstBarcode).passo + ".csv");
+
+            mkdir(outEtichette.getAbsolutePath());
+
+            boolean needsHeader = !outEtichette.exists() || outEtichette.length() == 0;
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(outEtichette, true))) {
+                if (needsHeader) {
+                    bw.write("Agenzia Mittente;Cliente Mittente;Numero pacco;Quantita;Primo Barcode;Ultimo Barcode;Data Archiviazione;Tipologia;Note;Entity;Riferimento Scatolo");
+                    bw.newLine();
+                }
+                String stock = obj.logic.equals("lotto") ? obj.prefix + "/" + obj.stockNumber : obj.prefix + obj.stockNumber;
+                bw.write(
+                        obj.agency+";"+
+                                obj.group+";"+
+                                stock+";"+
+                                stockPdfs.get(obj.prefix).get(obj.stockNumber)+";"+
+                                obj.firstBarcode+";"+
+                                obj.lastBarcode+";"+
+                                LocalDate.now(java.time.ZoneId.of("Europe/Rome")).format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))+";"+
+                                obj.cppCode+";"+
+                                ";"+
+                                obj.agencyID+";"+
+                                obj.stockLabel
+                );
+                bw.newLine();
+                UI.controller.refresh(pi, ++count);
+            } catch (IOException e) {
+                printError(e, true);
+            }
+        }
     }
 
-    private static Thread newThread(objValidTiff objValidTiff,String name){
+    private static Thread controlloQualitaThread(){
+        return new Thread(new Task<Void>(){
+            @Override
+            protected Void call() {
+                objProgressItem pi = UI.controller.addProgress("File controllo qualita", ValidTiffs.barcodeObject.size());
+                int count = 0;
+
+                for (String barcode : ValidTiffs.barcodeObject.keySet()) {
+                    objValidTiff obj = ValidTiffs.barcodeObject.get(barcode);
+                    String passo = new File(obj.file).getParentFile().getParentFile().getName();
+
+                    File out = new File(objGlobals.controlloQualita + passo + ".csv");
+
+                    mkdir(out.getAbsolutePath());
+
+                    boolean needsHeader = !out.exists() || out.length() == 0;
+
+                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(out, true))) {
+                        if (needsHeader) {
+                            bw.write("Barcode");
+                            bw.newLine();
+                        }
+                        bw.write(obj.barcode);
+                        bw.newLine();
+
+                        String alternativeBarcode = JobSorter.alternativeBarcode(obj.barcode);
+
+                        if(alternativeBarcode!=null && !alternativeBarcode.isEmpty()){
+                            bw.write(alternativeBarcode);
+                            bw.newLine();
+                        }
+
+                        UI.controller.refresh(pi, ++count);
+                    }
+                    catch (IOException e) {
+                        printError(e, true);
+                    }
+                }
+                return null;
+            }
+        });
+    }
+
+    private static LinkedHashMap<Integer, objStock> orderStock() {
+        return StockFile.rowObject.entrySet().stream()
+                .sorted(
+                        Comparator
+                                .comparingInt((Map.Entry<Integer, objStock> e) -> Integer.parseInt(e.getValue().cassetto))
+                                .thenComparingInt(e -> Integer.parseInt(e.getValue().stockNumber))
+                )
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, _) -> a,
+                        LinkedHashMap::new
+                ));
+    }
+
+
+    private static void refreshThreads(AtomicInteger count, objProgressItem pi, String text,ArrayList<Thread> threads)  {
+        try{
+            Iterator<Thread> it = threads.iterator();
+            while (it.hasNext()) {
+                Thread t = it.next();
+                if (!t.isAlive()) {
+                    it.remove();
+                    UI.controller.refresh(pi, count.incrementAndGet());
+                    objLogTimeline.add("refreshThreads","[ generatePdfs ] done "+text);
+                }
+                else{
+                    objLogTimeline.add("refreshThreads","[ generatePdfs ] running "+text);
+                }
+            }
+            if(Pc.usage.get("cpu")<90.00 && Pc.usage.get("disk")<90.00){
+                objGlobals.totalThreads += 100;
+                sleep(500);
+            }
+            else if(objGlobals.totalThreads > 1)
+            {
+                objGlobals.totalThreads -= 100;
+            }
+            objLogTimeline.add("generatePdfs","[ objGlobals.totalThreads ] : "+objGlobals.totalThreads);
+        }
+        catch (Exception e){
+            logError("pdf",e);
+        }
+    }
+
+    private static Thread newPdfThread(objValidTiff objValidTiff,String name){
         Thread t = new Thread(new Task<Void>() {
             @Override
             protected Void call() {
@@ -194,24 +237,34 @@ public class pdf {
         String tiffFile1 = objValidTiff.file + "-FRONTE.tiff";
         String tiffFile2 = objValidTiff.file + "-RETRO.tiff";
         String to = outputPdfFile(objValidTiff);
-        try {
-            mkDir(to);
-            rotateIfNeeded(tiffFile1);
-            rotateIfNeeded(tiffFile2);
-            mergeTiffToPdf(tiffFile1, tiffFile2, to);
-            Pdfs.prefixPdf.computeIfAbsent(objValidTiff.prefix, _-> new ArrayList<>());
-            Pdfs.prefixPdf.get(objValidTiff.prefix).add(new objPdf(
-                objValidTiff.prefix,
-                objValidTiff.barcode,
-                Integer.parseInt(objValidTiff.stockNumber),
-                to,
-                objValidTiff.file
-            ));
-        }
-        catch (IOException e) {
-            printError(e,true);
+        if(!to.isEmpty()){
+            try {
+                mkDir(to);
+                rotateIfNeeded(tiffFile1);
+                rotateIfNeeded(tiffFile2);
+                mergeTiffToPdf(tiffFile1, tiffFile2, to);
+                Pdfs.prefixPdf.computeIfAbsent(objValidTiff.prefix, _-> new ArrayList<>());
+                Pdfs.prefixPdf.get(objValidTiff.prefix).add(new objPdf(
+                        objValidTiff.prefix,
+                        objValidTiff.barcode,
+                        Integer.parseInt(objValidTiff.stockNumber),
+                        to,
+                        objValidTiff.file
+                ));
+                addStockPdfs(objValidTiff);
+            }
+            catch (IOException e) {
+                printError(e,true);
+            }
         }
 
+    }
+
+    private static void addStockPdfs(objValidTiff v){
+        stockPdfs
+            .computeIfAbsent(v.prefix, _ -> new ConcurrentHashMap<>())
+            .computeIfAbsent(v.stockNumber, _ -> new AtomicInteger(0))
+            .incrementAndGet();
     }
 
     public static String outputPdfFile(objValidTiff objValidTiff){
@@ -222,18 +275,24 @@ public class pdf {
         String year = String.valueOf(LocalDate.now().getYear());
         String stock;
         File folder;
+        String filename;
+        String ret = "";
         if(objValidTiff.prefix==null||objValidTiff.stockNumber==null){
-            stock =  "[paccomancante]" ;
-            folder = new File(objGlobals.pdfNoStockFolder,objValidTiff.group);
+            if(!objGlobals.onlyStockPdf){
+                stock =  "[paccomancante]" ;
+                folder = new File(objGlobals.pdfNoStockFolder,objValidTiff.group);
+                filename = barcode + "-sorter-" +status + "-" + entity + "-" + year + "-" + stock + ".pdf";
+                ret = new File(folder,filename).getPath();
+            }
         }
         else{
             stock = objValidTiff.prefix + objValidTiff.stockNumber;
             folder = new File(objGlobals.pdfFolder,objValidTiff.group);
+            filename = barcode + "-sorter-" +status + "-" + entity + "-" + year + "-" + stock + ".pdf";
+            ret = new File(folder,filename).getPath();
         }
 
-        String filename = barcode + "-sorter-" +status + "-" + entity + "-" + year + "-" + stock + ".pdf";
-
-        return new File(folder,filename).getPath();
+        return ret;
     }
 
     public static void mergeTiffToPdf(String tiffFile1, String tiffFile2, String outputPdfFile) throws IOException {
@@ -322,14 +381,6 @@ public class pdf {
         }
         catch (IOException e) {
             logError("rotateWithJai "+path, e);
-        }
-    }
-    private static Integer safeParseInt(String s) {
-        try {
-            return s != null ? Integer.parseInt(s) : null;
-        }
-        catch (NumberFormatException e) {
-            return null;
         }
     }
 

@@ -1,7 +1,6 @@
 package app.tasks;
 
 import app.Routing;
-import app.classes.StockFile;
 import app.classes.UI;
 import app.classes.ValidTiffs;
 import app.objects.objLogTimeline;
@@ -67,22 +66,17 @@ public class taskStockToShoot {
                 scheduler.shutdown();
 
                 switch (Routing.stockToShoot){
-                    case "shoot":{
+                    case "shoot"->{
                         Routing.stockToShoot = "";
                         scheduleNext();
                         Platform.runLater(() -> UI.loadDefault(9,"SISTEMA LE ANOMALIE"));
-                        break;
                     }
-                    case "back":{
+                    case "back"->{
                         Routing.stockToShoot = "";
                         scheduleNext();
                         Platform.runLater(() -> UI.loadDefault(8,"SISTEMA LE ANOMALIE"));
-                        break;
                     }
-                    case "end":{
-                        StockFile.writeNewFile();
-                        Routing.next();
-                    }
+                    case "end"-> Routing.next();
                 }
             }
 

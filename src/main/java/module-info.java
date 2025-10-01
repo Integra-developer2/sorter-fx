@@ -13,6 +13,7 @@ module app {
     requires java.sql;
     requires jdk.management;
     requires com.github.oshi;
+    requires javafx.base;
     opens app to javafx.fxml;
     exports app;
     exports app.views;

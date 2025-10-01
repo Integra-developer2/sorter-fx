@@ -4,14 +4,19 @@ import app.classes.Pc;
 import app.classes.StockFile;
 import app.classes.UI;
 import app.classes.ValidTiffs;
+import app.models.modelStockFile;
 import app.models.modelStockNumber;
 import app.models.modelStockToShoot;
 import app.objects.*;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static app.functions.printError;
 import static java.lang.Thread.sleep;
@@ -25,13 +30,36 @@ public class stockNumber {
             objGlobals.totalThreads = 1;
             pkObjStockToShoot.clear();
             StockFile.prefixNumber.clear();
+            StockFile.stockFileFXCollections.clear();
             StockFile.stockNumberFXCollections.clear();
             ValidTiffs.modelStockToShootFXCollections.clear();
             getStock();
-            ValidTiffs.writeToFile();
-            StockFile.writeNewFile();
-            for(String pk:pkObjStockToShoot.keySet()){
-                ValidTiffs.modelStockToShootFXCollections.add(new modelStockToShoot(pkObjStockToShoot.get(pk)));
+            checkStockFile();
+            if(!StockFile.stockFileFXCollections.isEmpty()){
+                Comparator<modelStockFile> byGroupThenProgStart =
+                        Comparator
+                                .comparing((modelStockFile msf) -> msf.group() == null ? null : msf.group().get(), Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER))
+                                .thenComparing(msf -> {
+                                    String s = msf.progStart() == null ? null : msf.progStart().get();
+                                    if (s == null || s.isBlank()) {
+                                        return null;
+                                    }
+                                    try {
+                                        return Integer.valueOf(s);
+                                    } catch (NumberFormatException e) {
+                                        return null;
+                                    }
+                                }, Comparator.nullsLast(Integer::compareTo));
+
+                FXCollections.sort(StockFile.stockFileFXCollections, byGroupThenProgStart);
+
+            }
+            else{
+                getStockByTiff();
+                ValidTiffs.writeToFile();
+                for(String pk:pkObjStockToShoot.keySet()){
+                    ValidTiffs.modelStockToShootFXCollections.add(new modelStockToShoot(pkObjStockToShoot.get(pk)));
+                }
             }
 
         }
@@ -41,25 +69,155 @@ public class stockNumber {
 
     }
 
-    private static void getStock() throws InterruptedException {
+    private static void checkStockFile(){
+        ArrayList<String> groupsWithError = new ArrayList<>();
+        for(String group:StockFile.groupObject.keySet()){
+
+            List<objStock> objStockList =  StockFile.groupObject.get(group);
+            int count = 1, i = -1, n = objStockList.size();
+
+            for(objStock objStock:objStockList){
+                String error = "";
+                i++;
+                objStock prev = i > 0 ? objStockList.get(i - 1) : null;
+                objStock next = i + 1 < n ? objStockList.get(i + 1) : null;
+
+                if(objStock.pacco == null || objStock.pacco.isEmpty()){
+                    if(objStockList.size()==1){
+                        objStock.pacco = "1001";
+                    }
+                    else{
+                        Matcher m = Pattern.compile("\\bPACCO\\D*(\\d+)", Pattern.CASE_INSENSITIVE).matcher(objStock.stockLabel);
+                        String pacco = m.find() ? m.group(1) : null;
+                        if(pacco == null){
+                            error=error(error,"Pacco non è presente");
+                        }
+                        else{
+                            int intPacco = Integer.parseInt(pacco);
+                            if(intPacco != count){
+                                error=error(error,"Pacco non è in ordine");
+                            }
+                            else {
+                                objStock.pacco = pacco;
+                            }
+                        }
+                    }
+                }
+
+                if(objStock.cassetto == null || objStock.cassetto.isEmpty()){
+                    Matcher m = Pattern.compile("\\bCASSETTO\\D*(\\d+)", Pattern.CASE_INSENSITIVE).matcher(objStock.stockLabel);
+                    String cassetto = m.find() ? m.group(1) : null;
+                    if(cassetto == null){
+                        error=error(error,"Cassetto non è presente");
+                    }
+                    else{
+                        objStock.cassetto = cassetto;
+                    }
+                }
+
+                if(prev != null){
+                    if(Integer.parseInt(objStock.progStart) < Integer.parseInt(prev.progEnd)){
+                        error = error(error,"ProgInizio in sovrapposizione");
+                    }
+                }
+
+                if(next != null){
+                    if(Integer.parseInt(objStock.progEnd) > Integer.parseInt(next.progStart)){
+                        error = error(error,"ProgFine in sovrapposizione");
+                    }
+                }
+
+                if(!error.isEmpty()){
+                    groupsWithError.add(group);
+                    StockFile.stockFileFXCollections.add(new modelStockFile(objStock,error));
+                }
+
+                count++;
+
+            }
+
+        }
+
+        Set<String> seen = StockFile.stockFileFXCollections.stream()
+                .map(m -> m.row.get())
+                .collect(Collectors.toCollection(HashSet::new));
+
+        for (String group : groupsWithError) {
+            List<objStock> list = StockFile.groupObject.getOrDefault(group, Collections.emptyList());
+            for (objStock s : list) {
+                String key = String.valueOf(s.row);
+                if (seen.add(key)) {
+                    StockFile.stockFileFXCollections.add(new modelStockFile(s, "-"));
+                }
+            }
+        }
+    }
+
+    private static String error(String error, String message){
+        if(!error.isEmpty()){
+            error += ", ";
+        }
+        error+=message;
+        return error;
+    }
+
+    private static void getStockByTiff() throws InterruptedException {
+        AtomicInteger count = new AtomicInteger(0);
+        Integer total = ValidTiffs.groupObject.size();
+        ArrayList<Thread> threads = new ArrayList<>();
+        UI.controller.removeSpinner();
+        objProgressItem pi = UI.controller.addProgress("Creo i pacchi",total);
+
+        for(String group : ValidTiffs.groupObject.keySet()){
+
+            while (threads.size() >= objGlobals.totalThreads) {
+                refreshThreads(count, threads, pi, group);
+            }
+
+            Thread newStockByTiffThread = newStockByTiffThread(group, "stockNumber-"+count.get());
+            newStockByTiffThread.start();
+            threads.add(newStockByTiffThread);
+        }
+
+        while (!threads.isEmpty()) {
+            refreshThreads(count, threads, pi, String.valueOf(count));
+        }
+    }
+
+    private static void getStock() {
         ValidTiffs.getData();
 
-        if (!StockFile.rowObject().isEmpty()) {
-            List<Map.Entry<Integer, objStock>> entries = new ArrayList<>(StockFile.rowObject().entrySet());
-            entries.sort(Comparator
-                .comparing((Map.Entry<Integer, objStock> e) -> e.getValue().logic, Comparator.nullsFirst(String::compareTo))
-                .thenComparing(e -> e.getValue().prefix, Comparator.nullsFirst(String::compareTo))
-                .thenComparing(Map.Entry::getKey)
-            );
+        if (StockFile.rowObject().isEmpty()) {
+
+            printError(new Exception("Stock File is empty"),true);
+
+        }
+        else{
+
+            List<Map.Entry<Integer, objStock>> entries = entries();
+
             StockFile.rowObject.clear();
+            StockFile.groupObject.clear();
+            StockFile.prefixNumber.clear();
 
             for(Map.Entry<Integer, objStock> entry : entries){
 
-                String prefix = entry.getValue().prefix;
+                objStock entryValue = entry.getValue();
 
-                Integer stockNumber = Integer.parseInt(entry.getValue().stockNumber) + 1;
+                String prefix = entryValue.prefix;
 
-                if(StockFile.prefixNumber.containsKey(entry.getValue().prefix)){
+                String entryStockNumber = entryValue.stockNumber;
+
+                if(entryStockNumber.isEmpty()){
+                    printError(new Exception("Stock Number is empty"),true);
+                }
+                assert !entryStockNumber.isEmpty();
+
+                int intEntryStockNumber = Integer.parseInt(entryStockNumber);
+
+                Integer stockNumber = intEntryStockNumber == 0 || intEntryStockNumber == 1 ? 1 : intEntryStockNumber + 1;
+
+                if(StockFile.prefixNumber.containsKey(entryValue.prefix)){
                     stockNumber = StockFile.prefixNumber.get(prefix)+1;
                     StockFile.prefixNumber.put(prefix,stockNumber);
                 }
@@ -69,49 +227,53 @@ public class stockNumber {
 
                 objStock objStock = new objStock(
                     entry.getKey(),
-                    entry.getValue().firstBarcode,
-                    entry.getValue().lastBarcode,
-                    entry.getValue().stockLabel,
-                    entry.getValue().obs,
-                    entry.getValue().group,
-                    entry.getValue().progStart,
-                    entry.getValue().progEnd,
-                    entry.getValue().logic,
+                    entryValue.firstBarcode,
+                    entryValue.lastBarcode,
+                    entryValue.stockLabel,
+                    entryValue.obs,
+                    entryValue.cassetto,
+                    entryValue.pacco,
+                    entryValue.group,
+                    entryValue.progStart,
+                    entryValue.progEnd,
+                    entryValue.logic,
                     prefix,
                     stockNumber == 0 ? "" :String.valueOf(stockNumber),
-                    entry.getValue().agency
+                    entryValue.agency,
+                    entryValue.agencyID,
+                    entryValue.cppCode,
+                    entryValue.customer
                 );
 
                 modelStockNumber modelStockNumber = new modelStockNumber(objStock);
 
                 StockFile.rowObject.put(entry.getKey(), objStock);
-                StockFile.groupObject.computeIfAbsent(entry.getValue().group, _ -> new ArrayList<>()).add(objStock);
+                StockFile.groupObject.computeIfAbsent(entryValue.group, _ -> new ArrayList<>()).add(objStock);
                 StockFile.stockNumberFXCollections.add(modelStockNumber);
 
             }
 
-            AtomicInteger count = new AtomicInteger(0);
-            Integer total = ValidTiffs.groupObject.size();
-            ArrayList<Thread> threads = new ArrayList<>();
-            UI.controller.removeSpinner();
-            objProgressItem pi = UI.controller.addProgress("Creo i pacchi",total);
-
-            for(String group : ValidTiffs.groupObject.keySet()){
-
-                while (threads.size() >= objGlobals.totalThreads) {
-                    refreshThreads(count, threads, pi, group);
-                }
-
-                Thread newThread = newThread(group, "stockNumber-"+count.get());
-                newThread.start();
-                threads.add(newThread);
-            }
-
-            while (!threads.isEmpty()) {
-                refreshThreads(count, threads, pi, String.valueOf(count));
-            }
         }
 
+    }
+
+    private static List<Map.Entry<Integer, objStock>> entries(){
+        List<Map.Entry<Integer, objStock>> entries = new ArrayList<>(StockFile.rowObject().entrySet());
+        entries.sort(
+                Comparator
+                        .comparing((Map.Entry<Integer, objStock> e) -> e.getValue().logic, Comparator.nullsFirst(Comparator.naturalOrder()))
+                        .thenComparing(e -> e.getValue().prefix, Comparator.nullsFirst(Comparator.naturalOrder()))
+                        .thenComparing(
+                                e -> {
+                                    String prog = e.getValue().progStart;
+                                    return prog == null ? null : Integer.parseInt(prog);
+                                },
+                                Comparator.nullsFirst(Integer::compareTo)
+                        )
+                        .thenComparing(Map.Entry::getKey, Comparator.nullsFirst(Comparator.naturalOrder()))
+        );
+
+        return entries;
     }
 
     private static void refreshThreads(AtomicInteger count, ArrayList<Thread> threads, objProgressItem pi, String text) throws InterruptedException {
@@ -139,7 +301,7 @@ public class stockNumber {
 
     }
 
-    private static Thread newThread(String group, String name){
+    private static Thread newStockByTiffThread(String group, String name){
         Thread t = new Thread(new Task<Void>() {
             @Override
             protected Void call() {

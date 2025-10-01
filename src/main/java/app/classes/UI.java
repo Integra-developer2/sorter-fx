@@ -1,7 +1,6 @@
 package app.classes;
 
 import app.objects.objGlobals;
-import app.objects.objProgressBar;
 import app.views.viewMain;
 import app.views.viewStatusBar;
 import javafx.fxml.FXMLLoader;
@@ -29,11 +28,12 @@ public class UI  {
         pages.put(8,"/app/views/viewStockToShoot.fxml");
         pages.put(9,"/app/views/viewStockShooting.fxml");
         pages.put(10,"/app/views/viewEnd.fxml");
+        pages.put(11,"/app/views/viewStockFile.fxml");
 
     }
 
     public static String page(Integer index){
-        objProgressBar.objProgressItems.clear();
+        viewStatusBar.objProgressItems.clear();
         return pages.get(index);
     }
 

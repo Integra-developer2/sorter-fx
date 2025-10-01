@@ -24,10 +24,11 @@
             <TableColumn fx:id="B" minWidth="100.0" text="ULTIMO BARCODE" />
             <TableColumn fx:id="C" editable="false" minWidth="175.0" text="RIFERIMENTO SCATOLO" />
             <TableColumn fx:id="D" editable="false" minWidth="175.0" text="RIFERIMENTO PEDANA" />
-            <TableColumn fx:id="E" editable="false" minWidth="75.0" text="LOGICA" />
-            <TableColumn fx:id="F" editable="false" minWidth="75.0" text="PREFISSO" />
-            <TableColumn fx:id="G" editable="false" minWidth="75.0" text="PACCO" />
-            <TableColumn fx:id="H" editable="false" minWidth="175.0" text="ANOMALIA" />
+            <TableColumn fx:id="E" editable="false" minWidth="175.0" text="CASSETTO" />
+            <TableColumn fx:id="F" editable="false" minWidth="75.0" text="LOGICA" />
+            <TableColumn fx:id="G" editable="false" minWidth="75.0" text="PREFISSO" />
+            <TableColumn fx:id="H" editable="false" minWidth="75.0" text="PACCO" />
+            <TableColumn fx:id="I" editable="false" minWidth="175.0" text="ANOMALIA" />
             <TableColumn fx:id="deleteColumn" text="ELIMINA RIGA" />
          </columns>
       </TableView>

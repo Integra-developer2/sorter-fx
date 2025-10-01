@@ -7,11 +7,14 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class objFilesGray {
     public static ArrayList<String> all = new ArrayList<>();
     public static ArrayList<String> files = new ArrayList<>();
     public static ArrayList<String> toBarcodeReader = new ArrayList<>();
+    public static HashMap<String, objReadBarcode> loggedFileObj = new HashMap<>();
+    public static  HashMap<String, ArrayList<String>> loggedLine = new HashMap<>();
 
     public static void list() throws Exception{
         Path startPath = Paths.get(objGlobals.targetGray);

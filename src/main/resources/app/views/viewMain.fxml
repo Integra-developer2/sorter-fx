@@ -19,7 +19,7 @@
                         <Insets />
                     </VBox.margin>
                     <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 5 10 5 10;" HBox.hgrow="ALWAYS">
-                        <Label text="JAVA-SORTER 2.0.1" textFill="WHITE" HBox.hgrow="ALWAYS">
+                        <Label text="JAVA-SORTER 2.0.2" textFill="WHITE" HBox.hgrow="ALWAYS">
                             <font>
                                 <Font name="System Bold" size="17.0" />
                             </font>

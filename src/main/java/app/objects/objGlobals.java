@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static app.functions.printError;
 
@@ -13,7 +14,7 @@ import app.classes.Api;
 import javafx.scene.Scene;
 
 public class objGlobals {
-    public static String version = "SORTER-FX 2.0.1";
+    public static String version = "SORTER-FX 2.0.2";
     public static int totalThreads=1;
     public static String runStep="";
     public static String scanditProgram="it.smaart.sorter.stock";
@@ -56,7 +57,8 @@ public class objGlobals {
     public static String notExpectedFolder;
     public static File allBlackFiles;
     public static File validTiffs;
-    public static String sorterExport;
+    public static String controlloQualita;
+    public static String fileEtichette;
     public static String outputFolder;
     public static Scene scene;
     public static String notPredictedLog;
@@ -73,6 +75,9 @@ public class objGlobals {
     public static AtomicBoolean shouldUpdateUrlFile = new AtomicBoolean(false);
     public static String apiOption;
     public static String partition;
+    public static AtomicInteger lastProgressBar = new AtomicInteger(0);
+    public static String ApiResponseTxt;
+    public static boolean onlyStockPdf = false;
 
     public static void variables(){
         logFolder=logFolder();
@@ -119,7 +124,10 @@ public class objGlobals {
         logGrayTxt =new File(logGray, "LOG_GRAY.txt").toString();
         pdfFolder=new File(outputFolder, "PDFS").toString();
         pdfNoStockFolder=new File(logFolder, "PDFS [paccomancante]").toString();
-        sorterExport=new File(outputFolder, "sorterExport_").toString();
+        controlloQualita=new File(outputFolder, "controllo_qualità_").toString();
+        fileEtichette=new File(outputFolder, "etichette_").toString();
+
+        ApiResponseTxt=new File(cacheFolder, "apiResponse.txt").toString();
 
         errorMap= new objErrorMap();
 

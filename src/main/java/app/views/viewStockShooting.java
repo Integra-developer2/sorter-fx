@@ -133,17 +133,15 @@ public class viewStockShooting implements Initializable{
         Integer row = null;
 
         switch (rowToSign){
-            case "row1":{
+            case "row1"->{
                 row = modelStockToShoot.row1();
                 StockFile.rowObject(row).lastBarcode = lastBarcode;
                 StockFile.rowObject(row).progEnd = String.valueOf(lastIndex);
-                break;
             }
-            case "row2":{
+            case "row2"->{
                 row = modelStockToShoot.row2();
                 StockFile.rowObject(row).firstBarcode = firstBarcode;
                 StockFile.rowObject(row).progStart = String.valueOf(firstIndex);
-                break;
             }
         }
 

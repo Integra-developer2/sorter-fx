@@ -1,6 +1,7 @@
 package app.tasks;
 
 import app.Routing;
+import app.classes.StockFile;
 import app.classes.UI;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -28,6 +29,7 @@ public class taskPdf {
         Thread t = new Thread( new Task<>() {
             @Override
             protected Void call() {
+                StockFile.writeNewFile();
                 pdf.start();
                 Routing.next();
                 return null;

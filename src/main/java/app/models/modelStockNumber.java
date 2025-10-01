@@ -46,5 +46,4 @@ public class modelStockNumber {
     public StringProperty I() { return I;}
     public StringProperty J() { return J;}
     public StringProperty K() { return K;}
-
 }

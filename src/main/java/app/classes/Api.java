@@ -2,6 +2,10 @@ package app.classes;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 import app.objects.objGlobals;
@@ -18,7 +22,25 @@ public class Api {
     public static String siteUrl = "https://integraa.net";
     final static String baseUrl = "/procedure/api/java_sorter/";
 
-    public static JsonObject prefix(List<String>barcodes) throws IOException {
+    public static JsonObject prefix(List<String> barcodes) throws IOException {
+        Path cacheFile = Paths.get(objGlobals.ApiResponseTxt);
+        if (Files.exists(cacheFile) && Files.size(cacheFile) > 0) {
+            try (BufferedReader br = Files.newBufferedReader(cacheFile, StandardCharsets.UTF_8)) {
+                JsonElement el = JsonParser.parseReader(br);
+                if (el.isJsonObject()) return el.getAsJsonObject();
+                throw new IOException("Cached JSON object expected");
+            }
+        }
+        JsonObject res = hitApi(barcodes);
+        Files.createDirectories(cacheFile.getParent());
+        try (BufferedWriter bw = Files.newBufferedWriter(cacheFile, StandardCharsets.UTF_8,
+                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+            bw.write(res.toString());
+        }
+        return res;
+    }
+
+    private static JsonObject hitApi(List<String>barcodes) throws IOException {
         String phpUrl = siteUrl + baseUrl + "get_prefix.php";
 
         Gson gson = new Gson();
@@ -45,6 +67,7 @@ public class Api {
             }
         }
     }
+
 
     public static void setApiUrl(){
         loadUrls();

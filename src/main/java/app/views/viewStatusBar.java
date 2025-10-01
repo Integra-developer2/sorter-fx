@@ -1,6 +1,6 @@
 package app.views;
 
-import app.objects.objProgressBar;
+import app.objects.objGlobals;
 import app.objects.objProgressItem;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -12,17 +12,32 @@ import javafx.scene.layout.VBox;
 import static app.functions.logError;
 
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class viewStatusBar implements Initializable {
     @FXML public VBox body;
     private ProgressIndicator spinner;
     private Label spinnerLabel;
 
+    public static ConcurrentHashMap<Integer,objProgressItem> objProgressItems = new ConcurrentHashMap<>();
+
     @FXML public void initialize(URL location, ResourceBundle resources) {}
 
+
+    public static void addProgressItems(objProgressItem pi,int count){
+        for(int id : objProgressItems.keySet()){
+            objProgressItem objProgressItem  = objProgressItems.get(id);
+            if(Objects.equals(id, pi.id) && objProgressItem.count<count){
+                pi.count = count;
+                objProgressItems.put(id, pi);
+            }
+        }
+    }
+
     public void refresh(objProgressItem pb, Integer count) {
-        objProgressBar.add(pb,count);
+        addProgressItems(pb,count);
     }
 
     public objProgressItem addProgress(String labelText,Integer total) {
@@ -37,7 +52,10 @@ public class viewStatusBar implements Initializable {
             body.getChildren().add(label);
         });
 
-        return new objProgressItem(progressBar,label,labelText,total);
+        int id = objGlobals.lastProgressBar.incrementAndGet();
+        objProgressItem pi = new objProgressItem(progressBar,label,labelText,total,0, id);
+        objProgressItems.put(id,pi);
+        return pi;
     }
 
     public void addSpinner(String labelText) {
