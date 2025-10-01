@@ -85,7 +85,6 @@ public class Routing {
     public static void next() {
         if(!objGlobals.stop){
             String currentStep = currentStep();
-            logError(currentStep,new Exception(currentStep));
             switch (currentStep) {
                 case "stepChoice" -> {
                     if(!UI.main.stepChoice.isSelected()){
