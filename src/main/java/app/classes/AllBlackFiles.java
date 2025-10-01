@@ -103,21 +103,24 @@ public class AllBlackFiles {
         hasData = true;
     }
 
+    private static String filename(String filename){
+        return filename.replace("-BACK","").replace("RAC-EST", "RAC_EST");
+    }
 
     public static String getBarcode(String filename){
-        String[] split = split(filename);
+        String[] split = split(filename(filename));
         return split[ 6 ];
     }
 
     public static String getIndex(String filename){
-        String[] blackPathSplit = split(filename);
+        String[] blackPathSplit = split(filename(filename));
         return blackPathSplit[ 9 ] + "-" + blackPathSplit[ 10 ];
     }
 
     private static String[] split(String fileStr){
         File file = new File(fileStr);
         String filename = file.getName();
-        filename = filename.replace("RAC-EST", "RAC_EST");
+        filename = filename(filename);
         return filename.split("-");
     }
 
