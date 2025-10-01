@@ -14,7 +14,7 @@ import app.classes.Api;
 import javafx.scene.Scene;
 
 public class objGlobals {
-    public static String version = "SORTER-FX 2.0.2";
+    public static String version = "SORTER-FX 2.0.3";
     public static int totalThreads=1;
     public static String runStep="";
     public static String scanditProgram="it.smaart.sorter.stock";
