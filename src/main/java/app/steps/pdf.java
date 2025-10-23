@@ -99,36 +99,52 @@ public class pdf {
 
         for (objStock obj : orderStock.values()) {
 
-            File outEtichette = new File(objGlobals.fileEtichette + ValidTiffs.barcodeObject.get(obj.firstBarcode).passo + ".csv");
+            var firstObj = ValidTiffs.barcodeObject.get(obj.firstBarcode);
+            var lastObj  = ValidTiffs.barcodeObject.get(obj.lastBarcode);
 
-            mkdir(outEtichette.getAbsolutePath());
+            String passo = (firstObj != null) ? firstObj.passo : null;
 
-            boolean needsHeader = !outEtichette.exists() || outEtichette.length() == 0;
-
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(outEtichette, true))) {
-                if (needsHeader) {
-                    bw.write("Agenzia Mittente;Cliente Mittente;Numero pacco;Quantita;Primo Barcode;Ultimo Barcode;Data Archiviazione;Tipologia;Note;Entity;Riferimento Scatolo");
-                    bw.newLine();
-                }
-                String stock = obj.logic.equals("lotto") ? obj.prefix + "/" + obj.stockNumber : obj.prefix + obj.stockNumber;
-                bw.write(
-                        obj.agency+";"+
-                                obj.group+";"+
-                                stock+";"+
-                                stockPdfs.get(obj.prefix).get(obj.stockNumber)+";"+
-                                obj.firstBarcode+";"+
-                                obj.lastBarcode+";"+
-                                LocalDate.now(java.time.ZoneId.of("Europe/Rome")).format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))+";"+
-                                obj.cppCode+";"+
-                                ";"+
-                                obj.agencyID+";"+
-                                obj.stockLabel
-                );
-                bw.newLine();
-                UI.controller.refresh(pi, ++count);
-            } catch (IOException e) {
-                printError(e, true);
+            if (passo == null || passo.isEmpty()) {
+                passo = (lastObj != null) ? lastObj.passo : null;
             }
+
+            if (passo == null || passo.isEmpty()) {
+                printError(new Exception("Not passo obj.firstBarcode:"+obj.firstBarcode+ " obj.lastBarcode:"+obj.lastBarcode), false);
+            }
+            else{
+                File outEtichette = new File(objGlobals.fileEtichette + passo + ".csv");
+
+                mkdir(outEtichette.getAbsolutePath());
+
+                boolean needsHeader = !outEtichette.exists() || outEtichette.length() == 0;
+
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter(outEtichette, true))) {
+                    if (needsHeader) {
+                        bw.write("Agenzia Mittente;Cliente Mittente;Numero pacco;Quantita;Primo Barcode;Ultimo Barcode;Data Archiviazione;Tipologia;Note;Entity;Riferimento Scatolo");
+                        bw.newLine();
+                    }
+                    String stock = obj.logic.equals("lotto") ? obj.prefix + "/" + obj.stockNumber : obj.prefix + obj.stockNumber;
+                    bw.write(
+                            obj.agency+";"+
+                                    obj.group+";"+
+                                    stock+";"+
+                                    stockPdfs.get(obj.prefix).get(obj.stockNumber)+";"+
+                                    obj.firstBarcode+";"+
+                                    obj.lastBarcode+";"+
+                                    LocalDate.now(java.time.ZoneId.of("Europe/Rome")).format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))+";"+
+                                    obj.cppCode+";"+
+                                    ";"+
+                                    obj.agencyID+";"+
+                                    obj.stockLabel
+                    );
+                    bw.newLine();
+                    UI.controller.refresh(pi, ++count);
+                } catch (IOException e) {
+                    printError(e, true);
+                }
+            }
+
+
         }
     }
 
@@ -143,31 +159,36 @@ public class pdf {
                     objValidTiff obj = ValidTiffs.barcodeObject.get(barcode);
                     String passo = new File(obj.file).getParentFile().getParentFile().getName();
 
-                    File out = new File(objGlobals.controlloQualita + passo + ".csv");
-
-                    mkdir(out.getAbsolutePath());
-
-                    boolean needsHeader = !out.exists() || out.length() == 0;
-
-                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(out, true))) {
-                        if (needsHeader) {
-                            bw.write("Barcode");
-                            bw.newLine();
-                        }
-                        bw.write(obj.barcode);
-                        bw.newLine();
-
-                        String alternativeBarcode = JobSorter.alternativeBarcode(obj.barcode);
-
-                        if(alternativeBarcode!=null && !alternativeBarcode.isEmpty()){
-                            bw.write(alternativeBarcode);
-                            bw.newLine();
-                        }
-
-                        UI.controller.refresh(pi, ++count);
+                    if(passo.isEmpty()){
+                        printError(new Exception("Not passo barcode:"+barcode+" obj.file:"+obj.file+" obj "+ obj), false);
                     }
-                    catch (IOException e) {
-                        printError(e, true);
+                    else{
+                        File out = new File(objGlobals.controlloQualita + passo + ".csv");
+
+                        mkdir(out.getAbsolutePath());
+
+                        boolean needsHeader = !out.exists() || out.length() == 0;
+
+                        try (BufferedWriter bw = new BufferedWriter(new FileWriter(out, true))) {
+                            if (needsHeader) {
+                                bw.write("Barcode");
+                                bw.newLine();
+                            }
+                            bw.write(obj.barcode);
+                            bw.newLine();
+
+                            String alternativeBarcode = JobSorter.alternativeBarcode(obj.barcode);
+
+                            if(alternativeBarcode!=null && !alternativeBarcode.isEmpty()){
+                                bw.write(alternativeBarcode);
+                                bw.newLine();
+                            }
+
+                            UI.controller.refresh(pi, ++count);
+                        }
+                        catch (IOException e) {
+                            printError(e, true);
+                        }
                     }
                 }
                 return null;
