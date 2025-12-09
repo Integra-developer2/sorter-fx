@@ -31,7 +31,28 @@ public class Api {
                 throw new IOException("Cached JSON object expected");
             }
         }
+
         JsonObject res = hitApi(barcodes);
+
+        for (Map.Entry<String, JsonElement> entry : res.entrySet()) {
+            JsonObject val = entry.getValue().getAsJsonObject();
+
+            if (val.has("auto_stock_number")) {
+                int oldValue = val.get("auto_stock_number").getAsInt();
+                val.addProperty("auto_stock_number", oldValue + 1);
+            }
+
+            for (Map.Entry<String, JsonElement> inner : val.entrySet()) {
+                if (inner.getValue().isJsonObject()) {
+                    JsonObject obj2 = inner.getValue().getAsJsonObject();
+                    if (obj2.has("auto_stock_number")) {
+                        int oldValue = obj2.get("auto_stock_number").getAsInt();
+                        obj2.addProperty("auto_stock_number", oldValue + 1);
+                    }
+                }
+            }
+        }
+
         Files.createDirectories(cacheFile.getParent());
         try (BufferedWriter bw = Files.newBufferedWriter(cacheFile, StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {

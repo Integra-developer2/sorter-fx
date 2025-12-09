@@ -213,17 +213,9 @@ public class stockNumber {
                 }
                 assert !entryStockNumber.isEmpty();
 
-                int intEntryStockNumber = Integer.parseInt(entryStockNumber);
+                Integer stockNumber = StockFile.prefixNumber.containsKey(entryValue.prefix) ? ( StockFile.prefixNumber.get(prefix) + 1 ): Integer.parseInt(entryStockNumber);
 
-                Integer stockNumber = intEntryStockNumber == 0 || intEntryStockNumber == 1 ? 1 : intEntryStockNumber + 1;
-
-                if(StockFile.prefixNumber.containsKey(entryValue.prefix)){
-                    stockNumber = StockFile.prefixNumber.get(prefix)+1;
-                    StockFile.prefixNumber.put(prefix,stockNumber);
-                }
-                else{
-                    StockFile.prefixNumber.put(prefix,stockNumber);
-                }
+                StockFile.prefixNumber.put(prefix,stockNumber);
 
                 objStock objStock = new objStock(
                     entry.getKey(),
