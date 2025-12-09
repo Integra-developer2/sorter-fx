@@ -215,7 +215,7 @@ public class stockNumber {
 
                 int intEntryStockNumber = Integer.parseInt(entryStockNumber);
 
-                Integer stockNumber = intEntryStockNumber + 1;
+                Integer stockNumber = intEntryStockNumber == 0 || intEntryStockNumber == 1 ? 1 : intEntryStockNumber + 1;
 
                 if(StockFile.prefixNumber.containsKey(entryValue.prefix)){
                     stockNumber = StockFile.prefixNumber.get(prefix)+1;
